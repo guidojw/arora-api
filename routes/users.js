@@ -1,10 +1,9 @@
 const express = require('express')
 const router = express.Router()
 
-const userController = require('../app/controllers/user.js')
-const validationResultController = require('../app/controllers/validation-result.js')
+const userController = require('../app/controllers/user')
+const validationResultController = require('../app/helpers/validation-result')
 
-router.get('/:userId/rank/:groupId', userController.validate('getRank'), validationResultController
-    .handleResult, userController.getRank)
+
 
 module.exports = router
