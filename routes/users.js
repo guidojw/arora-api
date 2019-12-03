@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
+const router = express.Router()
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+const userController = require('../app/controllers/user.js')
+const validationResultController = require('../app/controllers/validation-result.js')
 
-module.exports = router;
+router.get('/:userId/rank/:groupId', userController.validate('getRank'), validationResultController
+    .handleResult, userController.getRank)
+
+module.exports = router
