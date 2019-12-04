@@ -1,3 +1,6 @@
+const dotenv = require('dotenv')
+dotenv.config()
+
 const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
@@ -8,9 +11,6 @@ const usersRouter = require('./routes/users')
 const groupsRouter = require('./routes/groups')
 
 const app = express()
-
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'pug')
 
 app.use(logger('dev'))
 app.use(express.json())
@@ -26,10 +26,7 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (err, req, res, next) {
-    res.locals.message = err.message
-    res.locals.error = req.app.get('env') === 'development' ? err : {}
-    res.status(err.status || 500)
-    res.render('error')
+    res.send({"errors": [{"code": err.status, "message": err.message}]})
 })
 
 module.exports = app

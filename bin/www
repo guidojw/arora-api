@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 
+const dotenv = require('dotenv')
+dotenv.config()
+
 /**
  * Module dependencies.
  */
 
-const dotenv = require('dotenv');
 var app = require('../app')
 var debug = require('debug')('nsadmin-api:server')
 var http = require('http')
+const roblox = require('noblox.js')
 
 /**
  * Get port from environment and store in Express.
  */
 
-dotenv.config();
 var port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
@@ -26,6 +28,10 @@ var server = http.createServer(app)
 /**
  * Listen on provided port, on all network interfaces.
  */
+
+roblox.cookieLogin(process.env.ROBLOX_COOKIE)
+    .then(() => {})
+    .catch(err => console.log(err))
 
 server.listen(port)
 server.on('error', onError)
