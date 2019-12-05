@@ -1,12 +1,11 @@
-const dotenv = require('dotenv')
-dotenv.config()
-
 const { sendError } = require('../helpers/error')
+const models = require('../models')
 
 exports.authenticate = (req, res, next) => {
-    if (req.body.key === process.env.APP_KEY) {
+    const admin = models.Admin.findById(req.body.id)
+    if (admin && req.body.key === admin.key) {
         next()
     } else {
-        sendError(res, 401, "Incorrect authentication key")
+        sendError(res, 401, 'Incorrect authentication key')
     }
 }
