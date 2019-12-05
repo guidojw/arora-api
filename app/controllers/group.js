@@ -59,13 +59,10 @@ exports.promote = (req, res, next) => {
         .then(rank => {
             if (rank > 0) {
                 if (rank < 100) {
-                    roblox.promote(req.params.groupId, req.params.userId)
-                        .then((roles) => {
-                            if (roles.newRole.rank === 2) {
-                                exports.promote(req, res, next)
-                            }
-                            res.send(roles)
-                        }).catch(() => sendError(res, 503, 'Couldn\'t promote'))
+                    const change = rank === 1 ? 2 : 1
+                    roblox.changeRank(req.params.groupId, req.params.userId, change)
+                        .then((roles) => res.send(roles))
+                        .catch(() => sendError(res, 503, 'Couldn\'t promote'))
                 } else {
                     sendError(res, 403, 'Can\'t promote MRs or higher')
                 }
