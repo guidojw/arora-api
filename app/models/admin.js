@@ -11,9 +11,10 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     Admin.findById = async (id) => {
-        return Admin.findOne({
+        let admin = await Admin.findOne({
             where: { id: id },
         })
+        return admin
     }
 
     return Admin

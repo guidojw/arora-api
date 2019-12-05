@@ -35,20 +35,21 @@ exports.suspend = (req, res, next) => {
         .then((rank) => {
             if (rank < 200) {
                 roblox.setRank(req.params.groupId, req.params.userId, 2)
-                    .then(res.send)
-                    .catch(err => sendError(res, 401, err.message))
+                    .then(roles => res.send(roles))
+                    .catch(() => sendError(res, 503, 'Couldn\'t suspend'))
             } else {
-                sendError(res, 401, 'Can\'t suspend HRs')
+                sendError(res, 403, 'Can\'t suspend HRs')
             }
-        }).catch(err => sendError(res, 401, err.message))
+        }).catch(() => sendError(res, 503, 'Couldn\'t get rank'))
 }
 
 exports.getRank = (req, res, next) => {
     req.params.groupId = parseInt(req.params.groupId)
     req.params.userId = parseInt(req.params.userId)
+    console.log(req.params.groupId + ', ' + req.params.userId)
     roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        .then(res.send)
-        .catch(err => sendError(res, 401, err.message))
+        .then(rank => res.json(rank))
+        .catch(() => sendError(res, 5003, 'Couldn\'t get rank'))
 }
 
 exports.promote = (req, res, next) => {
@@ -56,18 +57,20 @@ exports.promote = (req, res, next) => {
     req.params.userId = parseInt(req.params.userId)
     roblox.getRankInGroup(req.params.groupId, req.params.userId)
         .then(rank => {
-            if (rank < 100) {
-                roblox.promote(req.params.groupId, req.params.userId)
-                    .then((roles) => {
-                        if (roles.newRole.rank == 2) {
-                            exports.promote(req, res, next)
-                        }
-                        res.send(roles)
-                    }).catch((err) => {
-                        sendError(res, 401, err.message)
-                })
+            if (rank > 0) {
+                if (rank < 100) {
+                    roblox.promote(req.params.groupId, req.params.userId)
+                        .then((roles) => {
+                            if (roles.newRole.rank === 2) {
+                                exports.promote(req, res, next)
+                            }
+                            res.send(roles)
+                        }).catch(() => sendError(res, 503, 'Couldn\'t promote'))
+                } else {
+                    sendError(res, 403, 'Can\'t promote MRs or higher')
+                }
             } else {
-                sendError(res, 401, 'Can\'t promote MRs or higher')
+                sendError(res, 403,'Can only promote group members')
             }
-        }).catch(err => sendError(res, 401, err.message))
+        }).catch(() => sendError(res, 503, 'Couldn\'t get rank'))
 }

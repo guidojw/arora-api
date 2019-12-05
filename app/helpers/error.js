@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator')
 
-exports.handleValidationResult = (res, req, next) => {
+exports.handleValidationResult = (req, res, next) => {
     const errors = validationResult(req)
     if (errors.isEmpty()) {
         return next()
