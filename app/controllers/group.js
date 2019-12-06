@@ -1,9 +1,10 @@
 const { param, body } = require('express-validator')
 const roblox = require('noblox.js')
 const { sendError } = require('../helpers/error')
-const DiscordMessageJob = require('../jobs/discord-message-job')
 const createError = require('http-errors')
 const pluralize = require('pluralize')
+
+const DiscordMessageJob = require('../jobs/discord-message-job')
 
 exports.validate = method => {
     switch (method) {
@@ -62,7 +63,7 @@ exports.getRank = async (req, res, next) => {
 exports.promote = async (req, res, next) => {
     try {
         const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        if (rank == 0) throw createError(503, 'Can only promote group members')
+        if (rank == 0) throw createError(403, 'Can only promote group members')
         if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
         const username = await roblox.getUsernameFromId(req.params.userId)
         const roles = await roblox.changeRank(req.params.groupId, req.params.userId, rank === 1 ? 2 : 1)
