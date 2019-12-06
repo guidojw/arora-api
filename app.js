@@ -1,11 +1,12 @@
-const dotenv = require('dotenv')
-dotenv.config()
+require('dotenv').config()
 
 const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
+const { sendError } = require('./app/helpers/error')
+const { authenticate } = require('./app/controllers/auth')
 
 const groupsRouter = require('./routes/groups')
 
@@ -16,6 +17,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(authenticate)
 
 app.use('/groups', groupsRouter)
 
@@ -24,7 +26,7 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (err, req, res, next) {
-    res.send({"errors": [{"code": err.status, "message": err.message}]})
+    sendError(res, err.status || 500, err.message)
 })
 
 module.exports = app

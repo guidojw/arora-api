@@ -1,6 +1,9 @@
 const { param, body } = require('express-validator')
 const roblox = require('noblox.js')
 const { sendError } = require('../helpers/error')
+const DiscordMessageJob = require('../jobs/discord-message-job')
+const createError = require('http-errors')
+const pluralize = require('pluralize')
 
 exports.validate = method => {
     switch (method) {
@@ -9,7 +12,10 @@ exports.validate = method => {
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
                 body('id').exists().isNumeric(),
-                body('key').exists().isString()
+                body('key').exists().isString(),
+                body('byUserId').exists().isNumeric(),
+                body('reason').exists().isString(),
+                body('duration').exists().isNumeric()
             ]
         case 'getRank':
             return [
@@ -23,51 +29,53 @@ exports.validate = method => {
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
                 body('id').exists().isNumeric(),
-                body('key').exists().isString()
+                body('key').exists().isString(),
+                body('byUserId').optional().isNumeric()
             ]
     }
 }
 
-exports.suspend = (req, res, next) => {
-    req.params.groupId = parseInt(req.params.groupId)
-    req.params.userId = parseInt(req.params.userId)
-    roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        .then((rank) => {
-            if (rank < 200) {
-                roblox.setRank(req.params.groupId, req.params.userId, 2)
-                    .then(roles => res.send(roles))
-                    .catch(() => sendError(res, 503, 'Couldn\'t suspend'))
-            } else {
-                sendError(res, 403, 'Can\'t suspend HRs')
-            }
-        }).catch(() => sendError(res, 503, 'Couldn\'t get rank'))
+exports.suspend = async (req, res, next) => {
+    try {
+        const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
+        if (rank >= 200) throw createError(403, 'Can\'t suspend HRs')
+        const username = await roblox.getUsernameFromId(req.params.userId)
+        const byUsername = await roblox.getUsernameFromId(req.params.byUserId)
+        const roles = roblox.setRank(req.params.groupId, req.params.userId)
+        new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for ` +
+            `**${req.body.duration} ${pluralize(req.body.duration, 'day')}** with reason "*${req.body.reason}*"`)
+        res.send(roles)
+    } catch (err) {
+        sendError(res, err.status || 500, err.message)
+    }
 }
 
-exports.getRank = (req, res, next) => {
-    req.params.groupId = parseInt(req.params.groupId)
-    req.params.userId = parseInt(req.params.userId)
-    console.log(req.params.groupId + ', ' + req.params.userId)
-    roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        .then(rank => res.json(rank))
-        .catch(() => sendError(res, 5003, 'Couldn\'t get rank'))
+exports.getRank = async (req, res, next) => {
+    try {
+        const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
+        res.json(rank)
+    } catch (err) {
+        sendError(res, err.status || 500, err.message)
+    }
 }
 
-exports.promote = (req, res, next) => {
-    req.params.groupId = parseInt(req.params.groupId)
-    req.params.userId = parseInt(req.params.userId)
-    roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        .then(rank => {
-            if (rank > 0) {
-                if (rank < 100) {
-                    const change = rank === 1 ? 2 : 1
-                    roblox.changeRank(req.params.groupId, req.params.userId, change)
-                        .then((roles) => res.send(roles))
-                        .catch(() => sendError(res, 503, 'Couldn\'t promote'))
-                } else {
-                    sendError(res, 403, 'Can\'t promote MRs or higher')
-                }
-            } else {
-                sendError(res, 403,'Can only promote group members')
-            }
-        }).catch(() => sendError(res, 503, 'Couldn\'t get rank'))
+exports.promote = async (req, res, next) => {
+    try {
+        const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
+        if (rank == 0) throw createError(503, 'Can only promote group members')
+        if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
+        const username = await roblox.getUsernameFromId(req.params.userId)
+        const roles = await roblox.changeRank(req.params.groupId, req.params.userId, rank === 1 ? 2 : 1)
+        if (req.body.byUserId) {
+            const byUsername = await roblox.getUsernameFromId(req.body.byUserId)
+            new DiscordMessageJob().perform('log', `**${byUsername}** promoted **${username}** from ` +
+                `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
+        } else {
+            new DiscordMessageJob().perform('log', `Promoted **${username}** from ` +
+                `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
+        }
+        res.send(roles)
+    } catch (err) {
+        sendError(res, err.status || 500, err.message)
+    }
 }

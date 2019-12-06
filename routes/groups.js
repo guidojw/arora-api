@@ -3,16 +3,16 @@ const router = express.Router()
 
 const groupController = require('../app/controllers/group')
 
-const authenticator = require('../app/controllers/authenticator')
 const { handleValidationResult } = require('../app/helpers/error')
+const { parseParams } = require('../app/helpers/params')
 
-router.post('/:groupId/suspend/:userId', authenticator.authenticate, groupController.validate('suspend'),
-    handleValidationResult, groupController.suspend)
+router.post('/:groupId/suspend/:userId', groupController.validate('suspend'), handleValidationResult,
+    parseParams, groupController.suspend)
 
-router.get('/:groupId/rank/:userId', authenticator.authenticate, groupController.validate('getRank'),
-    handleValidationResult, groupController.getRank)
+router.get('/:groupId/rank/:userId', groupController.validate('getRank'), handleValidationResult, parseParams,
+    groupController.getRank)
 
-router.post('/:groupId/promote/:userId', authenticator.authenticate, groupController.validate('promote'),
-    handleValidationResult, groupController.promote)
+router.post('/:groupId/promote/:userId', groupController.validate('promote'), handleValidationResult,
+    parseParams, groupController.promote)
 
 module.exports = router

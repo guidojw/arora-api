@@ -5,11 +5,13 @@ exports.handleValidationResult = (req, res, next) => {
     if (errors.isEmpty()) return next()
     const extractedErrors = []
     errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }))
-    return res.status(422).json({
-        errors: extractedErrors
-    })
+    exports.sendErrors(res, 422, extractedErrors)
 }
 
 exports.sendError = (res, statusCode, message) => {
-    res.status(statusCode).send({"error": message})
+    exports.sendErrors(res, statusCode, [{"message": message}])
+}
+
+exports.sendErrors = (res, statusCode, errors) => {
+    res.status(statusCode).send({"errors": errors})
 }

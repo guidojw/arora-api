@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-const dotenv = require('dotenv')
-dotenv.config()
+require('dotenv').config()
 
 const app = require('../app')
 const debug = require('debug')('nsadmin-api:server')
