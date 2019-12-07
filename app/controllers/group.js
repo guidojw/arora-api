@@ -41,7 +41,7 @@ exports.suspend = async (req, res, next) => {
         const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
         if (rank >= 200) throw createError(403, 'Can\'t suspend HRs')
         const username = await roblox.getUsernameFromId(req.params.userId)
-        const byUsername = await roblox.getUsernameFromId(req.params.byUserId)
+        const byUsername = await roblox.getUsernameFromId(req.body.byUserId)
         const roles = roblox.setRank(req.params.groupId, req.params.userId)
         new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for ` +
             `**${req.body.duration} ${pluralize(req.body.duration, 'day')}** with reason "*${req.body.reason}*"`)
