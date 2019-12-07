@@ -1,3 +1,4 @@
+'use strict'
 const { sendError } = require('../helpers/error')
 const models = require('../models')
 

@@ -1,3 +1,4 @@
+'use strict'
 const { validationResult } = require('express-validator')
 
 exports.handleValidationResult = (req, res, next) => {

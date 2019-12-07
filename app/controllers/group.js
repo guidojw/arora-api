@@ -1,3 +1,4 @@
+'use strict'
 const { param, body } = require('express-validator')
 const roblox = require('noblox.js')
 const { sendError } = require('../helpers/error')
