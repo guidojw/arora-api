@@ -16,7 +16,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(authenticate)
 
-app.use('/groups', groupsRouter)
+app.use('/v1/groups', groupsRouter)
 
 app.use(function (req, res, next) {
     next(createError(404))
