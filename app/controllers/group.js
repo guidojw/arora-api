@@ -22,9 +22,9 @@ exports.validate = method => {
         case 'getRank':
             return [
                 param('groupId').isNumeric(),
-                param('userId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString()
+                param('userId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
             ]
         case 'promote':
             return [

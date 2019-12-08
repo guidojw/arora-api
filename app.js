@@ -14,7 +14,7 @@ const app = express()
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-app.use(authenticate)
+//app.use(authenticate)
 
 app.use('/v1/groups', groupsRouter)
 
