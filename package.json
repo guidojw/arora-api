@@ -21,7 +21,7 @@
     "debug": "2.6.9",
     "discord.js": "11.5.1",
     "dotenv": "8.2.0",
-    "express": "4.16.1",
+    "express": "4.17.1",
     "express-json-views": "0.2.0",
     "express-validator": "6.3.0",
     "http-errors": "1.6.3",
