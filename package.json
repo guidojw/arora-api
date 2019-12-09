@@ -18,7 +18,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "debug": "2.6.9",
+    "debug": "4.1.1",
     "discord.js": "11.5.1",
     "dotenv": "8.2.0",
     "express": "4.17.1",
