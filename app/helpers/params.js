@@ -1,7 +1,7 @@
 'use strict'
-exports.parseParams = (req, res, next) => {
+exports.parseParams = async (req, res, next) => {
     for (const param in req.params) {
-        req.params[param] = parseInt(req.params[param])
+        req.params[param] = await parseInt(req.params[param])
     }
     next()
 }

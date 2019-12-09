@@ -1,14 +1,17 @@
 'use strict'
-const { sendError } = require('../helpers/error')
+const createError = require('http-errors')
+
 const models = require('../models')
 
-exports.authenticate = (req, res, next) => {
-    models.Admin.findById(req.body.id)
-        .then(admin => {
-            if (admin !== undefined && req.body.key === admin.key) {
-                next()
-            } else {
-                sendError(res, 401, 'Incorrect authentication key')
-            }
-        })
+exports.authenticate = async (req, res, next) => {
+    try {
+        const admin = await models.Admin.findById(req.body.id)
+        if (admin !== undefined && req.body.key === admin.key) {
+            next()
+        } else {
+            next(createError(401, 'Incorrect authentication key'))
+        }
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
 }

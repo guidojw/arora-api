@@ -5,7 +5,7 @@ const createError = require('http-errors')
 const express = require('express')
 const logger = require('morgan')
 const { sendError } = require('./app/helpers/error')
-const { authenticate } = require('./app/controllers/auth')
+//const { authenticate } = require('./app/controllers/auth')
 
 const groupsRouter = require('./routes/groups')
 
@@ -18,11 +18,11 @@ app.use(express.urlencoded({extended: false}))
 
 app.use('/v1/groups', groupsRouter)
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     next(createError(404))
 })
 
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
     sendError(res, err.status || 500, err.message)
 })
 
