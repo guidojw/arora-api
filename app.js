@@ -8,6 +8,7 @@ const { sendError } = require('./app/helpers/error')
 //const { authenticate } = require('./app/controllers/auth')
 
 const groupsRouter = require('./routes/groups')
+const usersRouter = require('./routes/users')
 
 const app = express()
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({extended: false}))
 //app.use(authenticate)
 
 app.use('/v1/groups', groupsRouter)
+app.use('/v1/users', usersRouter)
 
 app.use((req, res, next) => {
     next(createError(404))

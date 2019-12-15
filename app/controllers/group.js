@@ -39,6 +39,13 @@ exports.validate = method => {
                 // body('id').exists().isNumeric(),
                 // body('key').exists().isString()
             ]
+        case 'getRole':
+            return [
+                param('groupId').isNumeric(),
+                param('userId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
     }
 }
 
@@ -90,7 +97,16 @@ exports.promote = async (req, res, next) => {
 exports.getShout = async (req, res, next) => {
     try {
         const shout = await roblox.getShout(req.params.groupId)
-        res.json(shout.body)
+        res.json(shout)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getRole = async (req, res, next) => {
+    try {
+        const role = await roblox.getRoleInGroup(req.params.groupId, req.params.userId)
+        res.json(role)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }

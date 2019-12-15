@@ -20,4 +20,7 @@ router.post('/:groupId/promote/:userId', groupController.validate('promote'), ha
 router.get('/:groupId/shout', groupController.validate('getShout'), handleValidationResult, parseParams,
     groupController.getShout)
 
+router.get('/:groupId/role/:userId', groupController.validate('getRole'), handleValidationResult, parseParams,
+    groupController.getRole)
+
 module.exports = router
