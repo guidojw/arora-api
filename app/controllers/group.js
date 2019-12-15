@@ -105,7 +105,7 @@ exports.getShout = async (req, res, next) => {
 
 exports.getRole = async (req, res, next) => {
     try {
-        const role = await roblox.getRoleInGroup(req.params.groupId, req.params.userId)
+        const role = await roblox.getRankNameInGroup(req.params.groupId, req.params.userId)
         res.json(role)
     } catch (err) {
         next(createError(err.status || 500, err.message))
