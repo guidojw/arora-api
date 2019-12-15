@@ -6,7 +6,7 @@ const models = require('../models')
 exports.authenticate = async (req, res, next) => {
     try {
         const admin = await models.Admin.findById(req.body.id)
-        if (admin !== undefined && req.body.key === admin.key) {
+        if (admin !== null && req.body.key === admin.key) {
             next()
         } else {
             next(createError(401, 'Incorrect authentication key'))

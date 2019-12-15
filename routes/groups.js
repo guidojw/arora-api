@@ -17,4 +17,7 @@ router.get('/:groupId/rank/:userId', groupController.validate('getRank'), handle
 router.post('/:groupId/promote/:userId', groupController.validate('promote'), handleValidationResult,
     authenticate, parseParams, groupController.promote)
 
+router.get('/:groupId/shout', groupController.validate('getShout'), handleValidationResult, parseParams,
+    groupController.getShout)
+
 module.exports = router

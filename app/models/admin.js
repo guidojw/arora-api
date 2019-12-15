@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
                 attributes: ['key']
             })
         } catch (err) {
-            return undefined
+            return null
         }
     }
 

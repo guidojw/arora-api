@@ -33,6 +33,12 @@ exports.validate = method => {
                 body('key').exists().isString(),
                 body('byUserId').optional().isNumeric()
             ]
+        case 'getShout':
+            return [
+                param('groupId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
     }
 }
 
@@ -76,6 +82,15 @@ exports.promote = async (req, res, next) => {
                 `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
         }
         res.send(roles)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getShout = async (req, res, next) => {
+    try {
+        const shout = await roblox.getShout(req.params.groupId)
+        res.json(shout.body)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
