@@ -6,6 +6,9 @@ const app = require('../app')
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
 const roblox = require('noblox.js')
+const cron = require('node-cron')
+
+const cronConfig = require('../config/cron')
 
 const models = require('../app/models')
 
@@ -25,6 +28,15 @@ models.sequelize.sync()
         server.on('error', onError)
         server.on('listening', onListening)
     })
+
+for (const job of Object.values(cronConfig)) {
+    if (job.hasOwnProperty('args')) {
+        const [...args] = job.args
+        cron.schedule(job.cron, () => new job.class().perform(...args), job.arguments)
+    } else {
+        cron.schedule(job.cron, new job.class().perform, job.arguments)
+    }
+}
 
 function normalizePort(val) {
     const port = parseInt(val, 10)
