@@ -6,6 +6,8 @@ const pluralize = require('pluralize')
 
 const DiscordMessageJob = require('../jobs/discord-message-job')
 
+const trelloController = require('./trello')
+
 exports.validate = method => {
     switch (method) {
         case 'suspend':
@@ -46,6 +48,18 @@ exports.validate = method => {
                 // body('id').exists().isNumeric(),
                 // body('key').exists().isString()
             ]
+        case 'getSuspensions':
+            return [
+                param('groupId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
+        case 'getTrainings':
+            return [
+                param('groupId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
     }
 }
 
@@ -76,7 +90,8 @@ exports.getRank = async (req, res, next) => {
 exports.promote = async (req, res, next) => {
     try {
         const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        if (rank == 0) next(createError(403, 'Can only promote group members'))
+        console.log(req.params.groupId, req.params.userId)
+        if (rank === 0) next(createError(403, 'Can only promote group members'))
         if (rank >= 100) next(createError(403, 'Can\'t promote MRs or higher'))
         const username = await roblox.getUsernameFromId(req.params.userId)
         const roles = await roblox.changeRank(req.params.groupId, req.params.userId, rank === 1 ? 2 : 1)
@@ -107,6 +122,28 @@ exports.getRole = async (req, res, next) => {
     try {
         const role = await roblox.getRankNameInGroup(req.params.groupId, req.params.userId)
         res.json(role)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getSuspensions = async (req, res, next) => {
+    try {
+        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+        const listId = await trelloController.getIdFromListName(boardId,'Current')
+        const cards = await trelloController.getCards(listId, {fields: 'desc'})
+        res.json(cards)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getTrainings = async (req, res, next) => {
+    try {
+        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+        const listId = await trelloController.getIdFromListName(boardId,'Scheduled')
+        const trainings = await trelloController.getCards(listId, {fields: 'desc'})
+        res.json(trainings)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }

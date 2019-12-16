@@ -23,4 +23,10 @@ router.get('/:groupId/shout', groupController.validate('getShout'), handleValida
 router.get('/:groupId/role/:userId', groupController.validate('getRole'), handleValidationResult, parseParams,
     groupController.getRole)
 
+router.get('/:groupId/suspensions', groupController.validate('getSuspensions'), handleValidationResult,
+    parseParams, groupController.getSuspensions)
+
+router.get('/:groupId/trainings', groupController.validate('getTrainings'), handleValidationResult,
+    parseParams, groupController.getTrainings)
+
 module.exports = router

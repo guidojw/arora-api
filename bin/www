@@ -19,7 +19,7 @@ const server = http.createServer(app)
 
 roblox.cookieLogin(process.env.ROBLOX_COOKIE)
     .then(() => console.log('Roblox account logged in!'))
-    .catch(err => console.log(err))
+    .catch(err => console.error(err.message))
 
 models.sequelize.sync()
     .then(() => {
@@ -28,13 +28,14 @@ models.sequelize.sync()
         server.on('error', onError)
         server.on('listening', onListening)
     })
+    .catch((err => { console.error(err.message)}))
 
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
         const [...args] = job.args
-        cron.schedule(job.cron, () => new job.class().perform(...args), job.arguments)
+        cron.schedule(job.cron, () => new job.class().perform(...args))
     } else {
-        cron.schedule(job.cron, new job.class().perform, job.arguments)
+        cron.schedule(job.cron, new job.class().perform)
     }
 }
 
