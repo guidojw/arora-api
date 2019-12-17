@@ -8,7 +8,7 @@ const { handleValidationResult } = require('../app/helpers/error')
 const { parseParams } = require('../app/helpers/params')
 const { authenticate } = require('../app/controllers/auth')
 
-router.post('/:groupId/suspend/:userId', groupController.validate('suspend'), handleValidationResult,
+router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult,
     authenticate, parseParams, groupController.suspend)
 
 router.get('/:groupId/rank/:userId', groupController.validate('getRank'), handleValidationResult, parseParams,
@@ -28,5 +28,8 @@ router.get('/:groupId/suspensions', groupController.validate('getSuspensions'), 
 
 router.get('/:groupId/trainings', groupController.validate('getTrainings'), handleValidationResult,
     parseParams, groupController.getTrainings)
+
+router.post('/:groupId/trainings', groupController.validate('hostTraining'), handleValidationResult,
+    authenticate, parseParams, groupController.hostTraining)
 
 module.exports = router
