@@ -67,6 +67,12 @@ exports.validate = method => {
                 body('key').exists().isString(),
                 body('by').exists().isNumeric()
             ]
+        case 'getExiles':
+            return [
+                param('groupId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
     }
 }
 
@@ -176,6 +182,23 @@ exports.getTrainings = async (req, res, next) => {
 exports.hostTraining = async (req, res, next) => {
     try {
 
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getExiles = async (req, res, next) => {
+    try {
+        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+        const listId = await trelloController.getIdFromListName(boardId,'Exiled')
+        const cards = await trelloController.getCards(listId, {fields: 'name'})
+        let exiles = []
+        for (const card of cards) {
+            const exile = {}
+            exile.userId = parseInt(card.name)
+            await exiles.push(exile)
+        }
+        res.json(exiles)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }

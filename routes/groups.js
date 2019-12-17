@@ -32,4 +32,7 @@ router.get('/:groupId/trainings', groupController.validate('getTrainings'), hand
 router.post('/:groupId/trainings', groupController.validate('hostTraining'), handleValidationResult,
     authenticate, parseParams, groupController.hostTraining)
 
+router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult,
+    parseParams, groupController.getExiles)
+
 module.exports = router
