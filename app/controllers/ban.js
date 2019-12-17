@@ -21,7 +21,7 @@ exports.validate = method => {
 exports.getBans = async (req, res, next) => {
     try {
         const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId,'Banned')
+        const listId = await trelloController.getIdFromListName(boardId, 'Banned')
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         let bans = []
         for (const card of cards) {

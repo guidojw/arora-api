@@ -142,7 +142,7 @@ exports.getRole = async (req, res, next) => {
 exports.getSuspensions = async (req, res, next) => {
     try {
         const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId,'Current')
+        const listId = await trelloController.getIdFromListName(boardId, 'Current')
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         let suspensions = []
         for (const card of cards) {
@@ -162,7 +162,7 @@ exports.getSuspensions = async (req, res, next) => {
 exports.getTrainings = async (req, res, next) => {
     try {
         const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
-        const listId = await trelloController.getIdFromListName(boardId,'Scheduled')
+        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         let trainings = []
         for (const card of cards) {
@@ -190,7 +190,7 @@ exports.hostTraining = async (req, res, next) => {
 exports.getExiles = async (req, res, next) => {
     try {
         const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId,'Exiled')
+        const listId = await trelloController.getIdFromListName(boardId, 'Exiled')
         const cards = await trelloController.getCards(listId, {fields: 'name'})
         let exiles = []
         for (const card of cards) {
