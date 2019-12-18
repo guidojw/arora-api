@@ -16,9 +16,10 @@ exports.validate = method => {
                 body('id').exists().isNumeric(),
                 body('key').exists().isString(),
                 body('userId').exists().isNumeric(),
-                body('byUserId').exists().isNumeric(),
+                body('by').exists().isNumeric(),
                 body('reason').exists().isString(),
-                body('duration').exists().isNumeric()
+                body('duration').exists().isNumeric(),
+                body('rankback').exists().isNumeric()
             ]
         case 'getRank':
             return [
@@ -33,7 +34,7 @@ exports.validate = method => {
                 param('userId').isNumeric(),
                 body('id').exists().isNumeric(),
                 body('key').exists().isString(),
-                body('byUserId').optional().isNumeric()
+                body('by').optional().isNumeric()
             ]
         case 'getShout':
             return [
@@ -65,7 +66,10 @@ exports.validate = method => {
                 param('groupId').isNumeric(),
                 body('id').exists().isNumeric(),
                 body('key').exists().isString(),
-                body('by').exists().isNumeric()
+                body('by').exists().isString(),
+                body('type').exists().isString(),
+                body('date').exists().isString(),
+                body('specialnotes').optional().isString()
             ]
         case 'getExiles':
             return [
@@ -82,7 +86,7 @@ exports.suspend = async (req, res, next) => {
         if (rank >= 200) return next(createError(403, 'Can\'t suspend HRs'))
         const [username, byUsername] = await Promise.all(roblox.getUsernameFromId(req.params.userId), roblox
             .getUsernameFromId(req.body.byUserId))
-        const roles = await roblox.setRank(req.params.groupId, req.params.userId)
+        const roles = await roblox.setRank(req.params.groupId, req.params.userId, 2)
         new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for ` +
             `**${req.body.duration} ${pluralize(req.body.duration, 'day')}** with reason "*${req.body.reason}*"`)
         res.send(roles)
@@ -108,7 +112,7 @@ exports.promote = async (req, res, next) => {
         const username = await roblox.getUsernameFromId(req.params.userId)
         const roles = await roblox.changeRank(req.params.groupId, req.params.userId, rank === 1 ? 2 : 1)
         if (req.body.byUserId) {
-            const byUsername = await roblox.getUsernameFromId(req.body.byUserId)
+            const byUsername = await roblox.getUsernameFromId(req.body.by)
             new DiscordMessageJob().perform('log', `**${byUsername}** promoted **${username}** from ` +
                 `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
         } else {
