@@ -77,6 +77,20 @@ exports.validate = method => {
                 // body('id').exists().isNumeric(),
                 // body('key').exists().isString()
             ]
+        case 'getSuspension':
+            return [
+                param('groupId').isNumeric(),
+                param('userId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
+        case 'getTraining':
+            return [
+                param('groupId').isNumeric(),
+                param('trainingId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString()
+            ]
     }
 }
 
@@ -203,6 +217,50 @@ exports.getExiles = async (req, res, next) => {
             await exiles.push(exile)
         }
         res.json(exiles)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getSuspension = async (req, res, next) => {
+    try {
+        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+        const listId = await trelloController.getIdFromListName(boardId, 'Current')
+        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+        for (const card of cards) {
+            const userId = parseInt(card.name)
+            if (userId === req.params.userId) {
+                const suspension = {}
+                suspension.userId = userId
+                for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
+                    suspension[key] = value
+                }
+                res.json(suspension)
+            }
+        }
+        res.json(null)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getTraining = async (req, res, next) => {
+    try {
+        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+        for (const card of cards) {
+            const trainingId = parseInt(card.name)
+            if (trainingId === req.params.trainingId) {
+                const training = {}
+                training.id = trainingId
+                for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
+                    training[key] = value
+                }
+                res.json(training)
+            }
+        }
+        res.json(null)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }

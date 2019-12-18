@@ -2,7 +2,6 @@
 const { param, body } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
-const pluralize = require('pluralize')
 
 const DiscordMessageJob = require('../jobs/discord-message-job')
 

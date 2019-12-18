@@ -8,7 +8,7 @@ const { handleValidationResult } = require('../app/helpers/error')
 const { parseParams } = require('../app/helpers/params')
 const { authenticate } = require('../app/controllers/auth')
 
-router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult,
+router.put('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult,
     authenticate, parseParams, groupController.suspend)
 
 router.get('/:groupId/rank/:userId', groupController.validate('getRank'), handleValidationResult, parseParams,
@@ -32,7 +32,13 @@ router.get('/:groupId/trainings', groupController.validate('getTrainings'), hand
 router.post('/:groupId/trainings', groupController.validate('hostTraining'), handleValidationResult,
     authenticate, parseParams, groupController.hostTraining)
 
-router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult,
-    parseParams, groupController.getExiles)
+router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult, parseParams,
+    groupController.getExiles)
+
+router.get('/:groupId/suspensions/:userId', groupController.validate('getSuspension'), handleValidationResult,
+    parseParams, groupController.getSuspension)
+
+router.get('/:groupId/trainings/:trainingId', groupController.validate('getTraining'), handleValidationResult,
+    parseParams, groupController.getTraining)
 
 module.exports = router
