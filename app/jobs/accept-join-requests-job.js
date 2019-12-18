@@ -16,7 +16,7 @@ class AcceptJoinRequestsJob {
                 await exiles.push(parseInt(card.name))
             }
             const requests = await roblox.getJoinRequests(groupId)
-            for (request of requests) {
+            for (const request of requests) {
                 const userId = await roblox.getIdFromUsername(request.username)
                 if (exiles.includes(userId)) {
                     await roblox.handleJoinRequestId(groupId, request.requestId, false)
