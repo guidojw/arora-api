@@ -93,13 +93,19 @@ exports.validate = method => {
                 // body('id').exists().isNumeric(),
                 // body('key').exists().isString()
             ]
+        case 'shout':
+            return [
+                param('groupId').isNumeric(),
+                body('id').exists().isNumeric(),
+                body('key').exists().isString(),
+                body('by').exists().isNumeric(),
+                body('shout').optional().isNumeric()
+            ]
     }
 }
 
 exports.suspend = async (req, res, next) => {
     try {
-        const byRank = await roblox.getRankInGroup(req.params.groupId, req.body.by)
-        if (byRank < 200) return next(createError(401, 'Suspender is not HR'))
         const rank = await roblox.getRankInGroup(req.params.groupId, req.body.userId)
         if (rank === 2) return next(createError(409, 'User is already suspended'))
         if (rank >= 200 || rank === 99 || rank === 103) return next(createError(403, 'User is unsuspendable'))
@@ -284,6 +290,21 @@ exports.getTraining = async (req, res, next) => {
             }
         }
         res.json(null)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.shout = async (req, res, next) => {
+    try {
+        const byUsername = await roblox.getUsernameFromId(req.body.by)
+        const shout = (await roblox.shout(req.params.groupId, req.body.shout ? req.body.shout : '')).data
+        if (shout.body === '') {
+            new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
+        } else {
+            new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${shout.body}"*`)
+        }
+        res.json(shout)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
