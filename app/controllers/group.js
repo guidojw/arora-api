@@ -17,7 +17,7 @@ exports.validate = method => {
                 param('groupId').isNumeric(),
                 body('id').exists().isNumeric(),
                 body('key').exists().isString(),
-                body('userId').isNumeric(),
+                body('userId').exists().isNumeric(),
                 body('by').exists().isNumeric(),
                 body('reason').exists().isString(),
                 body('duration').exists().isNumeric(),
@@ -112,6 +112,7 @@ exports.suspend = async (req, res, next) => {
         if (rank > 0 && rank !== 2) {
             await roblox.setRank(req.params.groupId, req.body.userId, 2)
         }
+        console.log('0')
         await trelloController.postCard({
             idList: listId,
             name: req.body.userId.toString(),
@@ -124,11 +125,15 @@ exports.suspend = async (req, res, next) => {
                 at: timeUtils.getUnix()
             })
         })
+        console.log('1')
         const [username, byUsername] = await Promise.all(roblox.getUsernameFromId(req.body.userId), roblox
             .getUsernameFromId(req.body.by))
+        console.log('2')
         const days = req.body.duration / 86400
+        console.log('3')
         new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for ` +
             `**${days} ${pluralize('day', days)}** with reason "*${req.body.reason}*"`)
+        console.log('4')
         res.sendStatus(200)
     } catch (err) {
         next(createError(err.status || 500, err.message))
