@@ -8,7 +8,7 @@ const { handleValidationResult } = require('../app/helpers/error')
 const { parseParams } = require('../app/helpers/params')
 const { authenticate } = require('../app/controllers/auth')
 
-router.put('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult,
+router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult,
     authenticate, parseParams, groupController.suspend)
 
 router.get('/:groupId/rank/:userId', groupController.validate('getRank'), handleValidationResult, parseParams,

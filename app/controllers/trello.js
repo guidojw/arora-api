@@ -43,3 +43,12 @@ exports.getCards = (listId, options) => {
         })
     })
 }
+
+exports.postCard = options => {
+    return new Promise((resolve, reject) => {
+        trello.post('/1/cards', options, (err, card) => {
+            if (err) reject(err)
+            resolve(card)
+        })
+    })
+}
