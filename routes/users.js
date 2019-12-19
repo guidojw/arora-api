@@ -11,4 +11,7 @@ const { authenticate } = require('../app/controllers/auth')
 router.get('/:username/user-id', userController.validate('getUserId'), handleValidationResult, userController
     .getUserId)
 
+router.get('/:userId/join-date', userController.validate('getJoinDate'), handleValidationResult, parseParams,
+    userController.getJoinDate)
+
 module.exports = router

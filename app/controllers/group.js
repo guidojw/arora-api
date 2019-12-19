@@ -102,7 +102,7 @@ exports.suspend = async (req, res, next) => {
             .getUsernameFromId(req.body.byUserId))
         const roles = await roblox.setRank(req.params.groupId, req.params.userId, 2)
         new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for ` +
-            `**${req.body.duration} ${pluralize(req.body.duration, 'day')}** with reason "*${req.body.reason}*"`)
+            `**${req.body.duration} ${pluralize('day', req.body.duration)}** with reason "*${req.body.reason}*"`)
         res.send(roles)
     } catch (err) {
         next(createError(err.status || 500, err.message))
@@ -111,8 +111,7 @@ exports.suspend = async (req, res, next) => {
 
 exports.getRank = async (req, res, next) => {
     try {
-        const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        res.json(rank)
+        res.json(await roblox.getRankInGroup(req.params.groupId, req.params.userId))
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
@@ -141,8 +140,7 @@ exports.promote = async (req, res, next) => {
 
 exports.getShout = async (req, res, next) => {
     try {
-        const shout = await roblox.getShout(req.params.groupId)
-        res.json(shout)
+        res.json(await roblox.getShout(req.params.groupId))
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
@@ -150,8 +148,7 @@ exports.getShout = async (req, res, next) => {
 
 exports.getRole = async (req, res, next) => {
     try {
-        const role = await roblox.getRankNameInGroup(req.params.groupId, req.params.userId)
-        res.json(role)
+        res.json(await roblox.getRankNameInGroup(req.params.groupId, req.params.userId))
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
