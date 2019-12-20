@@ -99,7 +99,7 @@ exports.validate = method => {
                 body('id').exists().isNumeric(),
                 body('key').exists().isString(),
                 body('by').exists().isNumeric(),
-                body('shout').optional().isNumeric()
+                body('message').exists().isString()
             ]
     }
 }
@@ -161,8 +161,8 @@ exports.promote = async (req, res, next) => {
             new DiscordMessageJob().perform('log', `**${byUsername}** promoted **${username}** from ` +
                 `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
         } else {
-            new DiscordMessageJob().perform('log', `Promoted **${username}** from ` +
-                `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
+            new DiscordMessageJob().perform('log', `Promoted **${username}** from **` +
+                `${roles.oldRole.name}** to **${roles.newRole.name}**`)
         }
         res.send(roles)
     } catch (err) {
@@ -298,7 +298,7 @@ exports.getTraining = async (req, res, next) => {
 exports.shout = async (req, res, next) => {
     try {
         const byUsername = await roblox.getUsernameFromId(req.body.by)
-        const shout = (await roblox.shout(req.params.groupId, req.body.shout ? req.body.shout : '')).data
+        const shout = (await roblox.shout(req.params.groupId, req.body.message)).data
         if (shout.body === '') {
             new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
         } else {
