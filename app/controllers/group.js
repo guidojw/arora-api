@@ -323,7 +323,7 @@ exports.getSuspension = async (req, res, next) => {
                 for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
                     suspension[key] = value
                 }
-                res.json(suspension)
+                return res.json(suspension)
             }
         }
         res.json(null)
@@ -345,7 +345,7 @@ exports.getTraining = async (req, res, next) => {
                 for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
                     training[key] = value
                 }
-                res.json(training)
+                return res.json(training)
             }
         }
         res.json(null)
@@ -375,8 +375,7 @@ exports.putTraining = async (req, res, next) => {
         const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         for (const card of cards) {
-            const trainingId = parseInt(card.name)
-            if (trainingId === req.params.trainingId) {
+            if (parseInt(card.name) === req.params.trainingId) {
                 const options = {}
                 const trainingData = JSON.parse(card.desc)
                 if (req.body.by) trainingData.by = req.body.by
@@ -399,7 +398,7 @@ exports.putTraining = async (req, res, next) => {
                     options.idList = await trelloController.getIdFromListName(boardId, 'Finished')
                 }
                 options.desc = JSON.stringify(trainingData)
-                res.json(await trelloController.putCard(card.id, JSON.stringify(trainingData)))
+                return res.json(await trelloController.putCard(card.id, options))
             }
         }
         res.json(null)
@@ -414,8 +413,7 @@ exports.putSuspension = async (req, res, next) => {
         const listId = await trelloController.getIdFromListName(boardId, 'Current')
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         for (const card of cards) {
-            const userId = parseInt(card.name)
-            if (userId === req.params.userId) {
+            if (parseInt(card.name) === req.params.userId) {
                 const options = {}
                 const suspensionData = JSON.parse(card.desc)
                 if (req.body.by) suspensionData.by = req.body.by
@@ -446,7 +444,7 @@ exports.putSuspension = async (req, res, next) => {
                     })
                 }
                 options.desc = JSON.stringify(suspensionData)
-                res.json(await trelloController.putCard(card.id, options))
+                return res.json(await trelloController.putCard(card.id, options))
             }
         }
         res.json(null)
