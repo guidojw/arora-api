@@ -357,14 +357,13 @@ exports.getTraining = async (req, res, next) => {
 exports.shout = async (req, res, next) => {
     try {
         const byUsername = await roblox.getUsernameFromId(req.body.by)
-        const shout = await roblox.shout(req.params.groupId, req.body.message)
-        console.log(shout)
-        if (shout.body === '') {
+        await roblox.shout(req.params.groupId, req.body.message)
+        if (req.body.message === '') {
             new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
         } else {
-            new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${shout.body}"*`)
+            new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${req.body.message}"*`)
         }
-        res.json(shout)
+        res.sendStatus(200)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
