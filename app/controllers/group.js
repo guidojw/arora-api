@@ -101,6 +101,23 @@ exports.validate = method => {
                 body('by').exists().isNumeric(),
                 body('message').exists().isString()
             ]
+        case 'putTraining':
+            return [
+                param('groupId').isNumeric(),
+                param('trainingId').isNumeric(),
+                body('id').exists().isNumeric(),
+                body('key').exists().isString(),
+                body('type').optional().isString(),
+                body('date').optional().isNumeric(),
+                body('specialnotes').optional().isString()
+            ]
+        case 'putSuspension':
+            return [
+                param('groupId').isNumeric(),
+                param('userId').isNumeric(),
+                body('id').exists().isNumeric(),
+                body('key').exists().isString()
+            ]
     }
 }
 
@@ -228,7 +245,21 @@ exports.getTrainings = async (req, res, next) => {
 
 exports.hostTraining = async (req, res, next) => {
     try {
-
+        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+        const trainingId = await trelloController.getCardsNumOnBoard(boardId) + 1
+        await trelloController.postCard({
+            idList: listId,
+            name: trainingId.toString(),
+            desc: JSON.stringify({
+                by: req.body.by,
+                type: req.body.type,
+                date: req.body.date,
+                specialnotes: req.body.specialnotes,
+                at: timeUtils.getUnix()
+            })
+        })
+        res.json(trainingId)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
@@ -298,13 +329,29 @@ exports.getTraining = async (req, res, next) => {
 exports.shout = async (req, res, next) => {
     try {
         const byUsername = await roblox.getUsernameFromId(req.body.by)
-        const shout = (await roblox.shout(req.params.groupId, req.body.message)).data
+        const shout = await roblox.shout(req.params.groupId, req.body.message)
         if (shout.body === '') {
             new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
         } else {
             new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${shout.body}"*`)
         }
         res.json(shout)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.putTraining = async (req, res, next) => {
+    try {
+
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.putSuspension = async (req, res, next) => {
+    try {
+
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }

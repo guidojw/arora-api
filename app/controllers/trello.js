@@ -52,3 +52,12 @@ exports.postCard = options => {
         })
     })
 }
+
+exports.getCardsNumOnBoard = boardId => {
+    return new Promise((resolve, reject) => {
+        trello.get(`/1/board/${boardId}/cards`, (err, cards) => {
+            if (err) reject(err)
+            resolve(cards.length)
+        })
+    })
+}
