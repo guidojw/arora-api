@@ -101,8 +101,50 @@ exports.validate = method => {
                 body('by').exists().isNumeric(),
                 body('message').exists().isString()
             ]
-        case 'putTraining':
-            return [
+        case 'putTraining': // This is ugly because epxress-validator doesn't support nested oneOf
+            return oneOf([
+                [
+                    param('groupId').isNumeric(),
+                    param('trainingId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('type').exists().isString()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('trainingId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('date').exists().isNumeric()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('trainingId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('specialnotes').exists().isString()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('trainingId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('by').exists().isString()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('trainingId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('cancelled').exists().isBoolean(),
+                    body('reason').exists().isBoolean(),
+                    body('by').exists().isString()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('trainingId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('finished').exists().isBoolean(),
+                    body('by').exists().isString()
+                ]
+            ])
+            /*return [
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
                 body('id').exists().isNumeric(),
@@ -122,9 +164,47 @@ exports.validate = method => {
                         body('by').exists().isString()
                     ]
                     ])
-            ]
+            ]*/
         case 'putSuspension':
-            return [
+            return oneOf([
+                [
+                    param('groupId').isNumeric(),
+                    param('userId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('by').exists().isNumeric()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('userId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('reason').exists().isString()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('userId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('rankback').exists().isNumeric()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('userId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('cancelled').exists().isBoolean(),
+                    body('reason').exists().isBoolean(),
+                    body('by').exists().isNumeric()
+                ], [
+                    param('groupId').isNumeric(),
+                    param('userId').isNumeric(),
+                    body('id').exists().isNumeric(),
+                    body('key').exists().isString(),
+                    body('extended').exists().isBoolean(),
+                    body('duration').exists().isNumeric(),
+                    body('reason').exists().isString(),
+                    body('by').exists().isNumeric()
+                ]
+            ])
+            /*return [
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
                 body('id').exists().isNumeric(),
@@ -145,7 +225,7 @@ exports.validate = method => {
                         body('by').exists().isNumeric()
                     ]
                 ])
-            ]
+            ]*/
     }
 }
 
@@ -238,11 +318,8 @@ exports.getSuspensions = async (req, res, next) => {
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         let suspensions = []
         for (const card of cards) {
-            const suspension = {}
+            const suspension = JSON.parse(card.desc)
             suspension.userId = parseInt(card.name)
-            for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
-                suspension[key] = value
-            }
             await suspensions.push(suspension)
         }
         res.json(suspensions)
@@ -258,11 +335,8 @@ exports.getTrainings = async (req, res, next) => {
         const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
         let trainings = []
         for (const card of cards) {
-            const training = {}
+            const training = JSON.parse(card.desc)
             training.id = parseInt(card.name)
-            for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
-                training[key] = value
-            }
             await trainings.push(training)
         }
         res.json(trainings)
@@ -318,11 +392,8 @@ exports.getSuspension = async (req, res, next) => {
         for (const card of cards) {
             const userId = parseInt(card.name)
             if (userId === req.params.userId) {
-                const suspension = {}
+                const suspension = JSON.parse(card.desc)
                 suspension.userId = userId
-                for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
-                    suspension[key] = value
-                }
                 return res.json(suspension)
             }
         }
@@ -340,11 +411,8 @@ exports.getTraining = async (req, res, next) => {
         for (const card of cards) {
             const trainingId = parseInt(card.name)
             if (trainingId === req.params.trainingId) {
-                const training = {}
+                const training = JSON.parse(card.desc)
                 training.id = trainingId
-                for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
-                    training[key] = value
-                }
                 return res.json(training)
             }
         }
@@ -403,7 +471,6 @@ exports.putTraining = async (req, res, next) => {
         }
         res.json(null)
     } catch (err) {
-        console.error(err)
         next(createError(err.status || 500, err.message))
     }
 }
@@ -450,7 +517,6 @@ exports.putSuspension = async (req, res, next) => {
         }
         res.json(null)
     } catch (err) {
-        console.error(err)
         next(createError(err.status || 500, err.message))
     }
 }
