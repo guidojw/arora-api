@@ -116,7 +116,11 @@ exports.validate = method => {
                         body('cancelled').exists().isBoolean(),
                             body('reason').exists().isBoolean(),
                             body('by').exists().isString()
-                        ]
+                        ],
+                    [
+                        body('finished').exists().isBoolean(),
+                        body('by').exists().isString()
+                    ]
                     ])
             ]
         case 'putSuspension':
@@ -384,6 +388,13 @@ exports.putTraining = async (req, res, next) => {
                     trainingData.cancelled = {
                         by: req.body.by,
                         reason: req.body.reason,
+                        at: timeUtils.getUnix()
+                    }
+                    options.idList = await trelloController.getIdFromListName(boardId, 'Cancelled')
+                }
+                if (req.body.finished) {
+                    trainingData.finished = {
+                        by: req.body.by,
                         at: timeUtils.getUnix()
                     }
                     options.idList = await trelloController.getIdFromListName(boardId, 'Finished')
