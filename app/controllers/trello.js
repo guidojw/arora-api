@@ -61,3 +61,12 @@ exports.getCardsNumOnBoard = boardId => {
         })
     })
 }
+
+exports.putCard = (cardId, options) => {
+    return new Promise((resolve, reject) => {
+        trello.put(`/1/cards/${cardId}`, options, (err, card) => {
+            if (err) reject(err)
+            resolve(card)
+        })
+    })
+}

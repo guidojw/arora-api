@@ -1,5 +1,5 @@
 'use strict'
-const { param, body } = require('express-validator')
+const { param, body, oneOf } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 const pluralize = require('pluralize')
@@ -107,16 +107,40 @@ exports.validate = method => {
                 param('trainingId').isNumeric(),
                 body('id').exists().isNumeric(),
                 body('key').exists().isString(),
-                body('type').optional().isString(),
-                body('date').optional().isNumeric(),
-                body('specialnotes').optional().isString()
+                oneOf([
+                    body('type').exists().isString(),
+                    body('date').exists().isNumeric(),
+                    body('specialnotes').exists().isString(),
+                    body('by').exists().isString()
+                    [
+                        body('cancelled').exists().isBoolean(),
+                            body('reason').exists().isBoolean(),
+                            body('by').exists().isString()
+                        ]
+                    ])
             ]
         case 'putSuspension':
             return [
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
                 body('id').exists().isNumeric(),
-                body('key').exists().isString()
+                body('key').exists().isString(),
+                oneOf([
+                    body('by').exists().isNumeric(),
+                    body('reason').exists().isString(),
+                    body('rankback').exists().isNumeric(),
+                        [
+                        body('cancelled').exists().isBoolean(),
+                            body('reason').exists().isBoolean(),
+                            body('by').exists().isNumeric()
+                        ],
+                    [
+                        body('extended').exists().isBoolean(),
+                        body('duration').exists().isNumeric(),
+                        body('reason').exists().isString(),
+                        body('by').exists().isNumeric()
+                    ]
+                ])
             ]
     }
 }
@@ -330,6 +354,7 @@ exports.shout = async (req, res, next) => {
     try {
         const byUsername = await roblox.getUsernameFromId(req.body.by)
         const shout = await roblox.shout(req.params.groupId, req.body.message)
+        console.log(shout)
         if (shout.body === '') {
             new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
         } else {
@@ -343,7 +368,31 @@ exports.shout = async (req, res, next) => {
 
 exports.putTraining = async (req, res, next) => {
     try {
-
+        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+        for (const card of cards) {
+            const trainingId = parseInt(card.name)
+            if (trainingId === req.params.trainingId) {
+                const options = {}
+                const trainingData = JSON.parse(card.desc)
+                if (req.body.by) trainingData.by = req.body.by
+                if (req.body.type) trainingData.type = req.body.type
+                if (req.body.date) trainingData.date = req.body.date
+                if (req.body.specialnotes) trainingData.specialnotes = req.body.specialnotes
+                if (req.body.cancelled) {
+                    trainingData.cancelled = {
+                        by: req.body.by,
+                        reason: req.body.reason,
+                        at: timeUtils.getUnix()
+                    }
+                    options.idList = await trelloController.getIdFromListName(boardId, 'Finished')
+                }
+                options.desc = JSON.stringify(trainingData)
+                res.json(await trelloController.putCard(card.id, JSON.stringify(trainingData)))
+            }
+        }
+        res.json(null)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
@@ -351,7 +400,46 @@ exports.putTraining = async (req, res, next) => {
 
 exports.putSuspension = async (req, res, next) => {
     try {
-
+        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+        const listId = await trelloController.getIdFromListName(boardId, 'Current')
+        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+        for (const card of cards) {
+            const userId = parseInt(card.name)
+            if (userId === req.params.userId) {
+                const options = {}
+                const suspensionData = JSON.parse(card.desc)
+                if (req.body.by) suspensionData.by = req.body.by
+                if (req.body.reason) suspensionData.reason = req.body.reason
+                if (req.body.rankback) suspensionData.rankback = req.body.rankback
+                if (req.body.cancelled) {
+                    suspensionData.cancelled = {
+                        by: req.body.by,
+                        reason: req.body.reason,
+                        at: timeUtils.getUnix()
+                    }
+                    options.idList = await trelloController.getIdFromListName(boardId, 'Done')
+                }
+                if (req.body.extended) {
+                    let days = suspensionData.duration / 86400
+                    if (!suspensionData.extended) suspensionData.extended = []
+                    suspensionData.extended.forEach(extension => {
+                        days += extension.duration / 86400
+                    })
+                    days += req.body.duration
+                    if (days < 1) return next(createError(403, 'Insufficient amount of days'))
+                    if (days > 7) return next(createError(403, 'Too many days'))
+                    suspensionData.extended.push({
+                        by: req.body.by,
+                        duration: req.body.duration * 86400,
+                        reason: req.body.reason,
+                        at: timeUtils.getUnix()
+                    })
+                }
+                options.desc = JSON.stringify(suspensionData)
+                res.json(await trelloController.putCard(card.id, options))
+            }
+        }
+        res.json(null)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
