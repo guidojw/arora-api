@@ -70,7 +70,7 @@ exports.validate = method => {
                 body('key').exists().isString(),
                 body('by').exists().isString(),
                 body('type').exists().isString(),
-                body('date').exists().isString(),
+                body('date').exists().isNumeric(),
                 body('specialnotes').optional().isString()
             ]
         case 'getExiles':
