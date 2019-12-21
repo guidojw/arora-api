@@ -11,6 +11,7 @@ const groupsRouter = require('./routes/groups')
 const usersRouter = require('./routes/users')
 const bansRouter = require('./routes/bans')
 const statusRouter = require('./routes/status')
+const qotdsRouter = require('./routes/qotds')
 
 const app = express()
 
@@ -23,6 +24,7 @@ app.use('/v1/groups', groupsRouter)
 app.use('/v1/users', usersRouter)
 app.use('/v1/bans', bansRouter)
 app.use('/v1/status', statusRouter)
+app.use('/v1/qotds', qotdsRouter)
 
 app.use((req, res, next) => {
     next(createError(404))

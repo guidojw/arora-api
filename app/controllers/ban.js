@@ -1,5 +1,5 @@
 'use strict'
-const { param, body } = require('express-validator')
+const { body } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 
