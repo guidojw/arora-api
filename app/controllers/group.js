@@ -403,6 +403,7 @@ exports.putTraining = async (req, res, next) => {
         }
         res.json(null)
     } catch (err) {
+        console.error(err)
         next(createError(err.status || 500, err.message))
     }
 }
@@ -449,6 +450,7 @@ exports.putSuspension = async (req, res, next) => {
         }
         res.json(null)
     } catch (err) {
+        console.error(err)
         next(createError(err.status || 500, err.message))
     }
 }
