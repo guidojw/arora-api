@@ -50,4 +50,7 @@ router.put('/:groupId/trainings/:trainingId', groupController.validate('putTrain
 router.put('/:groupId/suspensions/:userId', groupController.validate('putSuspension'), handleValidationResult,
     parseParams, groupController.putSuspension)
 
+router.get('/:groupId', groupController.validate('getGroup'), handleValidationResult, parseParams,
+    groupController.getGroup)
+
 module.exports = router

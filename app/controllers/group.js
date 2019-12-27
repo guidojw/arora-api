@@ -3,6 +3,7 @@ const { param, body, oneOf } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 const pluralize = require('pluralize')
+const axios = require('axios')
 
 const timeUtils = require('../utils/timeUtils')
 
@@ -226,6 +227,12 @@ exports.validate = method => {
                     ]
                 ])
             ]*/
+        case 'getGroup':
+            return [
+                param('groupId').isNumeric()
+                // body('id').exists().isNumeric(),
+                // body('key').exists().isString(),
+            ]
     }
 }
 
@@ -516,6 +523,17 @@ exports.putSuspension = async (req, res, next) => {
             }
         }
         res.json(null)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.getGroup = async (req, res, next) => {
+    try {
+        res.json((await axios({
+            method: 'get',
+            url: `https://groups.roblox.com/v1/groups/${req.params.groupId}`,
+        })).data)
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }

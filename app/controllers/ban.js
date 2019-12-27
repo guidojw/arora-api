@@ -1,5 +1,5 @@
 'use strict'
-const { body } = require('express-validator')
+const { param, body, oneOf } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 
@@ -24,6 +24,14 @@ exports.validate = method => {
                 body('by').exists().isNumeric(),
                 body('reason').exists().isString()
             ]
+        case 'putBan':
+            return oneOf([
+                param('userId').exists().isNumeric(),
+                body('id').exists().isNumeric(),
+                body('key').exists().isString(),
+                body('by').exists().isNumeric(),
+                body('unbanned').exists().isBoolean()
+            ])
     }
 }
 
@@ -72,6 +80,30 @@ exports.ban = async (req, res, next) => {
         new DiscordMessageJob().perform('log', `**${byUsername}** banned **${username}** with reason ` +
             `"*${req.body.reason}*"`)
         res.sendStatus(200)
+    } catch (err) {
+        next(createError(err.status || 500, err.message))
+    }
+}
+
+exports.putBan = async (req, res, next) => {
+    try {
+        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+        const listId = await trelloController.getIdFromListName(boardId, 'Banned')
+        const cards = await trelloController.getCards(listId, {fields: 'name'})
+        for (const card of cards) {
+            if (parseInt(card.name) === req.body.userId) {
+                if (req.body.unbanned) {
+                    await trelloController.putCard(card.id, {
+                        idList: await trelloController.getIdFromListName(boardId, 'Unbanned')
+                    })
+                    const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(req.body.userId),
+                        roblox.getUsernameFromId(req.body.by)])
+                    new DiscordMessageJob().perform('log', `**${byUsername}** unbanned **${username}**.`)
+                    return res.sendStatus(200)
+                }
+            }
+        }
+        next(createError(404))
     } catch (err) {
         next(createError(err.status || 500, err.message))
     }
