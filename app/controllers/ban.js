@@ -3,7 +3,7 @@ const { param, body, oneOf } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 
-const timeUtils = require('../utils/timeUtils')
+const timeHelper = require('../helpers/time')
 
 const DiscordMessageJob = require('../jobs/discord-message-job')
 
@@ -72,7 +72,7 @@ exports.ban = async (req, res, next) => {
                 rank: rank,
                 by: req.body.by,
                 reason: req.body.reason,
-                at: timeUtils.getUnix()
+                at: timeHelper.getUnix()
             })
         })
         const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(req.body.userId), roblox

@@ -5,7 +5,7 @@ const createError = require('http-errors')
 const pluralize = require('pluralize')
 const axios = require('axios')
 
-const timeUtils = require('../utils/timeUtils')
+const timeHelper = require('../helpers/time')
 
 const DiscordMessageJob = require('../jobs/discord-message-job')
 
@@ -259,7 +259,7 @@ exports.suspend = async (req, res, next) => {
                 duration: req.body.duration,
                 by: req.body.by,
                 reason: req.body.reason,
-                at: timeUtils.getUnix()
+                at: timeHelper.getUnix()
             })
         })
         const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(req.body.userId), roblox
@@ -365,7 +365,7 @@ exports.hostTraining = async (req, res, next) => {
                 type: req.body.type,
                 date: req.body.date,
                 specialnotes: req.body.specialnotes,
-                at: timeUtils.getUnix()
+                at: timeHelper.getUnix()
             })
         })
         res.json(trainingId)
@@ -461,14 +461,14 @@ exports.putTraining = async (req, res, next) => {
                     trainingData.cancelled = {
                         by: req.body.by,
                         reason: req.body.reason,
-                        at: timeUtils.getUnix()
+                        at: timeHelper.getUnix()
                     }
                     options.idList = await trelloController.getIdFromListName(boardId, 'Cancelled')
                 }
                 if (req.body.finished) {
                     trainingData.finished = {
                         by: req.body.by,
-                        at: timeUtils.getUnix()
+                        at: timeHelper.getUnix()
                     }
                     options.idList = await trelloController.getIdFromListName(boardId, 'Finished')
                 }
@@ -498,7 +498,7 @@ exports.putSuspension = async (req, res, next) => {
                     suspensionData.cancelled = {
                         by: req.body.by,
                         reason: req.body.reason,
-                        at: timeUtils.getUnix()
+                        at: timeHelper.getUnix()
                     }
                     options.idList = await trelloController.getIdFromListName(boardId, 'Done')
                 }
@@ -515,7 +515,7 @@ exports.putSuspension = async (req, res, next) => {
                         by: req.body.by,
                         duration: req.body.duration * 86400,
                         reason: req.body.reason,
-                        at: timeUtils.getUnix()
+                        at: timeHelper.getUnix()
                     })
                 }
                 options.desc = JSON.stringify(suspensionData)
