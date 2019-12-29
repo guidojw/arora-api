@@ -22,7 +22,8 @@ exports.validate = method => {
                 body('key').exists().isString(),
                 body('userId').exists().isNumeric(),
                 body('by').exists().isNumeric(),
-                body('reason').exists().isString()
+                body('reason').exists().isString(),
+                body('groupId').exists().isNumeric()
             ]
         case 'putBan':
             return oneOf([
@@ -57,7 +58,7 @@ exports.getBans = async (req, res, next) => {
 
 exports.ban = async (req, res, next) => {
     try {
-        const rank = await roblox.getRankInGroup(req.params.groupId, req.body.userId)
+        const rank = await roblox.getRankInGroup(req.body.groupId, req.body.userId)
         if (rank >= 200 || rank === 99 || rank === 103) return next(createError(403, 'User is unbannable'))
         const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
         const listId = await trelloController.getIdFromListName(boardId, 'Banned')
