@@ -1,7 +1,7 @@
 'use strict'
 const createError = require('http-errors')
 
-const models = require('../models')
+const models = require('../../models')
 
 exports.authenticate = async (req, res, next) => {
     try {

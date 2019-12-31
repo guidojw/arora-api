@@ -3,9 +3,9 @@ const { param, body, oneOf } = require('express-validator')
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 
-const timeHelper = require('../helpers/time')
+const timeHelper = require('../../helpers/time')
 
-const DiscordMessageJob = require('../jobs/discord-message-job')
+const DiscordMessageJob = require('../../jobs/discord-message-job')
 
 const trelloController = require('./trello')
 

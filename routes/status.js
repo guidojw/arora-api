@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 
-const statusController = require('../app/controllers/status')
+const statusController = require('../app/controllers/v1/status')
 
 const { handleValidationResult } = require('../app/helpers/error')
 

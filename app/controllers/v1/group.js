@@ -5,9 +5,9 @@ const createError = require('http-errors')
 const pluralize = require('pluralize')
 const axios = require('axios')
 
-const timeHelper = require('../helpers/time')
+const timeHelper = require('../../helpers/time')
 
-const DiscordMessageJob = require('../jobs/discord-message-job')
+const DiscordMessageJob = require('../../jobs/discord-message-job')
 
 const trelloController = require('./trello')
 

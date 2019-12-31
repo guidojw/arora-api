@@ -20,11 +20,11 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 //app.use(authenticate)
 
-app.use('/v1/groups', groupsRouter)
-app.use('/v1/users', usersRouter)
-app.use('/v1/bans', bansRouter)
-app.use('/v1/status', statusRouter)
-app.use('/v1/qotds', qotdsRouter)
+app.use('/api/v1/groups', groupsRouter)
+app.use('/api/v1/users', usersRouter)
+app.use('/api/v1/bans', bansRouter)
+app.use('/api/v1/status', statusRouter)
+app.use('/api/v1/qotds', qotdsRouter)
 
 app.use((req, res, next) => {
     next(createError(404))
