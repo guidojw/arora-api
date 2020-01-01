@@ -1,7 +1,6 @@
 'use strict'
-const { param, body } = require('express-validator')
+const { body } = require('express-validator')
 const roblox = require('noblox.js')
-const createError = require('http-errors')
 
 exports.validate = method => {
     switch (method) {
@@ -12,11 +11,7 @@ exports.validate = method => {
             ]
     }
 }
-exports.getStatus = async (req, res, next) => {
-    try {
-        await roblox.getCurrentUser()
-        res.json(true)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
+exports.getStatus = async (req, res) => {
+    await roblox.getCurrentUser()
+    res.json(true)
 }

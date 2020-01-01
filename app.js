@@ -14,6 +14,7 @@ const statusRouter = require('./routes/status')
 const qotdsRouter = require('./routes/qotds')
 
 const app = express()
+require('express-async-errors')
 
 app.use(logger('dev'))
 app.use(express.json())
@@ -26,11 +27,11 @@ app.use('/api/v1/bans', bansRouter)
 app.use('/api/v1/status', statusRouter)
 app.use('/api/v1/qotds', qotdsRouter)
 
-app.use((req, res, next) => {
-    next(createError(404))
+app.use(() => {
+    throw createError(404)
 })
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     sendError(res, err.status || 500, err.message)
 })
 

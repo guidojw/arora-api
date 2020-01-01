@@ -236,305 +236,245 @@ exports.validate = method => {
     }
 }
 
-exports.suspend = async (req, res, next) => {
-    try {
-        const rank = await roblox.getRankInGroup(req.params.groupId, req.body.userId)
-        if (rank === 2) return next(createError(409, 'User is already suspended'))
-        if (rank >= 200 || rank === 99 || rank === 103) return next(createError(403, 'User is unsuspendable'))
-        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId, 'Current')
-        const cards = await trelloController.getCards(listId, {fields: 'name'})
-        for (const card of cards) {
-            if (parseInt(card.name) === req.body.userId) return next(createError(409, 'User is already suspended'))
-        }
-        if (rank > 0 && rank !== 2) {
-            await roblox.setRank(req.params.groupId, req.body.userId, 2)
-        }
-        await trelloController.postCard({
-            idList: listId,
-            name: req.body.userId.toString(),
-            desc: JSON.stringify({
-                rank: rank,
-                rankback: req.body.rankback,
-                duration: req.body.duration,
-                by: req.body.by,
-                reason: req.body.reason,
-                at: timeHelper.getUnix()
-            })
+exports.suspend = async (req, res) => {
+    const rank = await roblox.getRankInGroup(req.params.groupId, req.body.userId)
+    if (rank === 2) throw createError(409, 'User is already suspended')
+    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable')
+    const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloController.getIdFromListName(boardId, 'Current')
+    const cards = await trelloController.getCards(listId, {fields: 'name'})
+    for (const card of cards) {
+        if (parseInt(card.name) === req.body.userId) throw createError(409, 'User is already suspended')
+    }
+    if (rank > 0 && rank !== 2) {
+        await roblox.setRank(req.params.groupId, req.body.userId, 2)
+    }
+    await trelloController.postCard({
+        idList: listId,
+        name: req.body.userId.toString(),
+        desc: JSON.stringify({
+            rank: rank,
+            rankback: req.body.rankback,
+            duration: req.body.duration,
+            by: req.body.by,
+            reason: req.body.reason,
+            at: timeHelper.getUnix()
         })
-        const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(req.body.userId), roblox
-            .getUsernameFromId(req.body.by)])
-        const days = req.body.duration / 86400
-        new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for ` +
-            `**${days} ${pluralize('day', days)}** with reason "*${req.body.reason}*"`)
-        res.sendStatus(200)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
+    })
+    const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(req.body.userId), roblox
+        .getUsernameFromId(req.body.by)])
+    const days = req.body.duration / 86400
+    new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for **${days} ` +
+        `${pluralize('day', days)}** with reason "*${req.body.reason}*"`)
+    res.sendStatus(200)
 }
 
-exports.getRank = async (req, res, next) => {
-    try {
-        res.json(await roblox.getRankInGroup(req.params.groupId, req.params.userId))
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
+exports.getRank = async (req, res) => {
+    res.json(await roblox.getRankInGroup(req.params.groupId, req.params.userId))
 }
 
-exports.promote = async (req, res, next) => {
-    try {
-        const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
-        if (rank === 0) return next(createError(403, 'Can only promote group members'))
-        if (rank >= 100) return next(createError(403, 'Can\'t promote MRs or higher'))
-        const username = await roblox.getUsernameFromId(req.params.userId)
-        const roles = await roblox.changeRank(req.params.groupId, req.params.userId, rank === 1 ? 2 : 1)
-        if (req.body.byUserId) {
-            const byUsername = await roblox.getUsernameFromId(req.body.by)
-            new DiscordMessageJob().perform('log', `**${byUsername}** promoted **${username}** from ` +
-                `**${roles.oldRole.name}** to **${roles.newRole.name}**`)
-        } else {
-            new DiscordMessageJob().perform('log', `Promoted **${username}** from **` +
-                `${roles.oldRole.name}** to **${roles.newRole.name}**`)
-        }
-        res.send(roles)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getShout = async (req, res, next) => {
-    try {
-        res.json(await roblox.getShout(req.params.groupId))
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getRole = async (req, res, next) => {
-    try {
-        res.json(await roblox.getRankNameInGroup(req.params.groupId, req.params.userId))
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getSuspensions = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId, 'Current')
-        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
-        let suspensions = []
-        for (const card of cards) {
-            const suspension = JSON.parse(card.desc)
-            suspension.userId = parseInt(card.name)
-            await suspensions.push(suspension)
-        }
-        res.json(suspensions)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getTrainings = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
-        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
-        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
-        let trainings = []
-        for (const card of cards) {
-            const training = JSON.parse(card.desc)
-            training.id = parseInt(card.name)
-            await trainings.push(training)
-        }
-        res.json(trainings)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.hostTraining = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
-        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
-        const trainingId = await trelloController.getCardsNumOnBoard(boardId) + 1
-        await trelloController.postCard({
-            idList: listId,
-            name: trainingId.toString(),
-            desc: JSON.stringify({
-                by: req.body.by,
-                type: req.body.type,
-                date: req.body.date,
-                specialnotes: req.body.specialnotes,
-                at: timeHelper.getUnix()
-            })
-        })
-        res.json(trainingId)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getExiles = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId, 'Exiled')
-        const cards = await trelloController.getCards(listId, {fields: 'name'})
-        let exiles = []
-        for (const card of cards) {
-            const exile = {}
-            exile.userId = parseInt(card.name)
-            await exiles.push(exile)
-        }
-        res.json(exiles)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getSuspension = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId, 'Current')
-        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
-        for (const card of cards) {
-            const userId = parseInt(card.name)
-            if (userId === req.params.userId) {
-                const suspension = JSON.parse(card.desc)
-                suspension.userId = userId
-                return res.json(suspension)
-            }
-        }
-        res.json(null)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.getTraining = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
-        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
-        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
-        for (const card of cards) {
-            const trainingId = parseInt(card.name)
-            if (trainingId === req.params.trainingId) {
-                const training = JSON.parse(card.desc)
-                training.id = trainingId
-                return res.json(training)
-            }
-        }
-        res.json(null)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.shout = async (req, res, next) => {
-    try {
+exports.promote = async (req, res) => {
+    const rank = await roblox.getRankInGroup(req.params.groupId, req.params.userId)
+    if (rank === 0) throw createError(403, 'Can only promote group members')
+    if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
+    const username = await roblox.getUsernameFromId(req.params.userId)
+    const roles = await roblox.changeRank(req.params.groupId, req.params.userId, rank === 1 ? 2 : 1)
+    if (req.body.byUserId) {
         const byUsername = await roblox.getUsernameFromId(req.body.by)
-        await roblox.shout(req.params.groupId, req.body.message)
-        if (req.body.message === '') {
-            new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
-        } else {
-            new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${req.body.message}"*`)
-        }
-        res.sendStatus(200)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
+        new DiscordMessageJob().perform('log', `**${byUsername}** promoted **${username}** from **` +
+            `${roles.oldRole.name}** to **${roles.newRole.name}**`)
+    } else {
+        new DiscordMessageJob().perform('log', `Promoted **${username}** from **${roles.oldRole.name} ` +
+            `** to **${roles.newRole.name}**`)
     }
+    res.send(roles)
 }
 
-exports.putTraining = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
-        const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
-        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
-        for (const card of cards) {
-            if (parseInt(card.name) === req.params.trainingId) {
-                const options = {}
-                const trainingData = JSON.parse(card.desc)
-                if (req.body.by) trainingData.by = req.body.by
-                if (req.body.type) trainingData.type = req.body.type
-                if (req.body.date) trainingData.date = req.body.date
-                if (req.body.specialnotes) trainingData.specialnotes = req.body.specialnotes
-                if (req.body.cancelled) {
-                    trainingData.cancelled = {
-                        by: req.body.by,
-                        reason: req.body.reason,
-                        at: timeHelper.getUnix()
-                    }
-                    options.idList = await trelloController.getIdFromListName(boardId, 'Cancelled')
+exports.getShout = async (req, res) => {
+    res.json(await roblox.getShout(req.params.groupId))
+}
+
+exports.getRole = async (req, res) => {
+    res.json(await roblox.getRankNameInGroup(req.params.groupId, req.params.userId))
+}
+
+exports.getSuspensions = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloController.getIdFromListName(boardId, 'Current')
+    const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+    let suspensions = []
+    for (const card of cards) {
+        const suspension = JSON.parse(card.desc)
+        suspension.userId = parseInt(card.name)
+        await suspensions.push(suspension)
+    }
+    res.json(suspensions)
+}
+
+exports.getTrainings = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+    const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+    const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+    let trainings = []
+    for (const card of cards) {
+        const training = JSON.parse(card.desc)
+        training.id = parseInt(card.name)
+        await trainings.push(training)
+    }
+    res.json(trainings)
+}
+
+exports.hostTraining = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+    const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+    const trainingId = await trelloController.getCardsNumOnBoard(boardId) + 1
+    await trelloController.postCard({
+        idList: listId,
+        name: trainingId.toString(),
+        desc: JSON.stringify({
+            by: req.body.by,
+            type: req.body.type,
+            date: req.body.date,
+            specialnotes: req.body.specialnotes,
+            at: timeHelper.getUnix()
+        })
+    })
+    res.json(trainingId)
+}
+
+exports.getExiles = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloController.getIdFromListName(boardId, 'Exiled')
+    const cards = await trelloController.getCards(listId, {fields: 'name'})
+    let exiles = []
+    for (const card of cards) {
+        const exile = {}
+        exile.userId = parseInt(card.name)
+        await exiles.push(exile)
+    }
+    res.json(exiles)
+}
+
+exports.getSuspension = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloController.getIdFromListName(boardId, 'Current')
+    const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+    for (const card of cards) {
+        const userId = parseInt(card.name)
+        if (userId === req.params.userId) {
+            const suspension = JSON.parse(card.desc)
+            suspension.userId = userId
+            return res.json(suspension)
+        }
+    }
+    res.json(null)
+}
+
+exports.getTraining = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+    const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+    const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+    for (const card of cards) {
+        const trainingId = parseInt(card.name)
+        if (trainingId === req.params.trainingId) {
+            const training = JSON.parse(card.desc)
+            training.id = trainingId
+            return res.json(training)
+        }
+    }
+    res.json(null)
+}
+
+exports.shout = async (req, res) => {
+    const byUsername = await roblox.getUsernameFromId(req.body.by)
+    await roblox.shout(req.params.groupId, req.body.message)
+    if (req.body.message === '') {
+        new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
+    } else {
+        new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${req.body.message}"*`)
+    }
+    res.sendStatus(200)
+}
+
+exports.putTraining = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Training Scheduler')
+    const listId = await trelloController.getIdFromListName(boardId, 'Scheduled')
+    const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+    for (const card of cards) {
+        if (parseInt(card.name) === req.params.trainingId) {
+            const options = {}
+            const trainingData = JSON.parse(card.desc)
+            if (req.body.by) trainingData.by = req.body.by
+            if (req.body.type) trainingData.type = req.body.type
+            if (req.body.date) trainingData.date = req.body.date
+            if (req.body.specialnotes) trainingData.specialnotes = req.body.specialnotes
+            if (req.body.cancelled) {
+                trainingData.cancelled = {
+                    by: req.body.by,
+                    reason: req.body.reason,
+                    at: timeHelper.getUnix()
                 }
-                if (req.body.finished) {
-                    trainingData.finished = {
-                        by: req.body.by,
-                        at: timeHelper.getUnix()
-                    }
-                    options.idList = await trelloController.getIdFromListName(boardId, 'Finished')
-                }
-                options.desc = JSON.stringify(trainingData)
-                return res.json(await trelloController.putCard(card.id, options))
+                options.idList = await trelloController.getIdFromListName(boardId, 'Cancelled')
             }
-        }
-        res.json(null)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
-    }
-}
-
-exports.putSuspension = async (req, res, next) => {
-    try {
-        const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-        const listId = await trelloController.getIdFromListName(boardId, 'Current')
-        const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
-        for (const card of cards) {
-            if (parseInt(card.name) === req.params.userId) {
-                const options = {}
-                const suspensionData = JSON.parse(card.desc)
-                if (req.body.by) suspensionData.by = req.body.by
-                if (req.body.reason) suspensionData.reason = req.body.reason
-                if (req.body.rankback) suspensionData.rankback = req.body.rankback
-                if (req.body.cancelled) {
-                    suspensionData.cancelled = {
-                        by: req.body.by,
-                        reason: req.body.reason,
-                        at: timeHelper.getUnix()
-                    }
-                    options.idList = await trelloController.getIdFromListName(boardId, 'Done')
+            if (req.body.finished) {
+                trainingData.finished = {
+                    by: req.body.by,
+                    at: timeHelper.getUnix()
                 }
-                if (req.body.extended) {
-                    let days = suspensionData.duration / 86400
-                    if (!suspensionData.extended) suspensionData.extended = []
-                    suspensionData.extended.forEach(extension => {
-                        days += extension.duration / 86400
-                    })
-                    days += req.body.duration
-                    if (days < 1) return next(createError(403, 'Insufficient amount of days'))
-                    if (days > 7) return next(createError(403, 'Too many days'))
-                    suspensionData.extended.push({
-                        by: req.body.by,
-                        duration: req.body.duration * 86400,
-                        reason: req.body.reason,
-                        at: timeHelper.getUnix()
-                    })
-                }
-                options.desc = JSON.stringify(suspensionData)
-                return res.json(await trelloController.putCard(card.id, options))
+                options.idList = await trelloController.getIdFromListName(boardId, 'Finished')
             }
+            options.desc = JSON.stringify(trainingData)
+            return res.json(await trelloController.putCard(card.id, options))
         }
-        res.json(null)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
     }
+    res.json(null)
 }
 
-exports.getGroup = async (req, res, next) => {
-    try {
-        res.json((await axios({
-            method: 'get',
-            url: `https://groups.roblox.com/v1/groups/${req.params.groupId}`,
-        })).data)
-    } catch (err) {
-        next(createError(err.status || 500, err.message))
+exports.putSuspension = async (req, res) => {
+    const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloController.getIdFromListName(boardId, 'Current')
+    const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
+    for (const card of cards) {
+        if (parseInt(card.name) === req.params.userId) {
+            const options = {}
+            const suspensionData = JSON.parse(card.desc)
+            if (req.body.by) suspensionData.by = req.body.by
+            if (req.body.reason) suspensionData.reason = req.body.reason
+            if (req.body.rankback) suspensionData.rankback = req.body.rankback
+            if (req.body.cancelled) {
+                suspensionData.cancelled = {
+                    by: req.body.by,
+                    reason: req.body.reason,
+                    at: timeHelper.getUnix()
+                }
+                options.idList = await trelloController.getIdFromListName(boardId, 'Done')
+            }
+            if (req.body.extended) {
+                let days = suspensionData.duration / 86400
+                if (!suspensionData.extended) suspensionData.extended = []
+                suspensionData.extended.forEach(extension => {
+                    days += extension.duration / 86400
+                })
+                days += req.body.duration
+                if (days < 1) throw createError(403, 'Insufficient amount of days')
+                if (days > 7) throw createError(403, 'Too many days')
+                suspensionData.extended.push({
+                    by: req.body.by,
+                    duration: req.body.duration * 86400,
+                    reason: req.body.reason,
+                    at: timeHelper.getUnix()
+                })
+            }
+            options.desc = JSON.stringify(suspensionData)
+            return res.json(await trelloController.putCard(card.id, options))
+        }
     }
+    res.json(null)
+}
+
+exports.getGroup = async (req, res) => {
+    res.json((await axios({
+        method: 'get',
+        url: `https://groups.roblox.com/v1/groups/${req.params.groupId}`,
+    })).data)
 }
