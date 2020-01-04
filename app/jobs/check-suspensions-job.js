@@ -16,19 +16,19 @@ class CheckSuspensionsJob {
             const newListId = await trelloController.getIdFromListName(boardId, 'Done')
             const cards = await trelloController.getCards(listId, {fields: 'name,desc'})
             for (const card of cards) {
-                const userId = parseInt(card.name)
-                const data = JSON.parse(card.desc)
-                let duration = data.duration
-                if (data.extensions) {
-                    for (const extension of data.extensions) {
+                const suspension = JSON.parse(card.desc)
+                suspension.userId = parseInt(card.name)
+                let duration = suspension.duration
+                if (suspension.extended) {
+                    for (const extension of suspension.extended) {
                         duration += extension.duration
                     }
                 }
-                if (data.at + data.duration <= now) {
-                    await roblox.setRank(groupId, userId, data.rankback ? data.rank : 1)
+                if (suspension.at + duration <= now) {
+                    await roblox.setRank(groupId, suspension.userId, suspension.rankback ? suspension.rank : 1)
                     trelloController.putCard(card.id, { idList: newListId })
                     const username = await roblox.getUsernameFromId(userId)
-                    new DiscordMessageJob().perform('log', `Successfully unsuspended **${username}**`)
+                    new DiscordMessageJob().perform('log', `Finished **${username}**'s suspension`)
                 }
             }
         } catch (err) {
