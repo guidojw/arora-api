@@ -3,7 +3,7 @@ const roblox = require('noblox.js')
 
 const DiscordMessageJob = require('./discord-message-job')
 
-const trelloController = require('../controllers/trello')
+const trelloController = require('../controllers/v1/trello')
 
 const timeHelper = require('../helpers/time')
 
