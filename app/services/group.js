@@ -190,7 +190,7 @@ exports.putTraining = async (trainingId, options) => {
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Finished')
             }
             cardOptions.desc = JSON.stringify(trainingData)
-            return await trelloService.putCard(card.id, cardOptions)
+            return trelloService.putCard(card.id, cardOptions)
         }
     }
 }
@@ -231,7 +231,7 @@ exports.putSuspension = async (userId, options) => {
                 })
             }
             cardOptions.desc = JSON.stringify(suspensionData)
-            return await trelloService.putCard(card.id, cardOptions)
+            return trelloService.putCard(card.id, cardOptions)
         }
     }
 }
