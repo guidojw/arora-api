@@ -5,7 +5,7 @@ const router = express.Router()
 const userController = require('../app/controllers/v1/user')
 
 const { handleValidationResult } = require('../app/helpers/error')
-const { parseParams } = require('../app/helpers/params')
+const { parseParams } = require('../app/helpers/request')
 
 router.get('/:username/user-id', userController.validate('getUserId'), handleValidationResult, userController
     .getUserId)

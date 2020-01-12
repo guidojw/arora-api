@@ -3,7 +3,7 @@ const roblox = require('noblox.js')
 
 const DiscordMessageJob = require('../jobs/discord-message-job')
 
-const trelloController = require('../controllers/v1/trello')
+const trelloController = require('../services/trello')
 
 class AcceptJoinRequestsJob {
     perform = async groupId => {

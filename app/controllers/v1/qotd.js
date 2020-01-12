@@ -1,7 +1,7 @@
 'use strict'
 const { body } = require('express-validator')
 
-const trelloController = require('./trello')
+const qotdService = require('../../services/qotd')
 
 exports.validate = method => {
     switch (method) {
@@ -16,12 +16,6 @@ exports.validate = method => {
 }
 
 exports.suggest = async (req, res) => {
-    const boardId = await trelloController.getIdFromBoardName('[NS] QOTD Board')
-    const listId = await trelloController.getIdFromListName(boardId, 'Suggested')
-    await trelloController.postCard({
-        idList: listId,
-        name: req.body.qotd,
-        desc: req.body.by
-    })
+   await qotdService.suggest(req.body.qotd, req.body.by)
     res.sendStatus(200)
 }

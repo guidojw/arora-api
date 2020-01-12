@@ -5,7 +5,7 @@ const router = express.Router()
 const groupController = require('../app/controllers/v1/group')
 
 const { handleValidationResult } = require('../app/helpers/error')
-const { parseParams } = require('../app/helpers/params')
+const { parseParams } = require('../app/helpers/request')
 const { authenticate } = require('../app/controllers/v1/auth')
 
 router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult,

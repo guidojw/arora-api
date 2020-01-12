@@ -1,13 +1,7 @@
 'use strict'
-const createError = require('http-errors')
-
-const models = require('../../models')
+const authService = require('../../services/auth')
 
 exports.authenticate = async (req, res, next) => {
-    const admin = await models.Admin.findById(req.body.id)
-    if (admin !== null && req.body.key === admin.key) {
-        next()
-    } else {
-        throw createError(401, 'Incorrect authentication key')
-    }
+    await authService.authenticate(req.body.id, req.body.key)
+    next()
 }

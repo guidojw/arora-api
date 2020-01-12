@@ -1,17 +1,14 @@
 'use strict'
 const { body } = require('express-validator')
-const roblox = require('noblox.js')
+const statusService = require('../../services/status')
 
 exports.validate = method => {
     switch (method) {
         case 'getStatus':
-            return [
-                // body('id').exists().isNumeric(),
-                // body('key').exists().isString()
-            ]
+            return []
     }
 }
+
 exports.getStatus = async (req, res) => {
-    await roblox.getCurrentUser()
-    res.json(true)
+    res.json(statusService.getStatus())
 }
