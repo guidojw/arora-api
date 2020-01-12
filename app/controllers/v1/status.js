@@ -1,5 +1,4 @@
 'use strict'
-const { body } = require('express-validator')
 const statusService = require('../../services/status')
 
 exports.validate = method => {

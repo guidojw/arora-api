@@ -1,5 +1,5 @@
 'use strict'
-const { param, body } = require('express-validator')
+const { param } = require('express-validator')
 
 const userService = require('../../services/user')
 

@@ -16,6 +16,6 @@ exports.validate = method => {
 }
 
 exports.suggest = async (req, res) => {
-   await qotdService.suggest(req.body.qotd, req.body.by)
+    await qotdService.suggest(req.body.qotd, req.body.by)
     res.sendStatus(200)
 }
