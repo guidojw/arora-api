@@ -2,11 +2,11 @@
 const express = require('express')
 const router = express.Router()
 
-const banController = require('../app/controllers/v1/ban')
+const banController = require('../controllers/v1/ban')
 
-const { handleValidationResult } = require('../app/helpers/error')
-const { parseParams } = require('../app/helpers/request')
-const { authenticate } = require('../app/controllers/v1/auth')
+const { handleValidationResult } = require('../middlewares/error')
+const { parseParams } = require('../middlewares/request')
+const { authenticate } = require('../middlewares/auth')
 
 router.get('/', banController.validate('getBans'), handleValidationResult, banController.getBans)
 

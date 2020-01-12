@@ -2,10 +2,10 @@
 const express = require('express')
 const router = express.Router()
 
-const qotdController = require('../app/controllers/v1/qotd')
+const qotdController = require('../controllers/v1/qotd')
 
-const { handleValidationResult } = require('../app/helpers/error')
-const { authenticate } = require('../app/controllers/v1/auth')
+const { handleValidationResult } = require('../middlewares/error')
+const { authenticate } = require('../middlewares/auth')
 
 router.post('/', qotdController.validate('suggest'), handleValidationResult, authenticate, qotdController
     .suggest)
