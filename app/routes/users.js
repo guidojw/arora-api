@@ -6,11 +6,12 @@ const userController = require('../controllers/v1/user')
 
 const { handleValidationResult } = require('../middlewares/error')
 const { parseParams } = require('../middlewares/request')
+const { authenticate } = require('../middlewares/auth')
 
-router.get('/:username/user-id', userController.validate('getUserId'), handleValidationResult, userController
-    .getUserId)
+router.get('/:username/user-id', userController.validate('getUserId'), handleValidationResult, authenticate,
+    userController.getUserId)
 
-router.get('/:userId/join-date', userController.validate('getJoinDate'), handleValidationResult, parseParams,
-    userController.getJoinDate)
+router.get('/:userId/join-date', userController.validate('getJoinDate'), handleValidationResult, authenticate,
+    parseParams, userController.getJoinDate)
 
 module.exports = router

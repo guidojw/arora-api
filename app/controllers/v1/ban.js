@@ -1,16 +1,17 @@
 'use strict'
-const { param, body, oneOf } = require('express-validator')
+const { param, body, header, oneOf } = require('express-validator')
 
 const banService = require('../../services/ban')
 
 exports.validate = method => {
     switch (method) {
         case 'getBans':
-            return []
+            return [
+                header('authorization').exists().isString()
+            ]
         case 'ban':
             return [
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
+                header('authorization').exists().isString(),
                 body('userId').exists().isNumeric(),
                 body('by').exists().isNumeric(),
                 body('reason').exists().isString(),
@@ -18,9 +19,8 @@ exports.validate = method => {
             ]
         case 'putBan':
             return oneOf([
+                header('authorization').exists().isString(),
                 param('userId').exists().isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 body('by').exists().isNumeric(),
                 body('unbanned').exists().isBoolean()
             ])

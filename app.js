@@ -5,7 +5,6 @@ const createError = require('http-errors')
 const express = require('express')
 const logger = require('morgan')
 const { sendError } = require('./app/middlewares/error')
-//const { authenticate } = require('./app/middlewares/auth')
 
 const groupsRouter = require('./app/routes/groups')
 const usersRouter = require('./app/routes/users')
@@ -19,7 +18,6 @@ require('express-async-errors')
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-//app.use(authenticate)
 
 app.use('/api/v1/groups', groupsRouter)
 app.use('/api/v1/users', usersRouter)
@@ -31,7 +29,7 @@ app.use(() => {
     throw createError(404)
 })
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
     sendError(res, err.status || 500, err.message)
 })
 

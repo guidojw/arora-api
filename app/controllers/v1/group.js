@@ -1,5 +1,5 @@
 'use strict'
-const { param, body, oneOf } = require('express-validator')
+const { param, body, header, oneOf } = require('express-validator')
 
 const groupService = require('../../services/group')
 
@@ -7,9 +7,8 @@ exports.validate = method => {
     switch (method) {
         case 'suspend':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 body('userId').exists().isNumeric(),
                 body('by').exists().isNumeric(),
                 body('reason').exists().isString(),
@@ -18,39 +17,42 @@ exports.validate = method => {
             ]
         case 'getRank':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric()
             ]
         case 'promote':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 body('by').optional().isNumeric()
             ]
         case 'getShout':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
         case 'getRole':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric()
             ]
         case 'getSuspensions':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
         case 'getTrainings':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
         case 'hostTraining':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 body('by').exists().isString(),
                 body('type').exists().isString(),
                 body('date').exists().isNumeric(),
@@ -58,74 +60,69 @@ exports.validate = method => {
             ]
         case 'getExiles':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
         case 'getSuspension':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric()
             ]
         case 'getTraining':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric()
             ]
         case 'shout':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 body('by').exists().isNumeric(),
                 body('message').exists().isString()
             ]
         case 'putTraining': // This is ugly because epxress-validator doesn't support nested oneOfs
             return oneOf([
                 [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('type').exists().isString()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('date').exists().isNumeric()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('specialnotes').exists().isString()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('by').exists().isString()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('cancelled').exists().isBoolean(),
                     body('reason').exists().isBoolean(),
                     body('by').exists().isString()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('finished').exists().isBoolean(),
                     body('by').exists().isString()
                 ]
             ])
             /*return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 oneOf([
                     body('type').exists().isString(),
                     body('date').exists().isNumeric(),
@@ -145,36 +142,31 @@ exports.validate = method => {
         case 'putSuspension':
             return oneOf([
                 [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('by').exists().isNumeric()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('reason').exists().isString()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('rankback').exists().isNumeric()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('cancelled').exists().isBoolean(),
                     body('reason').exists().isBoolean(),
                     body('by').exists().isNumeric()
                 ], [
+                    header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('id').exists().isNumeric(),
-                    body('key').exists().isString(),
                     body('extended').exists().isBoolean(),
                     body('duration').exists().isNumeric(),
                     body('reason').exists().isString(),
@@ -182,10 +174,9 @@ exports.validate = method => {
                 ]
             ])
             /*return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
-                body('id').exists().isNumeric(),
-                body('key').exists().isString(),
                 oneOf([
                     body('by').exists().isNumeric(),
                     body('reason').exists().isString(),
@@ -205,6 +196,7 @@ exports.validate = method => {
             ]*/
         case 'getGroup':
             return [
+                header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
     }

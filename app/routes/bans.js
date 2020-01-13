@@ -8,7 +8,7 @@ const { handleValidationResult } = require('../middlewares/error')
 const { parseParams } = require('../middlewares/request')
 const { authenticate } = require('../middlewares/auth')
 
-router.get('/', banController.validate('getBans'), handleValidationResult, banController.getBans)
+router.get('/', banController.validate('getBans'), handleValidationResult, authenticate, banController.getBans)
 
 router.post('/', banController.validate('ban'), handleValidationResult, authenticate, banController.ban)
 
