@@ -1,5 +1,5 @@
 'use strict'
-const { param } = require('express-validator')
+const { param, header } = require('express-validator')
 
 const userService = require('../../services/user')
 
@@ -7,10 +7,12 @@ exports.validate = method => {
     switch (method) {
         case 'getUserId':
             return [
+                header('authorization').exists().isString(),
                 param('username').isString()
             ]
         case 'getJoinDate':
             return [
+                header('authorization').exists().isString(),
                 param('userId').isNumeric()
             ]
     }

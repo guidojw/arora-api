@@ -1,10 +1,14 @@
 'use strict'
+const { header } = require('express-validator')
+
 const statusService = require('../../services/status')
 
 exports.validate = method => {
     switch (method) {
         case 'getStatus':
-            return []
+            return [
+                header('authorization').exists().isString()
+            ]
     }
 }
 

@@ -4,3 +4,5 @@
 /config/database.json
 /cookie
 /ecosystem.config.js
+/private.key
+/public.key
