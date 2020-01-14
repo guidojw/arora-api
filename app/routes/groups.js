@@ -35,6 +35,9 @@ router.post('/:groupId/trainings', groupController.validate('hostTraining'), han
 router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult, authenticate,
     parseParams, groupController.getExiles)
 
+router.get('/:groupId/suspensions/finished', groupController.validate('getFinishedSuspensions'),
+    handleValidationResult, authenticate, parseParams, groupController.getFinishedSuspensions)
+
 router.get('/:groupId/suspensions/:userId', groupController.validate('getSuspension'), handleValidationResult,
     authenticate, parseParams, groupController.getSuspension)
 
@@ -52,8 +55,5 @@ router.put('/:groupId/suspensions/:userId', groupController.validate('putSuspens
 
 router.get('/:groupId', groupController.validate('getGroup'), handleValidationResult, authenticate,
     parseParams, groupController.getGroup)
-
-router.get('/:groupId/suspensions/finished', groupController.validate('getFinishedSuspensions'),
-    handleValidationResult, authenticate, parseParams, groupController.getFinishedSuspensions)
 
 module.exports = router
