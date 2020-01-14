@@ -20,12 +20,12 @@ class AcceptJoinRequestsJob {
                 const userId = await roblox.getIdFromUsername(request.username)
                 if (exiles.includes(userId)) {
                     await roblox.handleJoinRequestId(groupId, request.requestId, false)
-                    new DiscordMessageJob().perform('log', `Declined **${request.username}**'s join ` +
-                    'request')
+                    await (new DiscordMessageJob()).perform('log', `Declined **${request.username}**` +
+                        '\'s join request')
                 } else {
                     await roblox.handleJoinRequestId(groupId, request.requestId, true)
-                    new DiscordMessageJob().perform('log', `Accepted **${request.username}**'s join ` +
-                        'request')
+                    await (new DiscordMessageJob()).perform('log', `Accepted **${request.username}**` +
+                        '\'s join request')
                 }
             }
         } catch (err) {

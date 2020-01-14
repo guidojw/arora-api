@@ -38,7 +38,7 @@ exports.suspend = async (groupId, userId, options) => {
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
         .getUsernameFromId(options.by)])
     const days = options.duration / 86400
-    new DiscordMessageJob().perform('log', `**${byUsername}** suspended **${username}** for **` +
+    await (new DiscordMessageJob()).perform('log', `**${byUsername}** suspended **${username}** for **` +
         `${days} ${pluralize('day', days)}** with reason "*${options.reason}*"`)
 }
 
@@ -54,11 +54,11 @@ exports.promote = async (groupId, userId, by) => {
     const roles = await roblox.changeRank(groupId, userId, rank === 1 ? 2 : 1)
     if (by) {
         const byUsername = await roblox.getUsernameFromId(by)
-        new DiscordMessageJob().perform('log', `**${byUsername}** promoted **${username}** from **` +
-            `${roles.oldRole.name}** to **${roles.newRole.name}**`)
+        await (new DiscordMessageJob()).perform('log', `**${byUsername}** promoted **${username}** ` +
+            `from **${roles.oldRole.name}** to **${roles.newRole.name}**`)
     } else {
-        new DiscordMessageJob().perform('log', `Promoted **${username}** from **${roles.oldRole.name} ` +
-            `** to **${roles.newRole.name}**`)
+        await (new DiscordMessageJob()).perform('log', `Promoted **${username}** from **` +
+            `${roles.oldRole.name}** to **${roles.newRole.name}**`)
     }
     return roles
 }
@@ -156,9 +156,9 @@ exports.shout = async (groupId, by, message) => {
     const byUsername = await roblox.getUsernameFromId(by)
     await roblox.shout(groupId, message)
     if (message === '') {
-        new DiscordMessageJob().perform('log', `**${byUsername}** cleared the shout`)
+        await (new DiscordMessageJob()).perform('log', `**${byUsername}** cleared the shout`)
     } else {
-        new DiscordMessageJob().perform('log', `**${byUsername}** shouted *"${message}"*`)
+        await (new DiscordMessageJob()).perform('log', `**${byUsername}** shouted *"${message}"*`)
     }
 }
 

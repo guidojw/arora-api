@@ -28,7 +28,8 @@ class CheckSuspensionsJob {
                     await roblox.setRank(groupId, suspension.userId, suspension.rankback ? suspension.rank : 1)
                     await trelloService.putCard(card.id, { idList: newListId })
                     const username = await roblox.getUsernameFromId(suspension.userId)
-                    new DiscordMessageJob().perform('log', `Finished **${username}**'s suspension`)
+                    await (new DiscordMessageJob()).perform('log', `Finished **${username}**'s ` +
+                        'suspension')
                 }
             }
         } catch (err) {

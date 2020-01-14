@@ -1,28 +1,31 @@
 'use strict'
 require('dotenv').config()
 
-const Discord = require('discord.js')
-
-const logsWebhook = new Discord.WebhookClient(process.env.DISCORD_LOGS_WEBHOOK_ID, process.env
-    .DISCORD_LOGS_WEBHOOK_TOKEN)
-const trainingsWebhook = new Discord.WebhookClient(process.env.DISCORD_TRAININGS_WEBHOOK_ID, process.env
-    .DISCORD_TRAININGS_WEBHOOK_TOKEN)
+const axios = require('axios')
 
 class DiscordMessageJob {
-    perform = (type, message) => {
+    perform = async (type, message) => {
         if (type === 'log') {
-            this.sendLog(message)
+            await this.sendLog(message)
         } else if (type === 'training') {
-            this.sendTraining(message)
+            await this.sendTraining(message)
         }
     }
 
-    sendLog = message => {
-        logsWebhook.send(message)
+    sendLog = async message => {
+        await axios({
+            method: 'post',
+            url: process.env.DISCORD_LOGS_WEBHOOK_URL,
+            data: { content: message }
+        })
     }
 
-    sendTraining = message => {
-        trainingsWebhook.send(message)
+    sendTraining = async message => {
+        await axios({
+            method: 'post',
+            url: process.env.DISCORD_TRAININGS_WEBHOOK_URL,
+            data: { content: message }
+        })
     }
 }
 

@@ -21,7 +21,6 @@
   "dependencies": {
     "axios": "^0.19.1",
     "debug": "^4.1.1",
-    "discord.js": "^11.5.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
