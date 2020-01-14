@@ -1,6 +1,6 @@
 'use strict'
-const AcceptJoinRequestsJob = require('../app/jobs/accept-join-requests-job')
-const CheckSuspensionsJob = require('../app/jobs/check-suspensions-job')
+const AcceptJoinRequestsJob = require('../app/jobs/accept-join-requests')
+const CheckSuspensionsJob = require('../app/jobs/check-suspensions')
 const AcceptMtJoinRequestsJob = require('../app/jobs/accept-mt-join-requests')
 
 module.exports = {

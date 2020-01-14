@@ -1,7 +1,7 @@
 'use strict'
 const roblox = require('noblox.js')
 
-const DiscordMessageJob = require('../jobs/discord-message-job')
+const DiscordMessageJob = require('./discord-message')
 
 class AcceptJoinRequestsJob {
     perform = async (groupId, mtGroupId) => {

@@ -6,7 +6,7 @@ const trelloController = require('./trello')
 
 const timeHelper = require('../helpers/time')
 
-const DiscordMessageJob = require('../jobs/discord-message-job')
+const DiscordMessageJob = require('../jobs/discord-message')
 
 exports.getBans = async () => {
     const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')

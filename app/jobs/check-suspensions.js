@@ -1,7 +1,7 @@
 'use strict'
 const roblox = require('noblox.js')
 
-const DiscordMessageJob = require('./discord-message-job')
+const DiscordMessageJob = require('./discord-message')
 
 const trelloService = require('../services/trello')
 
