@@ -1,6 +1,7 @@
 'use strict'
-const AcceptJoinRequestsJob = require('../app/jobs/accept-join-requests-job')
-const CheckSuspensionsJob = require('../app/jobs/check-suspensions-job')
+const AcceptJoinRequestsJob = require('../app/jobs/accept-join-requests')
+const CheckSuspensionsJob = require('../app/jobs/check-suspensions')
+const AcceptMtJoinRequestsJob = require('../app/jobs/accept-mt-join-requests')
 
 module.exports = {
   'acceptJoinRequestsJob': {
@@ -12,5 +13,10 @@ module.exports = {
     'cron': '0 */1 * * *',
     'class': CheckSuspensionsJob,
     'args': [1018818]
+  },
+  'acceptMtJoinRequestsJob': {
+    'cron': '0 0 */1 * *',
+    'class': AcceptMtJoinRequestsJob,
+    'args': [1018818, 2661380]
   }
 }
