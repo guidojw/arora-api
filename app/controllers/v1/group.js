@@ -199,6 +199,11 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
+        case 'getFinishedSuspensions':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric()
+            ]
     }
 }
 
@@ -287,4 +292,8 @@ exports.putSuspension = async (req, res) => {
 
 exports.getGroup = async (req, res) => {
     res.json(await groupService.getGroup(req.params.groupId))
+}
+
+exports.getFinishedSuspensions = async (req, res) => {
+    res.json(await groupService.getFinishedSuspensions())
 }

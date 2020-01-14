@@ -242,3 +242,16 @@ exports.getGroup = async groupId => {
         url: `https://groups.roblox.com/v1/groups/${groupId}`,
     })).data
 }
+
+exports.getFinishedSuspensions = async () => {
+    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloService.getIdFromListName(boardId, 'Done')
+    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
+    let suspensions = []
+    for (const card of cards) {
+        const suspension = JSON.parse(card.desc)
+        suspension.userId = parseInt(card.name)
+        await suspensions.push(suspension)
+    }
+    return suspensions
+}

@@ -53,4 +53,7 @@ router.put('/:groupId/suspensions/:userId', groupController.validate('putSuspens
 router.get('/:groupId', groupController.validate('getGroup'), handleValidationResult, authenticate,
     parseParams, groupController.getGroup)
 
+router.get('/:groupId/suspensions/finished', groupController.validate('getFinishedSuspensions'),
+    handleValidationResult, authenticate, parseParams, groupController.getFinishedSuspensions)
+
 module.exports = router
