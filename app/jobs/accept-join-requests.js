@@ -3,14 +3,14 @@ const roblox = require('noblox.js')
 
 const DiscordMessageJob = require('./discord-message')
 
-const trelloController = require('../services/trello')
+const trelloService = require('../services/trello')
 
 class AcceptJoinRequestsJob {
     perform = async groupId => {
         try {
-            const boardId = await trelloController.getIdFromBoardName('[NS] Ongoing Suspensions')
-            const listId = await trelloController.getIdFromListName(boardId, 'Exiled')
-            const cards = await trelloController.getCards(listId, {fields: 'name'})
+            const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
+            const listId = await trelloService.getIdFromListName(boardId, 'Exiled')
+            const cards = await trelloService.getCards(listId, {fields: 'name'})
             let exiles = []
             for (const card of cards) {
                 await exiles.push(parseInt(card.name))

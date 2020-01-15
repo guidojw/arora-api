@@ -6,7 +6,7 @@ const DiscordMessageJob = require('./discord-message')
 class AcceptJoinRequestsJob {
     perform = async (groupId, mtGroupId) => {
         try {
-            const requests = await roblox.getJoinRequests(groupId)
+            const requests = await roblox.getJoinRequests(mtGroupId)
             for (const request of requests) {
                 const userId = await roblox.getIdFromUsername(request.username)
                 const rank = await roblox.getRankInGroup(groupId, userId)
