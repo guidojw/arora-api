@@ -3,22 +3,17 @@ const roblox = require('noblox.js')
 
 const DiscordMessageJob = require('./discord-message')
 
-const trelloService = require('../services/trello')
+const groupService = require('../services/group')
 
 class AcceptJoinRequestsJob {
     perform = async groupId => {
         try {
-            const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-            const listId = await trelloService.getIdFromListName(boardId, 'Exiled')
-            const cards = await trelloService.getCards(listId, {fields: 'name'})
-            let exiles = []
-            for (const card of cards) {
-                await exiles.push(parseInt(card.name))
-            }
+            const exiles = await groupService.getExiles()
+            const suspensions = await groupService.getSuspensions()
             const requests = await roblox.getJoinRequests(groupId)
             for (const request of requests) {
                 const userId = await roblox.getIdFromUsername(request.username)
-                if (exiles.includes(userId)) {
+                if (exiles.find(exile => exile.userId === userId)) {
                     await roblox.handleJoinRequestId(groupId, request.requestId, false)
                     await (new DiscordMessageJob()).perform('log', `Declined **${request.username}**` +
                         '\'s join request')
@@ -26,6 +21,11 @@ class AcceptJoinRequestsJob {
                     await roblox.handleJoinRequestId(groupId, request.requestId, true)
                     await (new DiscordMessageJob()).perform('log', `Accepted **${request.username}**` +
                         '\'s join request')
+                    if (suspensions.find(suspension => suspension.userId === userId)) {
+                        await roblox.setRank(groupId, userId, 2)
+                        await (new DiscordMessageJob()).perform('log', `Promoted **` +
+                            `${request.username}** from **Customer** to **Suspended**`)
+                    }
                 }
             }
         } catch (err) {
