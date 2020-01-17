@@ -92,7 +92,8 @@ exports.getMember = (memberId, options) => {
 }
 
 exports.getActionEmbed = async action => {
-    if (ACTION_TYPES[action]) {
+    console.log(action)
+    if (ACTION_TYPES[action.type]) {
         const member = await exports.getMember(action.idMemberCreator, 'username,avatarHash')
         const actionUrl = `https://trello.com/c/${action.data.card.shortLink}/${action.data.card.idShort}#action-` +
             action.id
