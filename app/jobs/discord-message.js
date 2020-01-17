@@ -9,6 +9,8 @@ class DiscordMessageJob {
             await this.sendLog(message)
         } else if (type === 'training') {
             await this.sendTraining(message)
+        } else if (type === 'trello') {
+            await this.sendTrello(message)
         }
     }
 
@@ -25,6 +27,14 @@ class DiscordMessageJob {
             method: 'post',
             url: process.env.DISCORD_TRAININGS_WEBHOOK_URL,
             data: { content: message }
+        })
+    }
+
+    sendTrello = async body => {
+        await axios({
+            method: 'post',
+            url: process.env.DISCORD_TRELLO_WEBHOOK_URL,
+            data: body
         })
     }
 }

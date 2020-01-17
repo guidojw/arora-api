@@ -11,6 +11,7 @@ const usersRouter = require('./app/routes/users')
 const bansRouter = require('./app/routes/bans')
 const statusRouter = require('./app/routes/status')
 const qotdsRouter = require('./app/routes/qotds')
+const trelloRouter = require('./app/routes/trello')
 
 const app = express()
 require('express-async-errors')
@@ -24,6 +25,7 @@ app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/bans', bansRouter)
 app.use('/api/v1/status', statusRouter)
 app.use('/api/v1/qotds', qotdsRouter)
+app.use('/api/v1/trello', trelloRouter)
 
 app.use(() => {
     throw createError(404)
