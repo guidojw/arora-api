@@ -17,18 +17,32 @@ app.set('port', port)
 
 const server = http.createServer(app)
 
-roblox.cookieLogin(process.env.ROBLOX_COOKIE)
-    .then(() => console.log('Roblox account logged in!'))
+const loginRoblox = async () => {
+    try {
+        await roblox.getCurrentUser()
+        return 'Roblox account is already logged in.'
+    } catch (err) {
+        await roblox.cookieLogin(process.env.ROBLOX_COOKIE)
+        return 'Roblox account logged in!'
+    }
+}
+
+loginRoblox()
+    .then(message => console.log(message))
     .catch(err => console.error(err.message))
 
+// roblox.cookieLogin(process.env.ROBLOX_COOKIE)
+//     .then(() => console.log('Roblox account logged in!'))
+//     .catch(err => console.error(err.message))
+
 models.sequelize.sync()
-   .then(() => {
-       console.log('Database & tables created!')
+    .then(() => {
+        console.log('Database & tables created!')
         server.listen(port)
         server.on('error', onError)
         server.on('listening', onListening)
-   })
-   .catch((err => { console.error(err.message)}))
+    })
+    .catch((err => { console.error(err.message)}))
 
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
