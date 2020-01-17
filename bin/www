@@ -22,6 +22,7 @@ const loginRoblox = async () => {
         await roblox.getCurrentUser()
         return 'Roblox account is already logged in.'
     } catch (err) {
+        console.error(err.message)
         await roblox.cookieLogin(process.env.ROBLOX_COOKIE)
         return 'Roblox account logged in!'
     }

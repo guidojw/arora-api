@@ -92,9 +92,8 @@ exports.getMember = (memberId, options) => {
 }
 
 exports.getActionEmbed = async action => {
-    console.log(action)
     if (ACTION_TYPES[action.type]) {
-        const member = await exports.getMember(action.idMemberCreator, 'username,avatarHash')
+        const member = await exports.getMember(action.idMemberCreator, 'username,avatarUrl')
         const actionUrl = `https://trello.com/c/${action.data.card.shortLink}/${action.data.card.idShort}#action-` +
             action.id
         return {
@@ -102,10 +101,11 @@ exports.getActionEmbed = async action => {
             description: `[\`${action.id}\`](${actionUrl}) ${action.data.card.name} - ${member.username}`,
             author: {
                 name: member.username,
-                icon: `https://trello-avatars.s3.amazonaws.com/${member.avatarHash}/170.png`,
-                // url:
+                icon_url: member.avatarUrl,
+                url: `https://trello.com/${member.username}`
             },
-            url: actionUrl
+            url: actionUrl,
+            color: 31424
         }
     }
 }
