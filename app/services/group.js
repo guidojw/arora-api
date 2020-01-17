@@ -239,7 +239,7 @@ exports.putSuspension = async (userId, options) => {
 exports.getGroup = async groupId => {
     return (await axios({
         method: 'get',
-        url: `https://groups.roblox.com/v1/groups/${groupId}`,
+        url: `https://groups.roblox.com/v1/groups/${groupId}`
     })).data
 }
 
