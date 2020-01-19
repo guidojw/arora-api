@@ -208,7 +208,7 @@ exports.validate = method => {
 }
 
 exports.suspend = async (req, res) => {
-    await groupService.suspend(req.params.groupId, req.params.userId, {
+    await groupService.suspend(req.params.groupId, req.body.userId, {
         by: req.body.by,
         reason: req.body.reason,
         duration: req.body.duration,
