@@ -170,7 +170,8 @@ exports.putTraining = async (trainingId, options) => {
         if (parseInt(card.name) === trainingId) {
             const cardOptions = {}
             const trainingData = JSON.parse(card.desc)
-            if (options.by) trainingData.by = options.by
+            if (options.by && options.cancelled === undefined && options.finished === undefined) trainingData.by =
+                options.by
             if (options.type) trainingData.type = options.type
             if (options.date) trainingData.date = options.date
             if (options.specialnotes) trainingData.specialnotes = options.specialnotes
@@ -203,7 +204,8 @@ exports.putSuspension = async (userId, options) => {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
             const suspensionData = JSON.parse(card.desc)
-            if (options.by) suspensionData.by = options.by
+            if (options.by && options.cancelled === undefined && options.extended === undefined) suspensionData.by =
+                options.by
             if (options.reason) suspensionData.reason = options.reason
             if (options.rankback) suspensionData.rankback = options.rankback
             if (options.cancelled) {
