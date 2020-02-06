@@ -1,5 +1,6 @@
 'use strict'
 require('dotenv').config()
+require('express-async-errors')
 
 const createError = require('http-errors')
 const express = require('express')
@@ -15,7 +16,6 @@ const trelloRouter = require('./app/routes/trello')
 const catalogRouter = require('./app/routes/catalog')
 
 const app = express()
-require('express-async-errors')
 
 app.use(logger('dev'))
 app.use(express.json())
