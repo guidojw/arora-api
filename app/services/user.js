@@ -12,3 +12,10 @@ exports.getJoinDate = async userId => {
         url: `https://users.roblox.com/v1/users/${userId}`,
     })).data.created
 }
+
+exports.hasBadge = async (userId, badgeId) => {
+    return (await axios({
+        method: 'get',
+        url: `https://inventory.roblox.com/v1/users/${userId}/items/Badge/${badgeId}`,
+    })).data.data.length === 1
+}
