@@ -204,6 +204,13 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
+        case 'announceTraining':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('trainingId').isNumeric(),
+                body('medium').optional().isString()
+            ]
     }
 }
 
@@ -296,4 +303,9 @@ exports.getGroup = async (req, res) => {
 
 exports.getFinishedSuspensions = async (req, res) => {
     res.json(await groupService.getFinishedSuspensions())
+}
+
+exports.announceTraining = async (req, res) => {
+    await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.medium)
+    res.sendStatus(200)
 }

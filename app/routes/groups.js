@@ -56,4 +56,7 @@ router.put('/:groupId/suspensions/:userId', groupController.validate('putSuspens
 router.get('/:groupId', groupController.validate('getGroup'), handleValidationResult, authenticate,
     parseParams, groupController.getGroup)
 
+router.post('/:groupId/trainings/:trainingId/announce', groupController.validate('announceTraining'),
+    handleValidationResult, authenticate, parseParams, groupController.announceTraining)
+
 module.exports = router

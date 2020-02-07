@@ -10,6 +10,9 @@ const timeHelper = require('../helpers/time')
 
 const DiscordMessageJob = require('../jobs/discord-message')
 
+exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
+    'Scheduler in the Group Center for more info!'
+
 exports.suspend = async (groupId, userId, options) => {
     const rank = await exports.getRank(groupId, userId)
     if (rank === 2) throw createError(409, 'User is already suspended')
@@ -254,4 +257,63 @@ exports.getFinishedSuspensions = async () => {
         await suspensions.push(suspension)
     }
     return suspensions
+}
+
+exports.announceTraining = async (groupId, trainingId, medium) => {
+    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
+        'Invalid medium')
+    const training = exports.getTraining(trainingId)
+    if (!training) throw createError(404, 'Training not found')
+    if (medium === 'roblox') {
+        return await exports.announceRoblox(groupId)
+    } else if (medium === 'discord') {
+        return await exports.announceDiscord(groupId, training)
+    } else if (medium === 'both') {
+        return {
+            shout: await exports.announceRoblox(groupId),
+            announcement: await exports.announceDiscord(groupId, training)
+        }
+    }
+}
+
+exports.announceRoblox = async (groupId /*, training*/ ) => {
+    const shout = exports.defaultTrainingShout
+    await roblox.shout(groupId, shout)
+    return shout
+}
+
+exports.announceDiscord = async (groupId, training) => {
+    const announcement = exports.getTrainingAnnouncement(training)
+    await (new DiscordMessageJob()).perform('training', announcement)
+    return announcement
+}
+
+exports.getTrainingAnnouncement = training => {
+    const role = exports.getRoleByAbbreviation(training.type)
+    const dateString = timeHelper.getDate(training.date * 1000)
+    const timeString = timeHelper.getTime(training.date * 1000)
+    const by = training.by
+    const specialNotes = training.specialnotes
+    return `<:ns:248922413599817728> **TRAINING**\nThere will be a *${role}* training on **` +
+        `${dateString}**.\nTime: **${timeString} ${timeHelper.isDst(training.date * 1000) ? 'CEST' : 'CET'}**.` +
+        `\n${specialNotes ? specialNotes + '\n' : ''}Hosted by **${by}**.\n@everyone`
+}
+
+exports.getRoleByAbbreviation = str => {
+    if (str) {
+        str = str.toUpperCase()
+        return str === 'G' ? 'Guest' : str === 'C' ? 'Customer' : str === 'S' ? 'Suspended' : str === 'TD' ?
+            'Train Driver' : str === 'CD' ? 'Conductor' : str === 'CSR' ? 'Customer Service Representative' : str
+            === 'CS' ? 'Customer Service' : str === 'J' ? 'Janitor' : str === 'Se' ? 'Security' : str === 'LC' ?
+            'Line Controller' : str === 'PR' ? 'Partner Representative' : str === 'R' ? 'Representative' : str ===
+            'MC' ? 'Management Coordinator' : str === 'OC' ? 'Operations Coordinator' : str === 'GA' ?
+            'Group Admin' : str === 'BoM' ? 'Board of Managers' : str === 'BoD' ? 'Board of Directors' : str ===
+            'CF' ? 'Co-Founder' : str === 'AA' ? 'Alt. Accounts' : str === 'PD' ? 'President-Director' : str ===
+            'UT' ? 'Update Tester' : str === 'P' ? 'Pending' : str === 'PH' ? 'Pending HR' : str === 'MoCR' ?
+            'Manager of Customer Relations' : str === 'MoSe' ? 'Manager of Security' : str === 'MoRS' ?
+            'Manager of Rolling Stock' : str === 'MoSt' ? 'Manager of Stations' : str === 'MoE' ?
+            'Manager of Events' : str === 'MoC' ? 'Manager of Conductors' : str === 'MoRM' ?
+            'Manager of Rail Management' : str === 'DoNSR' ? 'Director of NS Reizgers' : str === 'DoO' ?
+            'Director of Operations' : null
+    }
 }
