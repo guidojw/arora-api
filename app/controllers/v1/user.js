@@ -15,6 +15,12 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('userId').isNumeric()
             ]
+        case 'hasBadge':
+            return [
+                header('authorization').exists().isString(),
+                param('userId').isNumeric(),
+                param('badgeId').isNumeric()
+            ]
     }
 }
 
@@ -24,4 +30,8 @@ exports.getUserId = async (req, res) => {
 
 exports.getJoinDate = async (req, res) => {
     res.json(await userService.getJoinDate(req.params.userId))
+}
+
+exports.hasBadge = async (req, res) => {
+    res.json(await userService.hasBadge(req.params.userId, req.params.badgeId))
 }

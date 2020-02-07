@@ -2,6 +2,10 @@
 const roblox = require('noblox.js')
 
 exports.getStatus = async () => {
-    await roblox.getCurrentUser()
-    return true
+    try {
+        await roblox.getCurrentUser()
+        return true
+    } catch (err) {
+        return false
+    }
 }

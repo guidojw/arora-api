@@ -14,4 +14,7 @@ router.get('/:username/user-id', userController.validate('getUserId'), handleVal
 router.get('/:userId/join-date', userController.validate('getJoinDate'), handleValidationResult, authenticate,
     parseParams, userController.getJoinDate)
 
+router.get('/:userId/has-badge/:badgeId', userController.validate('hasBadge'), handleValidationResult,
+    parseParams, authenticate, userController.hasBadge)
+
 module.exports = router
