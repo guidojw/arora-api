@@ -1,5 +1,4 @@
 'use strict'
-require('dotenv').config()
 require('express-async-errors')
 
 const createError = require('http-errors')
