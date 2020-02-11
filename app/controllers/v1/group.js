@@ -237,7 +237,7 @@ exports.getShout = async (req, res) => {
 }
 
 exports.getRole = async (req, res) => {
-    res.json(await groupService.getRankNameInGroup(req.params.groupId, req.params.userId))
+    res.json(await groupService.getRole(req.params.groupId, req.params.userId))
 }
 
 exports.getSuspensions = async (req, res) => {
