@@ -46,7 +46,7 @@ exports.ban = async (groupId, userId, by, reason) => {
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
         .getUsernameFromId(by)])
     await (new DiscordMessageJob()).perform('log', `**${byUsername}** banned **${username}** with ` +
-        `reason "*$reason}*"`)
+        `reason "*${reason}*"`)
 }
 
 exports.putBan = async (userId, options) => {
