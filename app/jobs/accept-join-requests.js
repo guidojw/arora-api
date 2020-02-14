@@ -14,11 +14,11 @@ class AcceptJoinRequestsJob {
             for (const request of requests) {
                 const userId = await roblox.getIdFromUsername(request.username)
                 if (exiles.find(exile => exile.userId === userId)) {
-                    await roblox.handleJoinRequestId(groupId, request.requestId, false)
+                    await roblox.handleJoinRequest(groupId, request.username, false)
                     await (new DiscordMessageJob()).perform('log', `Declined **${request.username}**` +
                         '\'s join request')
                 } else {
-                    await roblox.handleJoinRequestId(groupId, request.requestId, true)
+                    await roblox.handleJoinRequest(groupId, request.username, true)
                     await (new DiscordMessageJob()).perform('log', `Accepted **${request.username}**` +
                         '\'s join request')
                     if (suspensions.find(suspension => suspension.userId === userId)) {
