@@ -3,7 +3,7 @@ require('dotenv').config()
 
 const axios = require('axios')
 
-class DiscordMessageJob {
+module.exports = class DiscordMessageJob {
     perform = async (type, message) => {
         if (type === 'log') {
             await this.sendLog(message)
@@ -38,5 +38,3 @@ class DiscordMessageJob {
         })
     }
 }
-
-module.exports = DiscordMessageJob
