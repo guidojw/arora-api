@@ -17,24 +17,9 @@ app.set('port', port)
 
 const server = http.createServer(app)
 
-const loginRoblox = async () => {
-    try {
-        await roblox.getCurrentUser()
-        return 'Roblox account is already logged in.'
-    } catch (err) {
-        console.error(err.message)
-        await roblox.cookieLogin(process.env.ROBLOX_COOKIE)
-        return 'Roblox account logged in!'
-    }
-}
-
-loginRoblox()
-    .then(message => console.log(message))
+roblox.cookieLogin(process.env.ROBLOX_COOKIE)
+    .then(() => console.log('Roblox account logged in!'))
     .catch(err => console.error(err.message))
-
-// roblox.cookieLogin(process.env.ROBLOX_COOKIE)
-//     .then(() => console.log('Roblox account logged in!'))
-//     .catch(err => console.error(err.message))
 
 models.sequelize.sync()
     .then(() => {

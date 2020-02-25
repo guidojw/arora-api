@@ -19,6 +19,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^5.12.4",
     "axios": "^0.19.2",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
