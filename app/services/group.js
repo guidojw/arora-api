@@ -264,7 +264,7 @@ exports.getFinishedSuspensions = async () => {
 exports.announceTraining = async (groupId, trainingId, medium) => {
     if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
         'Invalid medium')
-    const training = exports.getTraining(trainingId)
+    const training = await exports.getTraining(trainingId)
     if (!training) throw createError(404, 'Training not found')
     if (medium === 'roblox') {
         return await exports.announceRoblox(groupId)
