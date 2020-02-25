@@ -306,6 +306,5 @@ exports.getFinishedSuspensions = async (req, res) => {
 }
 
 exports.announceTraining = async (req, res) => {
-    await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.medium)
-    res.sendStatus(200)
+    res.json(groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.medium))
 }
