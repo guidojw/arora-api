@@ -19,9 +19,12 @@ const catalogRouter = require('./app/routes/catalog')
 const app = express()
 
 require('express-async-errors')
-Sentry.init({ dsn: process.env.SENTRY_DSN })
 
-app.use(Sentry.Handlers.requestHandler())
+if (process.env.SENTRY_DSN) {
+    Sentry.init({dsn: process.env.SENTRY_DSN})
+    app.use(Sentry.Handlers.requestHandler())
+}
+
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
@@ -38,7 +41,9 @@ app.use(() => {
     throw createError(404)
 })
 
-app.use(Sentry.Handlers.errorHandler())
+if (process.env.SENTRY_DSN) {
+    app.use(Sentry.Handlers.errorHandler())
+}
 
 app.use((err, req, res, next) => {
     sendError(res, err.status || 500, err.message)
