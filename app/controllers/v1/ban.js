@@ -37,7 +37,7 @@ exports.ban = async (req, res) => {
 }
 
 exports.putBan = async (req, res) => {
-    await banService.putBan(req.body.userId, {
+    await banService.putBan(req.params.userId, {
         unbanned: req.body.unbanned,
         by: req.body.by
     })
