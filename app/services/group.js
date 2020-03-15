@@ -3,12 +3,9 @@ const roblox = require('noblox.js')
 const createError = require('http-errors')
 const pluralize = require('pluralize')
 const axios = require('axios')
-
 const trelloService = require('./trello')
-
 const timeHelper = require('../helpers/time')
-
-const DiscordMessageJob = require('../jobs/discord-message')
+const discordMessageJob = require('../jobs/discord-message')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
@@ -41,8 +38,8 @@ exports.suspend = async (groupId, userId, options) => {
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
         .getUsernameFromId(options.by)])
     const days = options.duration / 86400
-    await (new DiscordMessageJob()).perform('log', `**${byUsername}** suspended **${username}** for **` +
-        `${days} ${pluralize('day', days)}** with reason "*${options.reason}*"`)
+    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days} ${pluralize
+    ('day', days)}** with reason "*${options.reason}*"`)
 }
 
 exports.getRank = async (groupId, userId) => {
@@ -57,11 +54,11 @@ exports.promote = async (groupId, userId, by) => {
     const roles = await roblox.changeRank(groupId, userId, rank === 1 ? 2 : 1)
     if (by) {
         const byUsername = await roblox.getUsernameFromId(by)
-        await (new DiscordMessageJob()).perform('log', `**${byUsername}** promoted **${username}** ` +
-            `from **${roles.oldRole.name}** to **${roles.newRole.name}**`)
+        await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${roles.oldRole
+            .name}** to **${roles.newRole.name}**`)
     } else {
-        await (new DiscordMessageJob()).perform('log', `Promoted **${username}** from **` +
-            `${roles.oldRole.name}** to **${roles.newRole.name}**`)
+        await discordMessageJob('log', `Promoted **${username}** from **${roles.oldRole.name}** to **${
+            roles.newRole.name}**`)
     }
     return roles
 }
@@ -159,9 +156,9 @@ exports.shout = async (groupId, by, message) => {
     const byUsername = await roblox.getUsernameFromId(by)
     await roblox.shout(groupId, message)
     if (message === '') {
-        await (new DiscordMessageJob()).perform('log', `**${byUsername}** cleared the shout`)
+        await discordMessageJob('log', `**${byUsername}** cleared the shout`)
     } else {
-        await (new DiscordMessageJob()).perform('log', `**${byUsername}** shouted *"${message}"*`)
+        await discordMessageJob('log', `**${byUsername}** shouted *"${message}"*`)
     }
 }
 
@@ -286,7 +283,7 @@ exports.announceRoblox = async (groupId /*, training*/ ) => {
 
 exports.announceDiscord = async (groupId, training) => {
     const announcement = exports.getTrainingAnnouncement(training)
-    await (new DiscordMessageJob()).perform('training', announcement)
+    await discordMessageJob('training', announcement)
     return announcement
 }
 

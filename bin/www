@@ -12,7 +12,7 @@ const cronConfig = require('../config/cron')
 
 const models = require('../app/models')
 
-var port = normalizePort(process.env.PORT || '3000')
+const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
 const server = http.createServer(app)
@@ -33,9 +33,9 @@ models.sequelize.sync()
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
         const [...args] = job.args
-        cron.schedule(job.cron, () => new job.class().perform(...args))
+        cron.schedule(job.expression, () => job.job(...args))
     } else {
-        cron.schedule(job.cron, new job.class().perform)
+        cron.schedule(job.expression, job.job)
     }
 }
 
