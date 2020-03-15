@@ -1,9 +1,7 @@
 'use strict'
 const { body } = require('express-validator')
-
 const trelloService = require('../../services/trello')
-
-const DiscordMessageJob = require('../../jobs/discord-message')
+const discordMessageJob = require('../../jobs/discord-message')
 
 exports.validate = method => {
     switch (method) {
@@ -21,6 +19,6 @@ exports.head = (req, res) => {
 
 exports.postWebhook = async (req, res) => {
     const embed = await trelloService.getActionEmbed(req.body.action)
-    if (embed) await (new DiscordMessageJob()).perform('trello', { embeds: [embed] })
+    if (embed) await discordMessageJob('trello', { embeds: [embed] })
     res.sendStatus(200)
 }

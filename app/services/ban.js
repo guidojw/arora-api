@@ -1,12 +1,9 @@
 'use strict'
 const roblox = require('noblox.js')
 const createError = require('http-errors')
-
 const trelloService = require('./trello')
-
 const timeHelper = require('../helpers/time')
-
-const DiscordMessageJob = require('../jobs/discord-message')
+const discordMessageJob = require('../jobs/discord-message')
 
 exports.getBans = async () => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
@@ -45,8 +42,7 @@ exports.ban = async (groupId, userId, by, reason) => {
     })
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
         .getUsernameFromId(by)])
-    await (new DiscordMessageJob()).perform('log', `**${byUsername}** banned **${username}** with ` +
-        `reason "*${reason}*"`)
+    await discordMessageJob('log', `**${byUsername}** banned **${username}** with reason "*${reason}*"`)
 }
 
 exports.putBan = async (userId, options) => {
@@ -61,8 +57,7 @@ exports.putBan = async (userId, options) => {
                 })
                 const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
                     .getUsernameFromId(options.by)])
-                await (new DiscordMessageJob()).perform('log', `**${byUsername}** unbanned ` +
-                    `**${username}**.`)
+                await discordMessageJob('log', `**${byUsername}** unbanned **${username}**.`)
                 return
             }
         }
