@@ -1,5 +1,5 @@
 'use strict'
-const { header, query } = require('express-validator')
+const { header } = require('express-validator')
 
 const catalogService = require('../../services/catalog')
 
