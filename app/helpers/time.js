@@ -10,13 +10,6 @@ function getReadableTime(opts) {
     return opts.hours + ':' + opts.minutes
 }
 
-exports.getUnix = date => {
-    if (!date) {
-        date = new Date()
-    }
-    return Math.round(date.getTime() / 1000)
-}
-
 exports.getDate = unix => {
     const dateObject = new Date(unix)
     const day = String(dateObject.getDate())

@@ -2,7 +2,6 @@
 const roblox = require('noblox.js')
 const createError = require('http-errors')
 const trelloService = require('./trello')
-const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
 
 exports.getBans = async () => {
@@ -37,7 +36,7 @@ exports.ban = async (groupId, userId, by, reason) => {
             rank: rank,
             by: by,
             reason: reason,
-            at: timeHelper.getUnix()
+            at: Math.round(Date.now() / 1000)
         })
     })
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox

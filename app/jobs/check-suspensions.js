@@ -2,10 +2,8 @@
 const roblox = require('noblox.js')
 const discordMessageJob = require('./discord-message')
 const trelloService = require('../services/trello')
-const timeHelper = require('../helpers/time')
 
 module.exports = async groupId => {
-    const now = timeHelper.getUnix()
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
     const listId = await trelloService.getIdFromListName(boardId, 'Current')
     const newListId = await trelloService.getIdFromListName(boardId, 'Done')
@@ -19,7 +17,7 @@ module.exports = async groupId => {
                 duration += extension.duration
             }
         }
-        if (suspension.at + duration <= now) {
+        if (suspension.at + duration <= Math.round(Date.now() / 1000)) {
             await roblox.setRank(groupId, suspension.userId, suspension.rankback ? suspension.rank : 1)
             await trelloService.putCard(card.id, { idList: newListId })
             const username = await roblox.getUsernameFromId(suspension.userId)
