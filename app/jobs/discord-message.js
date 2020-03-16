@@ -10,6 +10,8 @@ module.exports = async (type, message) => {
         await sendTraining(message)
     } else if (type === 'trello') {
         await sendTrello(message)
+    } else if (type === 'backupNotification') {
+        await sendBackupNotification(message)
     }
 }
 
@@ -33,6 +35,14 @@ const sendTrello = async body => {
     await axios({
         method: 'post',
         url: process.env.DISCORD_TRELLO_WEBHOOK_URL,
+        data: body
+    })
+}
+
+const sendBackupNotification = async body => {
+    await axios({
+        method: 'post',
+        url: process.env.DISCORD_BACKUP_NOTIFICATION_WEBHOOK_URL,
         data: body
     })
 }
