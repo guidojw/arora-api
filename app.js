@@ -8,6 +8,8 @@ const Sentry = require('@sentry/node')
 
 const { sendError } = require('./app/middlewares/error')
 
+require('express-async-errors')
+
 const groupsRouter = require('./app/routes/groups')
 const usersRouter = require('./app/routes/users')
 const bansRouter = require('./app/routes/bans')
@@ -16,8 +18,6 @@ const trelloRouter = require('./app/routes/trello')
 const catalogRouter = require('./app/routes/catalog')
 
 const app = express()
-
-require('express-async-errors')
 
 if (process.env.SENTRY_DSN) {
     Sentry.init({dsn: process.env.SENTRY_DSN})
