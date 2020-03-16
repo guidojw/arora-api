@@ -32,14 +32,14 @@ exports.suspend = async (groupId, userId, options) => {
             duration: options.duration,
             by: options.by,
             reason: options.reason,
-            at: timeHelper.getUnix()
+            at: Math.round(Date.now() / 1000)
         })
     })
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
         .getUsernameFromId(options.by)])
     const days = options.duration / 86400
-    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days} ${pluralize
-    ('day', days)}** with reason "*${options.reason}*"`)
+    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days} ${
+        pluralize('day', days)}** with reason "*${options.reason}*"`)
 }
 
 exports.getRank = async (groupId, userId) => {
@@ -109,7 +109,7 @@ exports.hostTraining = async options => {
             type: options.type,
             date: options.date,
             specialnotes: options.specialnotes,
-            at: timeHelper.getUnix()
+            at: Math.round(Date.now() / 1000)
         })
     })
     return trainingId
@@ -179,14 +179,14 @@ exports.putTraining = async (trainingId, options) => {
                 trainingData.cancelled = {
                     by: options.by,
                     reason: options.reason,
-                    at: timeHelper.getUnix()
+                    at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Cancelled')
             }
             if (options.finished) {
                 trainingData.finished = {
                     by: options.by,
-                    at: timeHelper.getUnix()
+                    at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Finished')
             }
@@ -212,7 +212,7 @@ exports.putSuspension = async (userId, options) => {
                 suspensionData.cancelled = {
                     by: options.by,
                     reason: options.reason,
-                    at: timeHelper.getUnix()
+                    at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Done')
             }
@@ -229,7 +229,7 @@ exports.putSuspension = async (userId, options) => {
                     by: options.by,
                     duration: options.duration * 86400,
                     reason: options.reason,
-                    at: timeHelper.getUnix()
+                    at: Math.round(Date.now() / 1000)
                 })
             }
             cardOptions.desc = JSON.stringify(suspensionData)
@@ -275,7 +275,7 @@ exports.announceTraining = async (groupId, trainingId, medium) => {
     }
 }
 
-exports.announceRoblox = async (groupId /*, training*/ ) => {
+exports.announceRoblox = async groupId => {
     const shout = exports.defaultTrainingShout
     await roblox.shout(groupId, shout)
     return shout
@@ -301,6 +301,7 @@ exports.getTrainingAnnouncement = training => {
 exports.getRoleByAbbreviation = str => {
     if (str) {
         str = str.toUpperCase()
+        /* eslint-disable indent */
         return str === 'G' ? 'Guest' : str === 'C' ? 'Customer' : str === 'S' ? 'Suspended' : str === 'TD' ?
             'Train Driver' : str === 'CD' ? 'Conductor' : str === 'CSR' ? 'Customer Service Representative' : str
             === 'CS' ? 'Customer Service' : str === 'J' ? 'Janitor' : str === 'Se' ? 'Security' : str === 'LC' ?
@@ -314,5 +315,6 @@ exports.getRoleByAbbreviation = str => {
             'Manager of Events' : str === 'MoC' ? 'Manager of Conductors' : str === 'MoRM' ?
             'Manager of Rail Management' : str === 'DoNSR' ? 'Director of NS Reizgers' : str === 'DoO' ?
             'Director of Operations' : null
+        /* eslint-enable indent */
     }
 }
