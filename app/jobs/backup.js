@@ -10,7 +10,8 @@ module.exports = () => {
     const backupName = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date
         .getMinutes()}`
     const backupFile = `export_${backupName}.tar`
-    const backupScript = `pg_dump -Ft --username=${databaseConfig.username} ${databaseConfig.database}`
+    const backupScript = `pg_dump -Ft --username=${databaseConfig.username} -h ${databaseConfig.host} ${databaseConfig
+        .database}`
 
     execFile(
         path.resolve(__dirname, '../../bin/backup.sh'),
