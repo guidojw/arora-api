@@ -1,6 +1,7 @@
 'use strict'
 const roblox = require('noblox.js')
 const axios = require('axios')
+const robloxManager = require('../managers/roblox')
 
 exports.getUserId = async username => {
     return await roblox.getIdFromUsername(username)

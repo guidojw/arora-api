@@ -6,6 +6,7 @@ const axios = require('axios')
 const trelloService = require('./trello')
 const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
+const robloxManager = require('../managers/roblox')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
