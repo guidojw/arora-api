@@ -1,17 +1,18 @@
 'use strict'
-const roblox = require('noblox.js')
 const createError = require('http-errors')
 const pluralize = require('pluralize')
-const axios = require('axios')
 const trelloService = require('./trello')
 const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
+const robloxManager = require('../managers/roblox')
+const userService = require('../services/user')
+const axios = require('axios')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
 
 exports.suspend = async (groupId, userId, options) => {
-    const rank = await exports.getRank(groupId, userId)
+    const rank = await userService.getRank(userId, groupId)
     if (rank === 2) throw createError(409, 'User is already suspended')
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable')
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
@@ -21,7 +22,10 @@ exports.suspend = async (groupId, userId, options) => {
         if (parseInt(card.name) === userId) throw createError(409, 'User is already suspended')
     }
     if (rank > 0 && rank !== 2) {
-        await roblox.setRank(groupId, userId, 2)
+        const roles = await exports.getRoles(groupId)
+        const roleId = roles.roles.find(role => role.rank === 2).id
+        const client = robloxManager.getClient(groupId)
+        await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
     }
     await trelloService.postCard({
         idList: listId,
@@ -35,40 +39,39 @@ exports.suspend = async (groupId, userId, options) => {
             at: Math.round(Date.now() / 1000)
         })
     })
-    const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
-        .getUsernameFromId(options.by)])
+    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
+        .getUsername(options.by)])
     const days = options.duration / 86400
     await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days} ${
         pluralize('day', days)}** with reason "*${options.reason}*"`)
 }
 
-exports.getRank = async (groupId, userId) => {
-    return await roblox.getRankInGroup(groupId, userId)
-}
-
 exports.promote = async (groupId, userId, by) => {
-    const rank = await exports.getRank(groupId, userId)
+    const rank = await userService.getRank(userId, groupId)
     if (rank === 0) throw createError(403, 'Can only promote group members')
     if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
-    const username = await roblox.getUsernameFromId(userId)
-    const roles = await roblox.changeRank(groupId, userId, rank === 1 ? 2 : 1)
+    const username = await userService.getUsername(userId)
+    const roles = await exports.getRoles(groupId)
+    const newRank = rank === 1 ? 3 : rank + 1
+    const oldRole = roles.roles.find(role => role.rank === rank)
+    const newRole = roles.roles.find(role => role.rank === newRank)
+    const client = robloxManager.getClient(groupId)
+    await client.apis.updateMemberInGroup({ groupId, userId, roleId: newRole.id })
     if (by) {
-        const byUsername = await roblox.getUsernameFromId(by)
-        await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${roles.oldRole
-            .name}** to **${roles.newRole.name}**`)
+        const byUsername = await userService.getUsername(by)
+        await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${oldRole.name
+        }** to **${newRole.name}**`)
     } else {
-        await discordMessageJob('log', `Promoted **${username}** from **${roles.oldRole.name}** to **${
-            roles.newRole.name}**`)
+        await discordMessageJob('log', `Promoted **${username}** from **${oldRole.name}** to **${newRole
+            .name}**`)
     }
     return roles
 }
 
 exports.getShout = async groupId => {
-    return await roblox.getShout(groupId)
-}
-
-exports.getRole = async (groupId, userId) => {
-    return await roblox.getRankNameInGroup(groupId, userId)
+    const client = await robloxManager.getClient(groupId)
+    const info = await client.apis.groups.getGroupInfo(groupId)
+    return info.shout
 }
 
 exports.getSuspensions = async () => {
@@ -153,13 +156,15 @@ exports.getTraining = async trainingId => {
 }
 
 exports.shout = async (groupId, by, message) => {
-    const byUsername = await roblox.getUsernameFromId(by)
-    await roblox.shout(groupId, message)
-    if (message === '') {
+    const client = robloxManager.getClient(groupId)
+    const shout = await client.apis.groups.updateGroupShout({ groupId, message })
+    const byUsername = await userService.getUsername(by)
+    if (shout.body === '') {
         await discordMessageJob('log', `**${byUsername}** cleared the shout`)
     } else {
-        await discordMessageJob('log', `**${byUsername}** shouted *"${message}"*`)
+        await discordMessageJob('log', `**${byUsername}** shouted *"${shout.body}"*`)
     }
+    return shout
 }
 
 exports.putTraining = async (trainingId, options) => {
@@ -219,9 +224,9 @@ exports.putSuspension = async (userId, options) => {
             if (options.extended) {
                 let days = suspensionData.duration / 86400
                 if (!suspensionData.extended) suspensionData.extended = []
-                suspensionData.extended.forEach(extension => {
+                for (const extension of suspensionData.extended) {
                     days += extension.duration / 86400
-                })
+                }
                 days += options.duration
                 if (days < 1) throw createError(403, 'Insufficient amount of days')
                 if (days > 7) throw createError(403, 'Too many days')
@@ -238,11 +243,9 @@ exports.putSuspension = async (userId, options) => {
     }
 }
 
-exports.getGroup = async groupId => {
-    return (await axios({
-        method: 'get',
-        url: `https://groups.roblox.com/v1/groups/${groupId}`
-    })).data
+exports.getGroup = groupId => {
+    const client = robloxManager.getClient(groupId)
+    return client.apis.groups.getGroupInfo(groupId)
 }
 
 exports.getFinishedSuspensions = async () => {
@@ -264,9 +267,9 @@ exports.announceTraining = async (groupId, trainingId, medium) => {
     const training = await exports.getTraining(trainingId)
     if (!training) throw createError(404, 'Training not found')
     if (medium === 'roblox') {
-        return await exports.announceRoblox(groupId)
+        return exports.announceRoblox(groupId)
     } else if (medium === 'discord') {
-        return await exports.announceDiscord(groupId, training)
+        return exports.announceDiscord(groupId, training)
     } else if (medium === 'both') {
         return {
             shout: await exports.announceRoblox(groupId),
@@ -276,9 +279,9 @@ exports.announceTraining = async (groupId, trainingId, medium) => {
 }
 
 exports.announceRoblox = async groupId => {
-    const shout = exports.defaultTrainingShout
-    await roblox.shout(groupId, shout)
-    return shout
+    const client = robloxManager.getClient(groupId)
+    const shout = await client.apis.groups.updateGroupShout({ groupId, message: exports.defaultTrainingShout })
+    return shout.body
 }
 
 exports.announceDiscord = async (groupId, training) => {
@@ -317,4 +320,11 @@ exports.getRoleByAbbreviation = str => {
             'Director of Operations' : null
         /* eslint-enable indent */
     }
+}
+
+exports.getRoles = async groupId => {
+    return (await axios({
+        method: 'get',
+        url: `https://groups.roblox.com/v1/groups/${groupId}/roles`
+    })).data
 }

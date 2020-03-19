@@ -21,6 +21,18 @@ exports.validate = method => {
                 param('userId').isNumeric(),
                 param('badgeId').isNumeric()
             ]
+        case 'getRank':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric()
+            ]
+        case 'getRole':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric()
+            ]
     }
 }
 
@@ -34,4 +46,12 @@ exports.getJoinDate = async (req, res) => {
 
 exports.hasBadge = async (req, res) => {
     res.json(await userService.hasBadge(req.params.userId, req.params.badgeId))
+}
+
+exports.getRank = async (req, res) => {
+    res.json(await userService.getRank(req.params.userId, req.params.groupId))
+}
+
+exports.getRole = async (req, res) => {
+    res.json(await userService.getRole(req.params.userId, req.params.groupId))
 }
