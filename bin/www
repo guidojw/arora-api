@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 'use strict'
-require('dotenv').config()
-
 const app = require('../app')
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
-const roblox = require('noblox.js')
 const cron = require('node-cron')
 const robloxManager = require('../app/managers/roblox')
 
@@ -17,10 +14,6 @@ const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
 const server = http.createServer(app)
-
-roblox.cookieLogin(process.env.ROBLOX_COOKIE)
-    .then(() => console.log('Roblox account logged in!'))
-    .catch(err => console.error(err.message))
 
 robloxManager.init()
     .then(() => console.log('Roblox account logged in!'))

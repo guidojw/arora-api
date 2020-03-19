@@ -6,6 +6,7 @@ const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
 const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
+const axios = require('axios')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
@@ -21,7 +22,10 @@ exports.suspend = async (groupId, userId, options) => {
         if (parseInt(card.name) === userId) throw createError(409, 'User is already suspended')
     }
     if (rank > 0 && rank !== 2) {
-        await roblox.setRank(groupId, userId, 2)
+        const roles = await exports.getRoles(groupId)
+        const roleId = roles.roles.find(role => role.rank === 2).id
+        const client = robloxManager.getClient(groupId)
+        await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
     }
     await trelloService.postCard({
         idList: listId,
@@ -47,14 +51,19 @@ exports.promote = async (groupId, userId, by) => {
     if (rank === 0) throw createError(403, 'Can only promote group members')
     if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
     const username = await userService.getUsername(userId)
-    const roles = await roblox.changeRank(groupId, userId, rank === 1 ? 2 : 1)
+    const roles = await exports.getRoles(groupId)
+    const newRank = rank === 1 ? 3 : rank + 1
+    const oldRole = roles.roles.find(role => role.rank === rank)
+    const newRole = roles.roles.find(role => role.rank === newRank)
+    const client = robloxManager.getClient(groupId)
+    await client.apis.updateMemberInGroup({ groupId, userId, roleId: newRole.id })
     if (by) {
         const byUsername = await userService.getUsername(by)
-        await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${roles.oldRole
-            .name}** to **${roles.newRole.name}**`)
+        await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${oldRole.name
+        }** to **${newRole.name}**`)
     } else {
-        await discordMessageJob('log', `Promoted **${username}** from **${roles.oldRole.name}** to **${
-            roles.newRole.name}**`)
+        await discordMessageJob('log', `Promoted **${username}** from **${oldRole.name}** to **${newRole
+            .name}**`)
     }
     return roles
 }
@@ -147,13 +156,15 @@ exports.getTraining = async trainingId => {
 }
 
 exports.shout = async (groupId, by, message) => {
+    const client = robloxManager.getClient(groupId)
+    const shout = await client.apis.groups.updateGroupShout({ groupId, message })
     const byUsername = await userService.getUsername(by)
-    await roblox.shout(groupId, message)
-    if (message === '') {
+    if (shout.body === '') {
         await discordMessageJob('log', `**${byUsername}** cleared the shout`)
     } else {
-        await discordMessageJob('log', `**${byUsername}** shouted *"${message}"*`)
+        await discordMessageJob('log', `**${byUsername}** shouted *"${shout.body}"*`)
     }
+    return shout
 }
 
 exports.putTraining = async (trainingId, options) => {
@@ -232,7 +243,7 @@ exports.putSuspension = async (userId, options) => {
     }
 }
 
-exports.getGroup = async groupId => {
+exports.getGroup = groupId => {
     const client = robloxManager.getClient(groupId)
     return client.apis.groups.getGroupInfo(groupId)
 }
@@ -268,9 +279,9 @@ exports.announceTraining = async (groupId, trainingId, medium) => {
 }
 
 exports.announceRoblox = async groupId => {
-    const shout = exports.defaultTrainingShout
-    await roblox.shout(groupId, shout)
-    return shout
+    const client = robloxManager.getClient(groupId)
+    const shout = await client.apis.groups.updateGroupShout({ groupId, message: exports.defaultTrainingShout })
+    return shout.body
 }
 
 exports.announceDiscord = async (groupId, training) => {
@@ -309,4 +320,11 @@ exports.getRoleByAbbreviation = str => {
             'Director of Operations' : null
         /* eslint-enable indent */
     }
+}
+
+exports.getRoles = async groupId => {
+    return (await axios({
+        method: 'get',
+        url: `https://groups.roblox.com/v1/groups/${groupId}/roles`
+    })).data
 }

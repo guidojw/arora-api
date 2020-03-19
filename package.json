@@ -10,12 +10,6 @@
     "start:dev": "nodemon ./bin/www",
     "lint": "eslint app"
   },
-  "keywords": [
-    "noblox.js",
-    "javascript",
-    "roblox",
-    "bot"
-  ],
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
@@ -30,7 +24,6 @@
     "http-errors": "^1.7.3",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.9.1",
-    "noblox.js": "^4.5.0",
     "node-cron": "^2.0.3",
     "node-trello": "^1.3.0",
     "pg": "^7.18.2",
