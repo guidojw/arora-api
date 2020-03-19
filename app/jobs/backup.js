@@ -21,9 +21,11 @@ module.exports = () => {
                 throw error
             } else {
                 discordMessageJob('backupNotification', {
-                    title: `${databaseConfig.database}-backup successful`,
-                    description: `${databaseConfig.database}-backup has been executed successfully!`,
-                    color: 65313
+                    embeds: [{
+                        title: `${databaseConfig.database}-backup successful`,
+                        description: `${databaseConfig.database}-backup has been executed successfully!`,
+                        color: 65313
+                    }]
                 })
             }
         }
