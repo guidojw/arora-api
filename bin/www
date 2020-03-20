@@ -19,10 +19,6 @@ robloxManager.init()
     .then(() => console.log('Roblox account logged in!'))
     .catch(err => console.error(err.message))
 
-robloxManager.init()
-    .then(() => console.log('Roblox account logged in!'))
-    .catch(err => console.error(err.message))
-
 models.sequelize.sync()
     .then(() => {
         console.log('Database & tables created!')
