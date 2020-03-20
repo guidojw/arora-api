@@ -56,7 +56,7 @@ exports.promote = async (groupId, userId, by) => {
     const oldRole = roles.roles.find(role => role.rank === rank)
     const newRole = roles.roles.find(role => role.rank === newRank)
     const client = robloxManager.getClient(groupId)
-    await client.apis.updateMemberInGroup({ groupId, userId, roleId: newRole.id })
+    await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId: newRole.id })
     if (by) {
         const byUsername = await userService.getUsername(by)
         await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${oldRole.name
