@@ -17,10 +17,4 @@ router.get('/:userId/join-date', userController.validate('getJoinDate'), handleV
 router.get('/:userId/has-badge/:badgeId', userController.validate('hasBadge'), handleValidationResult,
     parseParams, authenticate, userController.hasBadge)
 
-router.get('/:userId/rank/:groupId', userController.validate('getRank'), handleValidationResult, authenticate,
-    parseParams, userController.getRank)
-
-router.get('/:userId/role/:groupId', userController.validate('getRole'), handleValidationResult, authenticate,
-    parseParams, userController.getRole)
-
 module.exports = router
