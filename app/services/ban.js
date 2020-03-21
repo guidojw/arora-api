@@ -1,8 +1,8 @@
 'use strict'
+const roblox = require('noblox.js')
 const createError = require('http-errors')
 const trelloService = require('./trello')
 const discordMessageJob = require('../jobs/discord-message')
-const userService = require('../services/user')
 
 exports.getBans = async () => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
@@ -21,7 +21,7 @@ exports.getBans = async () => {
 }
 
 exports.ban = async (groupId, userId, by, reason) => {
-    const rank = await userService.getRank(userId, groupId)
+    const rank = await roblox.getRankInGroup(groupId, userId)
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
     const listId = await trelloService.getIdFromListName(boardId, 'Banned')
@@ -39,8 +39,8 @@ exports.ban = async (groupId, userId, by, reason) => {
             at: Math.round(Date.now() / 1000)
         })
     })
-    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
-        by)])
+    const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
+        .getUsernameFromId(by)])
     await discordMessageJob('log', `**${byUsername}** banned **${username}** with reason "*${reason}*"`)
 }
 
@@ -54,8 +54,8 @@ exports.putBan = async (userId, options) => {
                 await trelloService.putCard(card.id, {
                     idList: await trelloService.getIdFromListName(boardId, 'Unbanned')
                 })
-                const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
-                    .getUsername(options.by)])
+                const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
+                    .getUsernameFromId(options.by)])
                 await discordMessageJob('log', `**${byUsername}** unbanned **${username}**.`)
                 return
             }

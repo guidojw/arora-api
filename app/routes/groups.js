@@ -11,11 +11,17 @@ const { authenticate } = require('../middlewares/auth')
 router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult, authenticate,
     parseParams, groupController.suspend)
 
+router.get('/:groupId/rank/:userId', groupController.validate('getRank'), handleValidationResult, authenticate,
+    parseParams, groupController.getRank)
+
 router.post('/:groupId/promote/:userId', groupController.validate('promote'), handleValidationResult,
     authenticate, parseParams, groupController.promote)
 
 router.get('/:groupId/shout', groupController.validate('getShout'), handleValidationResult, authenticate,
     parseParams, groupController.getShout)
+
+router.get('/:groupId/role/:userId', groupController.validate('getRole'), handleValidationResult, authenticate,
+    parseParams, groupController.getRole)
 
 router.get('/:groupId/suspensions', groupController.validate('getSuspensions'), handleValidationResult,
     authenticate, parseParams, groupController.getSuspensions)
