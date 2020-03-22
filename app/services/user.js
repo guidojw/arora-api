@@ -19,3 +19,11 @@ exports.hasBadge = async (userId, badgeId) => {
         url: `https://inventory.roblox.com/v1/users/${userId}/items/Badge/${badgeId}`
     })).data.data.length === 1
 }
+
+exports.getUsers = async (userIds, excludeBannedUsers) => {
+    return (await axios({
+        method: 'post',
+        url: 'https://users.roblox.com/v1/users',
+        data: { userIds, excludeBannedUsers }
+    })).data
+}
