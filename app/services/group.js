@@ -207,7 +207,7 @@ exports.putSuspension = async (userId, options) => {
             if (options.by && options.cancelled === undefined && options.extended === undefined) suspensionData.by =
                 options.by
             if (options.reason) suspensionData.reason = options.reason
-            if (options.rankback) suspensionData.rankback = options.rankback
+            if (options.rankback === 0 || options.rankback === 1) suspensionData.rankback = options.rankback
             if (options.cancelled) {
                 suspensionData.cancelled = {
                     by: options.by,
