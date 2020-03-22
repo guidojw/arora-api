@@ -1,5 +1,5 @@
 'use strict'
-const { param, header } = require('express-validator')
+const { param, header, body } = require('express-validator')
 
 const userService = require('../../services/user')
 
@@ -21,6 +21,12 @@ exports.validate = method => {
                 param('userId').isNumeric(),
                 param('badgeId').isNumeric()
             ]
+        case 'getUsers':
+            return [
+                header('authorization').exists().isString(),
+                body('userIds').exists(),
+                body('excludeBannedUsers').optional().isBoolean()
+            ]
     }
 }
 
@@ -34,4 +40,8 @@ exports.getJoinDate = async (req, res) => {
 
 exports.hasBadge = async (req, res) => {
     res.json(await userService.hasBadge(req.params.userId, req.params.badgeId))
+}
+
+exports.getUsers = async (req, res) => {
+    res.json(await userService.getUsers(req.body.userIds, req.body.excludeBannedUsers))
 }
