@@ -4,4 +4,3 @@
 config/database.json
 ecosystem.config.js
 *.key
-cookie
