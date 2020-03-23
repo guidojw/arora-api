@@ -7,7 +7,7 @@ const clients = { authenticated: {} }
 
 exports.init = async () => {
     try {
-        const client = new Client()
+        const client = new Client({ setup: { throwHttpErrors: true }})
         await client.login({ cookie: process.env.ROBLOX_COOKIE })
         const groups = await client.user.getGroups()
         const groupIds = groups.map(group => group.id)
@@ -17,7 +17,7 @@ exports.init = async () => {
     } catch (err) {
         console.error(err.message)
     }
-    clients.unauthenticated = new Client()
+    clients.unauthenticated = new Client({ setup: { throwHttpErrors: true }})
 }
 
 exports.getClient = groupId => {
