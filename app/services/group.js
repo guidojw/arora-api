@@ -6,6 +6,7 @@ const axios = require('axios')
 const trelloService = require('./trello')
 const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
+const stringHelper = require('../helpers/string')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
@@ -25,7 +26,7 @@ exports.suspend = async (groupId, userId, options) => {
     }
     await trelloService.postCard({
         idList: listId,
-        name: userId.toString(),
+        name: userId,
         desc: JSON.stringify({
             rank: rank,
             rankback: options.rankback,
@@ -97,13 +98,13 @@ exports.getTrainings = async () => {
     return trainings
 }
 
-exports.hostTraining = async options => {
+exports.scheduleTraining = async options => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Training Scheduler')
     const listId = await trelloService.getIdFromListName(boardId, 'Scheduled')
     const trainingId = await trelloService.getCardsNumOnBoard(boardId) + 1
     await trelloService.postCard({
         idList: listId,
-        name: trainingId.toString(),
+        name: trainingId,
         desc: JSON.stringify({
             by: options.by,
             type: options.type,
@@ -112,6 +113,11 @@ exports.hostTraining = async options => {
             at: Math.round(Date.now() / 1000)
         })
     })
+    const dateString = timeHelper.getDate(options.date * 1000)
+    const timeString = timeHelper.getTime(options.date * 1000)
+    await discordMessageJob('log', `**${options.by}** scheduled a **${options.type.toUpperCase()}** ` +
+        `training at **${dateString} ${timeString} ${timeHelper.isDst(options.date * 1000) ? 'CEST' : 'CET'}**` +
+    `${options.specialnotes ? ' with note "*' + options.specialnotes + '*"' : ''}`)
     return trainingId
 }
 
@@ -158,84 +164,128 @@ exports.shout = async (groupId, by, message) => {
     if (message === '') {
         await discordMessageJob('log', `**${byUsername}** cleared the shout`)
     } else {
-        await discordMessageJob('log', `**${byUsername}** shouted *"${message}"*`)
+        await discordMessageJob('log', `**${byUsername}** shouted "*${message}*"`)
     }
 }
 
-exports.putTraining = async (trainingId, options) => {
+exports.putTraining = async (groupId, trainingId, options) => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Training Scheduler')
     const listId = await trelloService.getIdFromListName(boardId, 'Scheduled')
     const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
     for (const card of cards) {
         if (parseInt(card.name) === trainingId) {
             const cardOptions = {}
-            const trainingData = JSON.parse(card.desc)
-            if (options.by && options.cancelled === undefined && options.finished === undefined) trainingData.by =
-                options.by
-            if (options.type) trainingData.type = options.type
-            if (options.date) trainingData.date = options.date
-            if (options.specialnotes) trainingData.specialnotes = options.specialnotes
+            const training = JSON.parse(card.desc)
+            const byUsername = await roblox.getUsernameFromId(options.byUserId)
+            if (options.by && options.cancelled === undefined && options.finished === undefined) {
+                training.by = options.by
+                const newByUsername = await roblox.getUsernameFromId(options.by)
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` host to **${newByUsername}**`)
+            }
+            if (options.type) {
+                training.type = options.type
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` type to **${options.type.toUpperCase()}**`)
+            }
+            if (options.date) {
+                training.date = options.date
+                const dateString = timeHelper.getDate(training.date * 1000)
+                const timeString = timeHelper.getTime(training.date * 1000)
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` date to **${dateString} ${timeString} ${timeHelper.isDst(training.date * 1000) ? 'CEST' : 
+                        'CET'}**`)
+            }
+            if (options.specialnotes) {
+                training.specialnotes = options.specialnotes
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` note to "*${options.specialnotes}*"`)
+            }
             if (options.cancelled) {
-                trainingData.cancelled = {
-                    by: options.by,
+                training.cancelled = {
+                    by: options.byUserId,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Cancelled')
+                await discordMessageJob('log', `**${byUsername}** cancelled training **${trainingId}**` +
+                    `with reason "*${options.reason}*"`)
             }
             if (options.finished) {
-                trainingData.finished = {
-                    by: options.by,
+                training.finished = {
+                    by: options.byUserId,
                     at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Finished')
+                await discordMessageJob('log', `**${byUsername}** finished training **${trainingId}**`)
             }
-            cardOptions.desc = JSON.stringify(trainingData)
+            cardOptions.desc = JSON.stringify(training)
             return trelloService.putCard(card.id, cardOptions)
         }
     }
+    throw createError(404)
 }
 
-exports.putSuspension = async (userId, options) => {
+exports.putSuspension = async (groupId, userId, options) => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
     const listId = await trelloService.getIdFromListName(boardId, 'Current')
     const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
     for (const card of cards) {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
-            const suspensionData = JSON.parse(card.desc)
-            if (options.by && options.cancelled === undefined && options.extended === undefined) suspensionData.by =
-                options.by
-            if (options.reason) suspensionData.reason = options.reason
-            if (options.rankback === 0 || options.rankback === 1) suspensionData.rankback = options.rankback
+            const suspension = JSON.parse(card.desc)
+            const username = await roblox.getUsernameFromId(userId)
+            const byUsername = await roblox.getUsernameFromId(options.byUserId)
+            if (options.by && options.cancelled === undefined && options.extended === undefined) {
+                suspension.by = options.by
+                const newByUsername = await roblox.getUsernameFromId(options.by)
+                await discordMessageJob('log', `**${byUsername}** changed the author of **${username}*` +
+                    `*'s suspension to **${newByUsername}**`)
+            }
+            if (options.reason) {
+                suspension.reason = options.reason
+                await discordMessageJob('log', `**${byUsername}** changed the reason of **${username}*` +
+                    `*'s suspension to *"${options.reason}"*`)
+            }
+            if (options.rankback === 1 || options.rankback === 0) {
+                suspension.rankback = options.rankback
+                await discordMessageJob('log', `**${byUsername}** changed the rankBack option of **${
+                    username}**'s suspension to **${options.rankback === 1 ? 'yes' : 'no'}**`)
+            }
             if (options.cancelled) {
-                suspensionData.cancelled = {
-                    by: options.by,
+                suspension.cancelled = {
+                    by: options.byUserId,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 }
+                await roblox.setRank(groupId, userId, suspension.rank)
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Done')
+                await discordMessageJob('log', `**${byUsername}** cancelled **${username}**'s ` +
+                    `suspension with reason "*${options.reason}*"`)
             }
             if (options.extended) {
-                let days = suspensionData.duration / 86400
-                if (!suspensionData.extended) suspensionData.extended = []
-                suspensionData.extended.forEach(extension => {
+                let days = suspension.duration / 86400
+                if (!suspension.extended) suspension.extended = []
+                suspension.extended.forEach(extension => {
                     days += extension.duration / 86400
                 })
                 days += options.duration
                 if (days < 1) throw createError(403, 'Insufficient amount of days')
                 if (days > 7) throw createError(403, 'Too many days')
-                suspensionData.extended.push({
-                    by: options.by,
+                suspension.extended.push({
+                    by: options.byUserId,
                     duration: options.duration * 86400,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 })
+                await discordMessageJob('log', `**${byUsername}** extended **${username}**'s ` +
+                    `suspension with **${options.duration} ${pluralize('day', options.duration)}**`)
             }
-            cardOptions.desc = JSON.stringify(suspensionData)
+            cardOptions.desc = JSON.stringify(suspension)
             return trelloService.putCard(card.id, cardOptions)
         }
     }
+    throw createError(404)
 }
 
 exports.getGroup = async groupId => {
@@ -258,16 +308,19 @@ exports.getFinishedSuspensions = async () => {
     return suspensions
 }
 
-exports.announceTraining = async (groupId, trainingId, medium) => {
-    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
-        'Invalid medium')
+exports.announceTraining = async (groupId, trainingId, options) => {
+    if (options.medium !== undefined && options.medium !== 'both' && options.medium !== 'roblox' && options.medium !==
+        'discord') throw createError(403, 'Invalid medium')
     const training = await exports.getTraining(trainingId)
     if (!training) throw createError(404, 'Training not found')
-    if (medium === 'roblox') {
+    const byUsername = await roblox.getUsernameFromId(options.byUserId)
+    await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}**${options
+        .medium !== 'both' ? ' on ' + stringHelper.toPascalCase(options.medium) : ''}`)
+    if (options.medium === 'roblox') {
         return await exports.announceRoblox(groupId)
-    } else if (medium === 'discord') {
+    } else if (options.medium === 'discord') {
         return await exports.announceDiscord(groupId, training)
-    } else if (medium === 'both') {
+    } else if (options.medium === 'both') {
         return {
             shout: await exports.announceRoblox(groupId),
             announcement: await exports.announceDiscord(groupId, training)
