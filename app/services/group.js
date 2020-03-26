@@ -162,21 +162,21 @@ exports.shout = async (groupId, by, message) => {
     }
 }
 
-exports.putTraining = async (trainingId, options) => {
+exports.putTraining = async (groupId, trainingId, options) => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Training Scheduler')
     const listId = await trelloService.getIdFromListName(boardId, 'Scheduled')
     const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
     for (const card of cards) {
         if (parseInt(card.name) === trainingId) {
             const cardOptions = {}
-            const trainingData = JSON.parse(card.desc)
-            if (options.by && options.cancelled === undefined && options.finished === undefined) trainingData.by =
-                options.by
-            if (options.type) trainingData.type = options.type
-            if (options.date) trainingData.date = options.date
-            if (options.specialnotes) trainingData.specialnotes = options.specialnotes
+            const training = JSON.parse(card.desc)
+            if (options.by && options.cancelled === undefined && options.finished === undefined) training.by = options
+                .by
+            if (options.type) training.type = options.type
+            if (options.date) training.date = options.date
+            if (options.specialnotes) training.specialnotes = options.specialnotes
             if (options.cancelled) {
-                trainingData.cancelled = {
+                training.cancelled = {
                     by: options.by,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
@@ -184,58 +184,61 @@ exports.putTraining = async (trainingId, options) => {
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Cancelled')
             }
             if (options.finished) {
-                trainingData.finished = {
+                training.finished = {
                     by: options.by,
                     at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Finished')
             }
-            cardOptions.desc = JSON.stringify(trainingData)
+            cardOptions.desc = JSON.stringify(training)
             return trelloService.putCard(card.id, cardOptions)
         }
     }
+    throw createError(404)
 }
 
-exports.putSuspension = async (userId, options) => {
+exports.putSuspension = async (groupId, userId, options) => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
     const listId = await trelloService.getIdFromListName(boardId, 'Current')
     const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
     for (const card of cards) {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
-            const suspensionData = JSON.parse(card.desc)
-            if (options.by && options.cancelled === undefined && options.extended === undefined) suspensionData.by =
-                options.by
-            if (options.reason) suspensionData.reason = options.reason
-            if (options.rankback === 0 || options.rankback === 1) suspensionData.rankback = options.rankback
+            const suspension = JSON.parse(card.desc)
+            if (options.by && options.cancelled === undefined && options.extended === undefined) suspension.by = options
+                .by
+            if (options.reason) suspension.reason = options.reason
+            if (options.rankback === 0 || options.rankback === 1) suspension.rankback = options.rankback
             if (options.cancelled) {
-                suspensionData.cancelled = {
+                suspension.cancelled = {
                     by: options.by,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 }
+                await roblox.setRank(groupId, userId, suspension.rank)
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Done')
             }
             if (options.extended) {
-                let days = suspensionData.duration / 86400
-                if (!suspensionData.extended) suspensionData.extended = []
-                suspensionData.extended.forEach(extension => {
+                let days = suspension.duration / 86400
+                if (!suspension.extended) suspension.extended = []
+                suspension.extended.forEach(extension => {
                     days += extension.duration / 86400
                 })
                 days += options.duration
                 if (days < 1) throw createError(403, 'Insufficient amount of days')
                 if (days > 7) throw createError(403, 'Too many days')
-                suspensionData.extended.push({
+                suspension.extended.push({
                     by: options.by,
                     duration: options.duration * 86400,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 })
             }
-            cardOptions.desc = JSON.stringify(suspensionData)
+            cardOptions.desc = JSON.stringify(suspension)
             return trelloService.putCard(card.id, cardOptions)
         }
     }
+    throw createError(404)
 }
 
 exports.getGroup = async groupId => {

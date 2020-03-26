@@ -275,7 +275,7 @@ exports.shout = async (req, res) => {
 }
 
 exports.putTraining = async (req, res) => {
-    res.json(await groupService.putTraining(req.params.trainingId, {
+    res.json(await groupService.putTraining(req.params.groupId, req.params.trainingId, {
         by: req.body.by,
         type: req.body.type,
         date: req.body.date,
@@ -287,7 +287,7 @@ exports.putTraining = async (req, res) => {
 }
 
 exports.putSuspension = async (req, res) => {
-    res.json(await groupService.putSuspension(req.params.userId, {
+    res.json(await groupService.putSuspension(req.params.groupId, req.params.userId, {
         by: req.body.by,
         reason: req.body.reason,
         rankback: req.body.rankback,
