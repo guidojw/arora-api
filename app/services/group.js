@@ -314,8 +314,8 @@ exports.announceTraining = async (groupId, trainingId, options) => {
     const training = await exports.getTraining(trainingId)
     if (!training) throw createError(404, 'Training not found')
     const byUsername = await roblox.getUsernameFromId(options.byUserId)
-    await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}** on **${
-        stringHelper.toPascalCase(options.medium)}**`)
+    await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}**${options
+        .medium !== 'both' ? ' on ' + stringHelper.toPascalCase(options.medium) : ''}`)
     if (options.medium === 'roblox') {
         return await exports.announceRoblox(groupId)
     } else if (options.medium === 'discord') {
