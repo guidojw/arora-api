@@ -170,25 +170,48 @@ exports.putTraining = async (groupId, trainingId, options) => {
         if (parseInt(card.name) === trainingId) {
             const cardOptions = {}
             const training = JSON.parse(card.desc)
-            if (options.by && options.cancelled === undefined && options.finished === undefined) training.by = options
-                .by
-            if (options.type) training.type = options.type
-            if (options.date) training.date = options.date
-            if (options.specialnotes) training.specialnotes = options.specialnotes
+            const byUsername = await roblox.getUsernameFromId(options.byUserId)
+            if (options.by && options.cancelled === undefined && options.finished === undefined) {
+                training.by = options.by
+                const newByUsername = await roblox.getUsernameFromId(options.by)
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` host to **${newByUsername}**`)
+            }
+            if (options.type) {
+                training.type = options.type
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` type to **${options.type.toUpperCase()}**`)
+            }
+            if (options.date) {
+                training.date = options.date
+                const dateString = timeHelper.getDate(training.date * 1000)
+                const timeString = timeHelper.getTime(training.date * 1000)
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` date to **${dateString} ${timeString} ${timeHelper.isDst(training.date * 1000) ? 'CEST' : 
+                        'CET'}**`)
+            }
+            if (options.specialnotes) {
+                training.specialnotes = options.specialnotes
+                await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
+                    ` note to "*${options.specialnotes}*"`)
+            }
             if (options.cancelled) {
                 training.cancelled = {
-                    by: options.by,
+                    by: options.byUserId,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Cancelled')
+                await discordMessageJob('log', `**${byUsername}** cancelled training **${trainingId}**` +
+                    `with reason "*${options.reason}*"`)
             }
             if (options.finished) {
                 training.finished = {
-                    by: options.by,
+                    by: options.byUserId,
                     at: Math.round(Date.now() / 1000)
                 }
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Finished')
+                await discordMessageJob('log', `**${byUsername}** finished training **${trainingId}**`)
             }
             cardOptions.desc = JSON.stringify(training)
             return trelloService.putCard(card.id, cardOptions)
@@ -225,7 +248,7 @@ exports.putSuspension = async (groupId, userId, options) => {
             }
             if (options.cancelled) {
                 suspension.cancelled = {
-                    by: options.by,
+                    by: options.byUserId,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 }
@@ -244,7 +267,7 @@ exports.putSuspension = async (groupId, userId, options) => {
                 if (days < 1) throw createError(403, 'Insufficient amount of days')
                 if (days > 7) throw createError(403, 'Too many days')
                 suspension.extended.push({
-                    by: options.by,
+                    by: options.byUserId,
                     duration: options.duration * 86400,
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
