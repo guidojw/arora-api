@@ -56,7 +56,7 @@ exports.putBan = async (userId, options) => {
                 })
                 const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
                     .getUsernameFromId(options.by)])
-                await discordMessageJob('log', `**${byUsername}** unbanned **${username}**.`)
+                await discordMessageJob('log', `**${byUsername}** unbanned **${username}**`)
                 return
             }
         }

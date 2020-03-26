@@ -39,8 +39,8 @@ exports.suspend = async (groupId, userId, options) => {
     const [username, byUsername] = await Promise.all([roblox.getUsernameFromId(userId), roblox
         .getUsernameFromId(options.by)])
     const days = options.duration / 86400
-    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days} ${
-        pluralize('day', days)}** with reason "*${options.reason}*"`)
+    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days}** ${
+        pluralize('day', days)} with reason "*${options.reason}*"`)
 }
 
 exports.getRank = async (groupId, userId) => {
@@ -279,7 +279,7 @@ exports.putSuspension = async (groupId, userId, options) => {
                     at: Math.round(Date.now() / 1000)
                 })
                 await discordMessageJob('log', `**${byUsername}** extended **${username}**'s ` +
-                    `suspension with **${options.duration} ${pluralize('day', options.duration)}**`)
+                    `suspension with **${options.duration}** ${pluralize('day', options.duration)}`)
             }
             cardOptions.desc = JSON.stringify(suspension)
             return trelloService.putCard(card.id, cardOptions)
