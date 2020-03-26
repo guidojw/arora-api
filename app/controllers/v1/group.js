@@ -49,7 +49,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
-        case 'hostTraining':
+        case 'scheduleTraining':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
@@ -260,8 +260,8 @@ exports.getTrainings = async (req, res) => {
     res.json(await groupService.getTrainings())
 }
 
-exports.hostTraining = async (req, res) => {
-    res.json(await groupService.hostTraining({
+exports.scheduleTraining = async (req, res) => {
+    res.json(await groupService.scheduleTraining({
         by: req.body.by,
         type: req.body.type,
         date: req.body.date,

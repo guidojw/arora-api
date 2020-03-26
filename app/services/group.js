@@ -26,7 +26,7 @@ exports.suspend = async (groupId, userId, options) => {
     }
     await trelloService.postCard({
         idList: listId,
-        name: userId.toString(),
+        name: userId,
         desc: JSON.stringify({
             rank: rank,
             rankback: options.rankback,
@@ -98,13 +98,13 @@ exports.getTrainings = async () => {
     return trainings
 }
 
-exports.hostTraining = async options => {
+exports.scheduleTraining = async options => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Training Scheduler')
     const listId = await trelloService.getIdFromListName(boardId, 'Scheduled')
     const trainingId = await trelloService.getCardsNumOnBoard(boardId) + 1
     await trelloService.postCard({
         idList: listId,
-        name: trainingId.toString(),
+        name: trainingId,
         desc: JSON.stringify({
             by: options.by,
             type: options.type,
@@ -113,6 +113,11 @@ exports.hostTraining = async options => {
             at: Math.round(Date.now() / 1000)
         })
     })
+    const dateString = timeHelper.getDate(options.date * 1000)
+    const timeString = timeHelper.getTime(options.date * 1000)
+    await discordMessageJob('log', `**${options.by}** scheduled a **${options.type.toUpperCase()}** ` +
+        `training at **${dateString} ${timeString} ${timeHelper.isDst(options.date * 1000) ? 'CEST' : 'CET'}**` +
+    `${options.specialnotes ? ' with note "*' + options.specialnotes + '*"' : ''}`)
     return trainingId
 }
 
