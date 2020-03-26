@@ -158,7 +158,7 @@ exports.shout = async (groupId, by, message) => {
     if (message === '') {
         await discordMessageJob('log', `**${byUsername}** cleared the shout`)
     } else {
-        await discordMessageJob('log', `**${byUsername}** shouted *"${message}"*`)
+        await discordMessageJob('log', `**${byUsername}** shouted "*${message}*"`)
     }
 }
 
@@ -205,10 +205,24 @@ exports.putSuspension = async (groupId, userId, options) => {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
             const suspension = JSON.parse(card.desc)
-            if (options.by && options.cancelled === undefined && options.extended === undefined) suspension.by = options
-                .by
-            if (options.reason) suspension.reason = options.reason
-            if (options.rankback === 0 || options.rankback === 1) suspension.rankback = options.rankback
+            const username = await roblox.getUsernameFromId(userId)
+            const byUsername = await roblox.getUsernameFromId(options.byUserId)
+            if (options.by && options.cancelled === undefined && options.extended === undefined) {
+                suspension.by = options.by
+                const newByUsername = await roblox.getUsernameFromId(options.by)
+                await discordMessageJob('log', `**${byUsername}** changed the author of **${username}*` +
+                    `*'s suspension to **${newByUsername}**`)
+            }
+            if (options.reason) {
+                suspension.reason = options.reason
+                await discordMessageJob('log', `**${byUsername}** changed the reason of **${username}*` +
+                    `*'s suspension to *"${options.reason}"*`)
+            }
+            if (options.rankback === 1 || options.rankback === 0) {
+                suspension.rankback = options.rankback
+                await discordMessageJob('log', `**${byUsername}** changed the rankBack option of **${
+                    username}**'s suspension to **${options.rankback === 1 ? 'yes' : 'no'}**`)
+            }
             if (options.cancelled) {
                 suspension.cancelled = {
                     by: options.by,
@@ -217,6 +231,8 @@ exports.putSuspension = async (groupId, userId, options) => {
                 }
                 await roblox.setRank(groupId, userId, suspension.rank)
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Done')
+                await discordMessageJob('log', `**${byUsername}** cancelled **${username}**'s ` +
+                    `suspension with reason "*${options.reason}*"`)
             }
             if (options.extended) {
                 let days = suspension.duration / 86400
@@ -233,6 +249,8 @@ exports.putSuspension = async (groupId, userId, options) => {
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 })
+                await discordMessageJob('log', `**${byUsername}** extended **${username}**'s ` +
+                    `suspension with **${options.duration} ${pluralize('day', options.duration)}**`)
             }
             cardOptions.desc = JSON.stringify(suspension)
             return trelloService.putCard(card.id, cardOptions)
