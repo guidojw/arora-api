@@ -26,7 +26,7 @@ exports.suspend = async (groupId, userId, options) => {
     }
     await trelloService.postCard({
         idList: listId,
-        name: userId,
+        name: userId.toString(),
         desc: JSON.stringify({
             rank: rank,
             rankback: options.rankback,
@@ -104,7 +104,7 @@ exports.scheduleTraining = async options => {
     const trainingId = await trelloService.getCardsNumOnBoard(boardId) + 1
     await trelloService.postCard({
         idList: listId,
-        name: trainingId,
+        name: trainingId.toString(),
         desc: JSON.stringify({
             by: options.by,
             type: options.type,

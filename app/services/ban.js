@@ -31,7 +31,7 @@ exports.ban = async (groupId, userId, by, reason) => {
     }
     await trelloService.postCard({
         idList: listId,
-        name: userId,
+        name: userId.toString(),
         desc: JSON.stringify({
             rank: rank,
             by: by,
