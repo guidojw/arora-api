@@ -220,6 +220,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
+                body('byUserId').exists().isNumeric(),
                 body('medium').optional().isString()
             ]
     }
@@ -319,5 +320,8 @@ exports.getFinishedSuspensions = async (req, res) => {
 }
 
 exports.announceTraining = async (req, res) => {
-    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.medium))
+    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, {
+        medium: req.body.medium,
+        byUserId: req.body.byUserId
+    }))
 }

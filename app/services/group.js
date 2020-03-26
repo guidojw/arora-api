@@ -6,6 +6,7 @@ const axios = require('axios')
 const trelloService = require('./trello')
 const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
+const stringHelper = require('../helpers/string')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
@@ -302,16 +303,19 @@ exports.getFinishedSuspensions = async () => {
     return suspensions
 }
 
-exports.announceTraining = async (groupId, trainingId, medium) => {
-    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
-        'Invalid medium')
+exports.announceTraining = async (groupId, trainingId, options) => {
+    if (options.medium !== undefined && options.medium !== 'both' && options.medium !== 'roblox' && options.medium !==
+        'discord') throw createError(403, 'Invalid medium')
     const training = await exports.getTraining(trainingId)
     if (!training) throw createError(404, 'Training not found')
-    if (medium === 'roblox') {
+    const byUsername = await roblox.getUsernameFromId(options.byUserId)
+    await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}** on **${
+        stringHelper.toPascalCase(options.medium)}**`)
+    if (options.medium === 'roblox') {
         return await exports.announceRoblox(groupId)
-    } else if (medium === 'discord') {
+    } else if (options.medium === 'discord') {
         return await exports.announceDiscord(groupId, training)
-    } else if (medium === 'both') {
+    } else if (options.medium === 'both') {
         return {
             shout: await exports.announceRoblox(groupId),
             announcement: await exports.announceDiscord(groupId, training)
