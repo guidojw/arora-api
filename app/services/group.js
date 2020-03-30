@@ -66,7 +66,7 @@ exports.promote = async (groupId, userId, by) => {
         await discordMessageJob('log', `Promoted **${username}** from **${oldRole.name}** to **${newRole
             .name}**`)
     }
-    return roles
+    return { oldRole, newRole }
 }
 
 exports.getShout = async groupId => {
