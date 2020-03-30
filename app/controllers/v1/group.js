@@ -225,7 +225,7 @@ exports.suspend = async (req, res) => {
 }
 
 exports.promote = async (req, res) => {
-    res.send(await groupService.promote(req.params.groupId, req.params.userId, req.body.by))
+    res.json(await groupService.promote(req.params.groupId, req.params.userId, req.body.by))
 }
 
 exports.getShout = async (req, res) => {
