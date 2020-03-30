@@ -1,6 +1,5 @@
 'use strict'
 const robloxManager = require('../managers/roblox')
-const axios = require('axios')
 
 const robloxConfig = require('../../config/roblox')
 
