@@ -19,7 +19,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^5.15.0",
+    "@sentry/node": "^5.15.4",
     "axios": "^0.19.2",
     "bloxy": "github:Visualizememe/bloxy#dev",
     "debug": "^4.1.1",
