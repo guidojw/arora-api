@@ -37,7 +37,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
-        case 'hostTraining':
+        case 'scheduleTraining':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
@@ -76,26 +76,31 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('type').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('date').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('specialnotes').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('by').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('cancelled').exists().isBoolean(),
                     body('reason').exists().isBoolean(),
                     body('by').exists().isString()
@@ -103,6 +108,7 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('finished').exists().isBoolean(),
                     body('by').exists().isString()
                 ]
@@ -133,21 +139,25 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('by').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('reason').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('rankback').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('cancelled').exists().isBoolean(),
                     body('reason').exists().isBoolean(),
                     body('by').exists().isNumeric()
@@ -155,6 +165,7 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
+                    body('byUserId').exists().isNumeric(),
                     body('extended').exists().isBoolean(),
                     body('duration').exists().isNumeric(),
                     body('reason').exists().isString(),
@@ -197,6 +208,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
+                body('byUserId').exists().isNumeric(),
                 body('medium').optional().isString()
             ]
     }
@@ -228,8 +240,8 @@ exports.getTrainings = async (req, res) => {
     res.json(await groupService.getTrainings())
 }
 
-exports.hostTraining = async (req, res) => {
-    res.json(await groupService.hostTraining({
+exports.scheduleTraining = async (req, res) => {
+    res.json(await groupService.scheduleTraining({
         by: req.body.by,
         type: req.body.type,
         date: req.body.date,
@@ -254,25 +266,27 @@ exports.shout = async (req, res) => {
 }
 
 exports.putTraining = async (req, res) => {
-    res.json(await groupService.putTraining(req.params.trainingId, {
+    res.json(await groupService.putTraining(req.params.groupId, req.params.trainingId, {
         by: req.body.by,
         type: req.body.type,
         date: req.body.date,
         specialnotes: req.body.specialnotes,
         cancelled: req.body.cancelled,
         reason: req.body.reason,
-        finished: req.body.finished
+        finished: req.body.finished,
+        byUserId: req.body.byUserId
     }))
 }
 
 exports.putSuspension = async (req, res) => {
-    res.json(await groupService.putSuspension(req.params.userId, {
+    res.json(await groupService.putSuspension(req.params.groupId, req.params.userId, {
         by: req.body.by,
         reason: req.body.reason,
         rankback: req.body.rankback,
         cancelled: req.body.cancelled,
         extended: req.body.extended,
-        duration: req.body.duration
+        duration: req.body.duration,
+        byUserId: req.body.byUserId
     }))
 }
 
@@ -285,5 +299,8 @@ exports.getFinishedSuspensions = async (req, res) => {
 }
 
 exports.announceTraining = async (req, res) => {
-    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.medium))
+    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, {
+        medium: req.body.medium,
+        byUserId: req.body.byUserId
+    }))
 }

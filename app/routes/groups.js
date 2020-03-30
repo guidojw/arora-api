@@ -23,8 +23,8 @@ router.get('/:groupId/suspensions', groupController.validate('getSuspensions'), 
 router.get('/:groupId/trainings', groupController.validate('getTrainings'), handleValidationResult,
     authenticate, parseParams, groupController.getTrainings)
 
-router.post('/:groupId/trainings', groupController.validate('hostTraining'), handleValidationResult,
-    authenticate, parseParams, groupController.hostTraining)
+router.post('/:groupId/trainings', groupController.validate('scheduleTraining'), handleValidationResult,
+    authenticate, parseParams, groupController.scheduleTraining)
 
 router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult, authenticate,
     parseParams, groupController.getExiles)
