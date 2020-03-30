@@ -20,4 +20,10 @@ router.get('/:userId/has-badge/:badgeId', userController.validate('hasBadge'), h
 router.post('/', userController.validate('getUsers'), handleValidationResult, authenticate, userController
     .getUsers)
 
+router.get('/:userId/rank/:groupId', userController.validate('getRank'), handleValidationResult, authenticate,
+    parseParams, userController.getRank)
+
+router.get('/:userId/role/:groupId', userController.validate('getRole'), handleValidationResult, authenticate,
+    parseParams, userController.getRole)
+
 module.exports = router
