@@ -263,7 +263,7 @@ exports.putSuspension = async (groupId, userId, options) => {
                     at: Math.round(Date.now() / 1000)
                 }
                 const roles = await exports.getRoles(groupId)
-                const roleId = roles.roles.find(role => role.rank === suspension.rank)
+                const roleId = roles.roles.find(role => role.rank === suspension.rank).id
                 const client = robloxManager.getClient(groupId)
                 await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Done')
