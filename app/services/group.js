@@ -180,10 +180,10 @@ exports.putTraining = async (groupId, trainingId, options) => {
         if (parseInt(card.name) === trainingId) {
             const cardOptions = {}
             const training = JSON.parse(card.desc)
-            const byUsername = await roblox.getUsernameFromId(options.byUserId)
+            const byUsername = await userService.getUsername(options.byUserId)
             if (options.by && options.cancelled === undefined && options.finished === undefined) {
                 training.by = options.by
-                const newByUsername = await roblox.getUsernameFromId(options.by)
+                const newByUsername = await userService.getUsername(options.by)
                 await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
                     ` host to **${newByUsername}**`)
             }
@@ -238,11 +238,11 @@ exports.putSuspension = async (groupId, userId, options) => {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
             const suspension = JSON.parse(card.desc)
-            const username = await roblox.getUsernameFromId(userId)
-            const byUsername = await roblox.getUsernameFromId(options.byUserId)
+            const username = await userService.getUsername(userId)
+            const byUsername = await userService.getUsername(options.byUserId)
             if (options.by && options.cancelled === undefined && options.extended === undefined) {
                 suspension.by = options.by
-                const newByUsername = await roblox.getUsernameFromId(options.by)
+                const newByUsername = await userService.getUsername(options.by)
                 await discordMessageJob('log', `**${byUsername}** changed the author of **${username}*` +
                     `*'s suspension to **${newByUsername}**`)
             }
@@ -318,7 +318,7 @@ exports.announceTraining = async (groupId, trainingId, options) => {
         'discord') throw createError(403, 'Invalid medium')
     const training = await exports.getTraining(trainingId)
     if (!training) throw createError(404, 'Training not found')
-    const byUsername = await roblox.getUsernameFromId(options.byUserId)
+    const byUsername = await userService.getUsername(options.byUserId)
     await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}**${options
         .medium !== 'both' ? ' on ' + stringHelper.toPascalCase(options.medium) : ''}`)
     if (options.medium === 'roblox') {
