@@ -170,6 +170,7 @@ exports.shout = async (groupId, by, message) => {
     } else {
         await discordMessageJob('log', `**${byUsername}** shouted "*${shout.body}*"`)
     }
+    return shout
 }
 
 exports.putTraining = async (groupId, trainingId, options) => {
@@ -321,15 +322,11 @@ exports.announceTraining = async (groupId, trainingId, options) => {
     const byUsername = await userService.getUsername(options.byUserId)
     await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}**${options
         .medium !== 'both' ? ' on ' + stringHelper.toPascalCase(options.medium) : ''}`)
-    if (options.medium === 'roblox') {
-        return exports.announceRoblox(groupId)
-    } else if (options.medium === 'discord') {
-        return exports.announceDiscord(groupId, training)
-    } else if (options.medium === 'both') {
-        return {
-            shout: await exports.announceRoblox(groupId),
-            announcement: await exports.announceDiscord(groupId, training)
-        }
+    return {
+        shout: options.medium === 'both' || options.medium === 'roblox' ? await exports.announceRoblox(groupId) :
+            undefined,
+        announcement: options.medium === 'both' || options.medium === 'discord' ? await exports.announceDiscord(groupId,
+            training) : undefined
     }
 }
 
