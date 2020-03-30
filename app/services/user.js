@@ -24,12 +24,9 @@ exports.hasBadge = async (userId, badgeId) => {
     })).data.length === 1
 }
 
-exports.getUsers = async (userIds, excludeBannedUsers) => {
-    return (await axios({
-        method: 'post',
-        url: 'https://users.roblox.com/v1/users',
-        data: { userIds, excludeBannedUsers }
-    })).data
+exports.getUsers = async userIds => {
+    const client = robloxManager.getClient()
+    return (await client.apis.users.getUsersByIds(userIds)).data
 }
 
 exports.getRank = async (userId, groupId) => {

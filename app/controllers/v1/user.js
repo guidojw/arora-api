@@ -24,8 +24,7 @@ exports.validate = method => {
         case 'getUsers':
             return [
                 header('authorization').exists().isString(),
-                body('userIds').exists(),
-                body('excludeBannedUsers').optional().isBoolean()
+                body('userIds').exists()
             ]
         case 'getRank':
             return [
@@ -55,7 +54,7 @@ exports.hasBadge = async (req, res) => {
 }
 
 exports.getUsers = async (req, res) => {
-    res.json(await userService.getUsers(req.body.userIds, req.body.excludeBannedUsers))
+    res.json(await userService.getUsers(req.body.userIds))
 }
 
 exports.getRank = async (req, res) => {
