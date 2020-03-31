@@ -350,7 +350,8 @@ exports.getTrainingAnnouncement = training => {
     const specialNotes = training.specialnotes
     return `<:ns:248922413599817728> **TRAINING**\nThere will be a *${role}* training on **` +
         `${dateString}**.\nTime: **${timeString} ${timeHelper.isDst(training.date * 1000) ? 'CEST' : 'CET'}**.` +
-        `\n${specialNotes ? specialNotes + '\n' : ''}Hosted by **${by}**.\n@everyone`
+        `\n${specialNotes ? specialNotes + '\n' : ''}Hosted by **${by}**.\n<@&${training.type === 'CD' ? 
+            '673950073716998177' : '673950095250554920'}>`
 }
 
 exports.getRoleByAbbreviation = str => {
