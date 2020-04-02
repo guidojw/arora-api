@@ -23,7 +23,7 @@ module.exports = async groupId => {
         }
         if (suspension.at + duration <= Math.round(Date.now() / 1000)) {
             const rank = suspension.rankback ? suspension.rank : 1
-            const roleId = roles.roles.find(role => role.rank === rank)
+            const roleId = roles.roles.find(role => role.rank === rank).id
             await client.apis.groups.updateMemberInGroup({ groupId, userId: suspension.userId, roleId })
             await trelloService.putCard(card.id, { idList: newListId })
             const username = await userService.getUsername(suspension.userId)
