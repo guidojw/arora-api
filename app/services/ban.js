@@ -56,7 +56,7 @@ exports.putBan = async (userId, options) => {
                 })
                 const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
                     .getUsername(options.by)])
-                await discordMessageJob('log', `**${byUsername}** unbanned **${username}**.`)
+                await discordMessageJob('log', `**${byUsername}** unbanned **${username}**`)
                 return
             }
         }

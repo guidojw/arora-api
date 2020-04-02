@@ -110,7 +110,7 @@ exports.scheduleTraining = async options => {
         name: trainingId.toString(),
         desc: JSON.stringify({
             by: options.by,
-            type: options.type,
+            type: options.type.toUpperCase(),
             date: options.date,
             specialnotes: options.specialnotes,
             at: Math.round(Date.now() / 1000)
@@ -189,9 +189,9 @@ exports.putTraining = async (groupId, trainingId, options) => {
                     ` host to **${newByUsername}**`)
             }
             if (options.type) {
-                training.type = options.type
+                training.type = options.type.toUpperCase()
                 await discordMessageJob('log', `**${byUsername}** changed training **${trainingId}**'s` +
-                    ` type to **${options.type.toUpperCase()}**`)
+                    ` type to **${training.type}**`)
             }
             if (options.date) {
                 training.date = options.date
@@ -346,33 +346,27 @@ exports.getTrainingAnnouncement = training => {
     const role = exports.getRoleByAbbreviation(training.type)
     const dateString = timeHelper.getDate(training.date * 1000)
     const timeString = timeHelper.getTime(training.date * 1000)
-    const by = training.by
     const specialNotes = training.specialnotes
     return `<:ns:248922413599817728> **TRAINING**\nThere will be a *${role}* training on **` +
         `${dateString}**.\nTime: **${timeString} ${timeHelper.isDst(training.date * 1000) ? 'CEST' : 'CET'}**.` +
-        `\n${specialNotes ? specialNotes + '\n' : ''}Hosted by **${by}**.\n<@&${training.type === 'CD' ? 
+        `\n${specialNotes ? specialNotes + '\n' : ''}Hosted by **${training.by}**.\n<@&${training.type === 'CD' ? 
             '673950073716998177' : '673950095250554920'}>`
 }
 
 exports.getRoleByAbbreviation = str => {
-    if (str) {
-        str = str.toUpperCase()
-        /* eslint-disable indent */
-        return str === 'G' ? 'Guest' : str === 'C' ? 'Customer' : str === 'S' ? 'Suspended' : str === 'TD' ?
-            'Train Driver' : str === 'CD' ? 'Conductor' : str === 'CSR' ? 'Customer Service Representative' : str
-            === 'CS' ? 'Customer Service' : str === 'J' ? 'Janitor' : str === 'Se' ? 'Security' : str === 'LC' ?
-            'Line Controller' : str === 'PR' ? 'Partner Representative' : str === 'R' ? 'Representative' : str ===
-            'MC' ? 'Management Coordinator' : str === 'OC' ? 'Operations Coordinator' : str === 'GA' ?
-            'Group Admin' : str === 'BoM' ? 'Board of Managers' : str === 'BoD' ? 'Board of Directors' : str ===
-            'CF' ? 'Co-Founder' : str === 'AA' ? 'Alt. Accounts' : str === 'PD' ? 'President-Director' : str ===
-            'UT' ? 'Update Tester' : str === 'P' ? 'Pending' : str === 'PH' ? 'Pending HR' : str === 'MoCR' ?
-            'Manager of Customer Relations' : str === 'MoSe' ? 'Manager of Security' : str === 'MoRS' ?
-            'Manager of Rolling Stock' : str === 'MoSt' ? 'Manager of Stations' : str === 'MoE' ?
-            'Manager of Events' : str === 'MoC' ? 'Manager of Conductors' : str === 'MoRM' ?
-            'Manager of Rail Management' : str === 'DoNSR' ? 'Director of NS Reizgers' : str === 'DoO' ?
-            'Director of Operations' : null
-        /* eslint-enable indent */
-    }
+    /* eslint-disable indent */
+    return str === 'G' ? 'Guest' : str === 'C' ? 'Customer' : str === 'S' ? 'Suspended' : str === 'TD' ? 'Train Driver'
+        : str === 'CD' ? 'Conductor' : str === 'CSR' ? 'Customer Service Representative' : str === 'CS' ?
+        'Customer Service' : str === 'J' ? 'Janitor' : str === 'Se' ? 'Security' : str === 'LC' ? 'Line Controller' :
+        str === 'PR' ? 'Partner Representative' : str === 'R' ? 'Representative' : str === 'MC' ?
+        'Management Coordinator' : str === 'OC' ? 'Operations Coordinator' : str === 'GA' ? 'Group Admin' : str ===
+        'BoM' ? 'Board of Managers' : str === 'BoD' ? 'Board of Directors' : str === 'CF' ? 'Co-Founder' : str === 'AA'
+        ? 'Alt. Accounts' : str === 'PD' ? 'President-Director' : str === 'UT' ? 'Update Tester' : str === 'P' ?
+        'Pending' : str === 'PH' ? 'Pending HR' : str === 'HoCR' ? 'Head of Customer Relations' : str === 'HoSe' ?
+        'Head of Security' : str === 'HoSt' ? 'Manager of Stations' : str === 'HoE' ? 'Head of Events' : str === 'HoC' ?
+        'Head of Conductors' : str === 'HoRM' ? 'Head of Rail Management' : str === 'SD' ? 'Staff Director' : str ===
+        'OD' ? 'Operations Director' : null
+    /* eslint-enable indent */
 }
 
 exports.getRoles = async groupId => {
