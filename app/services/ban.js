@@ -44,7 +44,7 @@ exports.ban = async (groupId, userId, by, reason) => {
 exports.putBan = async (userId, options) => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
     const listId = await trelloService.getIdFromListName(boardId, 'Banned')
-    const cards = await trelloService.getCards(listId, {fields: 'name'})
+    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
     for (const card of cards) {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
