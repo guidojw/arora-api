@@ -28,11 +28,16 @@ exports.suspend = async (groupId, userId, options) => {
         const client = robloxManager.getClient(groupId)
         await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
     }
-    await trelloService.postCard({
+    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
+        options.by)])
+    const days = options.duration / 86400
+    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days}** ${
+        pluralize('day', days)} with reason "*${options.reason}*"`)
+    return trelloService.postCard({
         idList: listId,
         name: userId.toString(),
         desc: JSON.stringify({
-            rank: rank,
+            rank,
             rankback: options.rankback,
             duration: options.duration,
             by: options.by,
@@ -40,11 +45,6 @@ exports.suspend = async (groupId, userId, options) => {
             at: Math.round(Date.now() / 1000)
         })
     })
-    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
-        options.by)])
-    const days = options.duration / 86400
-    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days}** ${
-        pluralize('day', days)} with reason "*${options.reason}*"`)
 }
 
 exports.promote = async (groupId, userId, by) => {
@@ -146,6 +146,7 @@ exports.getSuspension = async userId => {
             return suspension
         }
     }
+    throw createError(404, 'Suspension not found')
 }
 
 exports.getTraining = async trainingId => {
@@ -159,6 +160,7 @@ exports.getTraining = async trainingId => {
             return training
         }
     }
+    throw createError(404, 'Training not found')
 }
 
 exports.shout = async (groupId, by, message) => {
@@ -228,7 +230,7 @@ exports.putTraining = async (groupId, trainingId, options) => {
             return trelloService.putCard(card.id, cardOptions)
         }
     }
-    throw createError(404)
+    throw createError(404, 'Training not found')
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
@@ -239,8 +241,8 @@ exports.putSuspension = async (groupId, userId, options) => {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
             const suspension = JSON.parse(card.desc)
-            const username = await userService.getUsername(userId)
-            const byUsername = await userService.getUsername(options.byUserId)
+            const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
+                .getUsername(options.byUserId)])
             if (options.by && options.cancelled === undefined && options.extended === undefined) {
                 suspension.by = options.by
                 const newByUsername = await userService.getUsername(options.by)
@@ -293,7 +295,7 @@ exports.putSuspension = async (groupId, userId, options) => {
             return trelloService.putCard(card.id, cardOptions)
         }
     }
-    throw createError(404)
+    throw createError(404, 'Suspension not found')
 }
 
 exports.getGroup = groupId => {
@@ -318,7 +320,6 @@ exports.announceTraining = async (groupId, trainingId, options) => {
     if (options.medium !== undefined && options.medium !== 'both' && options.medium !== 'roblox' && options.medium !==
         'discord') throw createError(403, 'Invalid medium')
     const training = await exports.getTraining(trainingId)
-    if (!training) throw createError(404, 'Training not found')
     const byUsername = await userService.getUsername(options.byUserId)
     await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}**${options
         .medium !== 'both' ? ' on ' + stringHelper.toPascalCase(options.medium) : ''}`)

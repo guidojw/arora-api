@@ -215,13 +215,12 @@ exports.validate = method => {
 }
 
 exports.suspend = async (req, res) => {
-    await groupService.suspend(req.params.groupId, req.body.userId, {
+    res.json(await groupService.suspend(req.params.groupId, req.body.userId, {
         by: req.body.by,
         reason: req.body.reason,
         duration: req.body.duration,
         rankback: req.body.rankback
-    })
-    res.sendStatus(200)
+    }))
 }
 
 exports.promote = async (req, res) => {
