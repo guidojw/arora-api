@@ -146,6 +146,7 @@ exports.getSuspension = async userId => {
             return suspension
         }
     }
+    throw createError(404, 'Suspension not found')
 }
 
 exports.getTraining = async trainingId => {
@@ -159,6 +160,7 @@ exports.getTraining = async trainingId => {
             return training
         }
     }
+    throw createError(404, 'Training not found')
 }
 
 exports.shout = async (groupId, by, message) => {
@@ -228,7 +230,7 @@ exports.putTraining = async (groupId, trainingId, options) => {
             return trelloService.putCard(card.id, cardOptions)
         }
     }
-    throw createError(404)
+    throw createError(404, 'Training not found')
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
@@ -293,7 +295,7 @@ exports.putSuspension = async (groupId, userId, options) => {
             return trelloService.putCard(card.id, cardOptions)
         }
     }
-    throw createError(404)
+    throw createError(404, 'Suspension not found')
 }
 
 exports.getGroup = groupId => {
@@ -318,7 +320,6 @@ exports.announceTraining = async (groupId, trainingId, options) => {
     if (options.medium !== undefined && options.medium !== 'both' && options.medium !== 'roblox' && options.medium !==
         'discord') throw createError(403, 'Invalid medium')
     const training = await exports.getTraining(trainingId)
-    if (!training) throw createError(404, 'Training not found')
     const byUsername = await userService.getUsername(options.byUserId)
     await discordMessageJob('log', `**${byUsername}** announced training **${trainingId}**${options
         .medium !== 'both' ? ' on ' + stringHelper.toPascalCase(options.medium) : ''}`)
