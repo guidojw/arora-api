@@ -101,7 +101,7 @@ exports.getActionEmbed = async action => {
             description: `[\`${action.id}\`](${actionUrl}) ${action.data.card.name} - ${member.username}`,
             author: {
                 name: member.username,
-                icon_url: member.avatarUrl,
+                icon_url: `${member.avatarUrl}/170.png`,
                 url: `https://trello.com/${member.username}`
             },
             url: actionUrl,
