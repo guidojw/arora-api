@@ -55,12 +55,12 @@ exports.putBan = async (userId, options) => {
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Unbanned')
                 await discordMessageJob('log', `**${byUsername}** unbanned **${username}**`)
             } else if (options.by) {
-                cardOptions.by = options.by
+                ban.by = options.by
                 const newByUsername = await userService.getUsername(options.by)
                 await discordMessageJob('log', `**${byUsername}** changed the author of **${username}*` +
                     `*'s ban to **${newByUsername}**`)
             } else if (options.reason) {
-                cardOptions.reason = options.reason
+                ban.reason = options.reason
                 await discordMessageJob('log', `**${byUsername}** changed the reason of **${username}*` +
                     `*'s ban to *"${options.reason}"*`)
             }
