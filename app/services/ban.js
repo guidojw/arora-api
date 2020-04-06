@@ -10,11 +10,8 @@ exports.getBans = async () => {
     const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
     let bans = []
     for (const card of cards) {
-        const ban = {}
+        const ban = JSON.parse(card.desc)
         ban.userId = parseInt(card.name)
-        for (const [key, value] of Object.entries(JSON.parse(card.desc))) {
-            ban[key] = value
-        }
         await bans.push(ban)
     }
     return bans
@@ -29,19 +26,19 @@ exports.ban = async (groupId, userId, by, reason) => {
     for (const card of cards) {
         if (parseInt(card.name) === userId) throw createError(409, 'User is already banned')
     }
-    await trelloService.postCard({
-        idList: listId,
-        name: userId.toString(),
-        desc: JSON.stringify({
-            rank: rank,
-            by: by,
-            reason: reason,
-            at: Math.round(Date.now() / 1000)
-        })
-    })
     const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
         by)])
     await discordMessageJob('log', `**${byUsername}** banned **${username}** with reason "*${reason}*"`)
+    return trelloService.postCard({
+        idList: listId,
+        name: userId.toString(),
+        desc: JSON.stringify({
+            rank,
+            by,
+            reason,
+            at: Math.round(Date.now() / 1000)
+        })
+    })
 }
 
 exports.putBan = async (userId, options) => {
@@ -52,8 +49,8 @@ exports.putBan = async (userId, options) => {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
             const ban = JSON.parse(card.desc)
-            const username = await userService.getUsername(userId)
-            const byUsername = await userService.getUsername(options.byUserId)
+            const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
+                .getUsername(options.byUserId)])
             if (options.unbanned) {
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Unbanned')
                 await discordMessageJob('log', `**${byUsername}** unbanned **${username}**`)

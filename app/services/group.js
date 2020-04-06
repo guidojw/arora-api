@@ -28,11 +28,16 @@ exports.suspend = async (groupId, userId, options) => {
         const client = robloxManager.getClient(groupId)
         await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
     }
-    await trelloService.postCard({
+    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
+        options.by)])
+    const days = options.duration / 86400
+    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days}** ${
+        pluralize('day', days)} with reason "*${options.reason}*"`)
+    return trelloService.postCard({
         idList: listId,
         name: userId.toString(),
         desc: JSON.stringify({
-            rank: rank,
+            rank,
             rankback: options.rankback,
             duration: options.duration,
             by: options.by,
@@ -40,11 +45,6 @@ exports.suspend = async (groupId, userId, options) => {
             at: Math.round(Date.now() / 1000)
         })
     })
-    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
-        options.by)])
-    const days = options.duration / 86400
-    await discordMessageJob('log', `**${byUsername}** suspended **${username}** for **${days}** ${
-        pluralize('day', days)} with reason "*${options.reason}*"`)
 }
 
 exports.promote = async (groupId, userId, by) => {
@@ -241,8 +241,8 @@ exports.putSuspension = async (groupId, userId, options) => {
         if (parseInt(card.name) === userId) {
             const cardOptions = {}
             const suspension = JSON.parse(card.desc)
-            const username = await userService.getUsername(userId)
-            const byUsername = await userService.getUsername(options.byUserId)
+            const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
+                .getUsername(options.byUserId)])
             if (options.by && options.cancelled === undefined && options.extended === undefined) {
                 suspension.by = options.by
                 const newByUsername = await userService.getUsername(options.by)
