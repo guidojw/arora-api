@@ -50,18 +50,28 @@ exports.putBan = async (userId, options) => {
     const cards = await trelloService.getCards(listId, {fields: 'name'})
     for (const card of cards) {
         if (parseInt(card.name) === userId) {
+            const cardOptions = {}
+            const ban = JSON.parse(card.desc)
+            const username = await userService.getUsername(userId)
+            const byUsername = await userService.getUsername(options.byUserId)
             if (options.unbanned) {
-                await trelloService.putCard(card.id, {
-                    idList: await trelloService.getIdFromListName(boardId, 'Unbanned')
-                })
-                const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
-                    .getUsername(options.by)])
+                cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Unbanned')
                 await discordMessageJob('log', `**${byUsername}** unbanned **${username}**`)
-                return
+            } else if (options.by) {
+                cardOptions.by = options.by
+                const newByUsername = await userService.getUsername(options.by)
+                await discordMessageJob('log', `**${byUsername}** changed the author of **${username}*` +
+                    `*'s ban to **${newByUsername}**`)
+            } else if (options.reason) {
+                cardOptions.reason = options.reason
+                await discordMessageJob('log', `**${byUsername}** changed the reason of **${username}*` +
+                    `*'s ban to *"${options.reason}"*`)
             }
+            cardOptions.desc = JSON.stringify(ban)
+            return trelloService.putCard(card.id, cardOptions)
         }
     }
-    throw createError(404)
+    throw createError(404, 'Ban not found')
 }
 
 exports.getBan = async userId => {
@@ -73,5 +83,5 @@ exports.getBan = async userId => {
         ban.userId = parseInt(card.name)
         if (ban.userId === userId) return ban
     }
-    throw createError(404)
+    throw createError(404, 'Ban not found')
 }

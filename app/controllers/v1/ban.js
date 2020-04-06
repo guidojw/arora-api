@@ -19,10 +19,22 @@ exports.validate = method => {
             ]
         case 'putBan':
             return oneOf([
-                header('authorization').exists().isString(),
-                param('userId').exists().isNumeric(),
-                body('by').exists().isNumeric(),
-                body('unbanned').exists().isBoolean()
+                [
+                    header('authorization').exists().isString(),
+                    param('userId').exists().isNumeric(),
+                    body('byUserId').exists().isNumeric(),
+                    body('unbanned').exists().isBoolean()
+                ], [
+                    header('authorization').exists().isString(),
+                    param('userId').exists().isNumeric(),
+                    body('byUserId').exists().isNumeric(),
+                    body('by').exists().isNumeric()
+                ], [
+                    header('authorization').exists().isString(),
+                    param('userId').exists().isNumeric(),
+                    body('byUserId').exists().isNumeric(),
+                    body('reason').exists().isString()
+                ]
             ])
         case 'getBan':
             return [
@@ -37,16 +49,16 @@ exports.getBans = async (req, res) => {
 }
 
 exports.ban = async (req, res) => {
-    await banService.ban(req.body.groupId, req.body.userId, req.body.by, req.body.reason)
-    res.sendStatus(200)
+    res.json(await banService.ban(req.body.groupId, req.body.userId, req.body.by, req.body.reason))
 }
 
 exports.putBan = async (req, res) => {
-    await banService.putBan(req.params.userId, {
+    res.json(banService.putBan(req.params.userId, {
         unbanned: req.body.unbanned,
-        by: req.body.by
-    })
-    res.sendStatus(200)
+        by: req.body.by,
+        reason: req.body.reason,
+        byUserId: req.body.byUserId
+    }))
 }
 
 exports.getBan = async (req, res) => {
