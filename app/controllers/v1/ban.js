@@ -24,6 +24,11 @@ exports.validate = method => {
                 body('by').exists().isNumeric(),
                 body('unbanned').exists().isBoolean()
             ])
+        case 'getBan':
+            return [
+                header('authorization').exists().isString(),
+                param('userId').exists().isNumeric()
+            ]
     }
 }
 
@@ -42,4 +47,8 @@ exports.putBan = async (req, res) => {
         by: req.body.by
     })
     res.sendStatus(200)
+}
+
+exports.getBan = async (req, res) => {
+    res.json(await banService.getBan(req.params.userId))
 }

@@ -63,3 +63,15 @@ exports.putBan = async (userId, options) => {
     }
     throw createError(404)
 }
+
+exports.getBan = async userId => {
+    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
+    const listId = await trelloService.getIdFromListName(boardId, 'Banned')
+    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
+    for (const card of cards) {
+        const ban = JSON.parse(card.desc)
+        ban.userId = parseInt(card.name)
+        if (ban.userId === userId) return ban
+    }
+    throw createError(404)
+}
