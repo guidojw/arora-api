@@ -19,8 +19,11 @@ module.exports = async groupId => {
             }
         }
         if (suspension.at + duration <= Math.round(Date.now() / 1000)) {
-            const rank = suspension.rankback ? suspension.rank : 1
-            await groupService.setRank(groupId, suspension.userId, rank)
+            const rank = await userService.getRank(suspension.userId, groupId)
+            if (rank !== 0) {
+                const newRank = suspension.rankback ? suspension.rank : 1
+                await groupService.setRank(groupId, suspension.userId, newRank)
+            }
             await trelloService.putCard(card.id, { idList: newListId })
             const username = await userService.getUsername(suspension.userId)
             await discordMessageJob('log', `Finished **${username}**'s suspension`)
