@@ -8,7 +8,7 @@ const discordMessageJob = require('../jobs/discord-message')
 const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
 const stringHelper = require('../helpers/string')
-const webSocketManager = require('../managers/webSocket')
+const webSocketManager = require('../managers/web-socket')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
