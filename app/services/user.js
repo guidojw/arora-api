@@ -48,3 +48,8 @@ exports.getUsername = userId => {
     const client = robloxManager.getClient()
     return client.getUsername(userId)
 }
+
+exports.getUser = userId => {
+    const client = robloxManager.getClient()
+    return client.apis.users.getUserInfo(userId)
+}
