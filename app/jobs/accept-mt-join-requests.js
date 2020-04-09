@@ -5,7 +5,6 @@ const userService = require('../services/user')
 const groupService = require('../services/group')
 
 module.exports = async (groupId, mtGroupId) => {
-    const roles = await groupService.getRoles(mtGroupId)
     const client = robloxManager.getClient(mtGroupId)
     let cursor = null
     do {
@@ -15,8 +14,7 @@ module.exports = async (groupId, mtGroupId) => {
             const rank = await userService.getRank(userId, groupId)
             if (rank >= 100) {
                 await client.apis.groups.acceptJoinRequest({ groupId: mtGroupId, userId })
-                const roleId = roles.roles.find(role => role.rank === rank).id
-                await client.apis.groups.updateMemberInGroup({ groupId: mtGroupId, userId, roleId })
+                await groupService.setRank(mtGroupId, userId, rank)
                 await discordMessageJob('log', `Accepted **${request.requester.username}**'s MT join ` +
                     'request')
             } else {

@@ -26,4 +26,7 @@ router.get('/:userId/rank/:groupId', userController.validate('getRank'), handleV
 router.get('/:userId/role/:groupId', userController.validate('getRole'), handleValidationResult, authenticate,
     parseParams, userController.getRole)
 
+router.get('/:userId', userController.validate('getUser'), handleValidationResult, parseParams, authenticate,
+    userController.getUser)
+
 module.exports = router

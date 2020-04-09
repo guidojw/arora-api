@@ -8,6 +8,7 @@ const discordMessageJob = require('../jobs/discord-message')
 const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
 const stringHelper = require('../helpers/string')
+const webSocketManager = require('../managers/web-socket')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
@@ -22,12 +23,7 @@ exports.suspend = async (groupId, userId, options) => {
     for (const card of cards) {
         if (parseInt(card.name) === userId) throw createError(409, 'User is already suspended')
     }
-    if (rank > 0 && rank !== 2) {
-        const roles = await exports.getRoles(groupId)
-        const roleId = roles.roles.find(role => role.rank === 2).id
-        const client = robloxManager.getClient(groupId)
-        await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
-    }
+    if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
     const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
         options.by)])
     const days = options.duration / 86400
@@ -52,12 +48,10 @@ exports.promote = async (groupId, userId, by) => {
     if (rank === 0) throw createError(403, 'Can only promote group members')
     if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
     const username = await userService.getUsername(userId)
-    const roles = await exports.getRoles(groupId)
     const newRank = rank === 1 ? 3 : rank + 1
+    const newRole = await exports.setRank(groupId, userId, newRank)
+    const roles = await exports.getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === rank)
-    const newRole = roles.roles.find(role => role.rank === newRank)
-    const client = robloxManager.getClient(groupId)
-    await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId: newRole.id })
     if (by) {
         const byUsername = await userService.getUsername(by)
         await discordMessageJob('log', `**${byUsername}** promoted **${username}** from **${oldRole.name
@@ -265,10 +259,7 @@ exports.putSuspension = async (groupId, userId, options) => {
                     reason: options.reason,
                     at: Math.round(Date.now() / 1000)
                 }
-                const roles = await exports.getRoles(groupId)
-                const roleId = roles.roles.find(role => role.rank === suspension.rank).id
-                const client = robloxManager.getClient(groupId)
-                await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
+                await exports.setRank(groupId, userId, suspension.rank)
                 cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Done')
                 await discordMessageJob('log', `**${byUsername}** cancelled **${username}**'s ` +
                     `suspension with reason "*${options.reason}*"`)
@@ -375,4 +366,13 @@ exports.getRoles = async groupId => {
         method: 'get',
         url: `https://groups.roblox.com/v1/groups/${groupId}/roles`
     })).data
+}
+
+exports.setRank = async (groupId, userId, rank) => {
+    const roles = await exports.getRoles(groupId)
+    const role = roles.roles.find(role => role.rank === rank)
+    const client = robloxManager.getClient(groupId)
+    await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId: role.id })
+    webSocketManager.broadcast('rankChanged', { groupId, userId, rank })
+    return role
 }

@@ -19,13 +19,13 @@ const catalogRouter = require('./app/routes/catalog')
 const app = express()
 
 if (process.env.SENTRY_DSN) {
-    Sentry.init({dsn: process.env.SENTRY_DSN})
+    Sentry.init({ dsn: process.env.SENTRY_DSN })
     app.use(Sentry.Handlers.requestHandler())
 }
 
 app.use(logger('dev'))
 app.use(express.json())
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/v1/groups', groupsRouter)
 app.use('/api/v1/users', usersRouter)
@@ -41,7 +41,7 @@ if (process.env.SENTRY_DSN) {
     app.use(Sentry.Handlers.errorHandler())
 }
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
     sendError(res, err.status || 500, err.message)
 })
 

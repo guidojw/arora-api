@@ -1,7 +1,6 @@
 'use strict'
 const discordMessageJob = require('./discord-message')
 const trelloService = require('../services/trello')
-const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
 const groupService = require('../services/group')
 
@@ -10,8 +9,6 @@ module.exports = async groupId => {
     const listId = await trelloService.getIdFromListName(boardId, 'Current')
     const newListId = await trelloService.getIdFromListName(boardId, 'Done')
     const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
-    const roles = await groupService.getRoles(groupId)
-    const client = robloxManager.getClient(groupId)
     for (const card of cards) {
         const suspension = JSON.parse(card.desc)
         suspension.userId = parseInt(card.name)
@@ -23,8 +20,7 @@ module.exports = async groupId => {
         }
         if (suspension.at + duration <= Math.round(Date.now() / 1000)) {
             const rank = suspension.rankback ? suspension.rank : 1
-            const roleId = roles.roles.find(role => role.rank === rank).id
-            await client.apis.groups.updateMemberInGroup({ groupId, userId: suspension.userId, roleId })
+            await groupService.setRank(groupId, suspension.userId, rank)
             await trelloService.putCard(card.id, { idList: newListId })
             const username = await userService.getUsername(suspension.userId)
             await discordMessageJob('log', `Finished **${username}**'s suspension`)

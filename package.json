@@ -10,12 +10,6 @@
     "start:dev": "nodemon ./bin/www",
     "lint": "eslint app"
   },
-  "keywords": [
-    "noblox.js",
-    "javascript",
-    "roblox",
-    "bot"
-  ],
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
@@ -35,7 +29,8 @@
     "pg": "^8.0.0",
     "pg-hstore": "^2.3.3",
     "pluralize": "^8.0.0",
-    "sequelize": "^5.21.5"
+    "sequelize": "^5.21.5",
+    "ws": "^7.2.3"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

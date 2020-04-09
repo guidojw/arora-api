@@ -6,7 +6,6 @@ const robloxManager = require('../managers/roblox')
 module.exports = async groupId => {
     const exiles = await groupService.getExiles()
     const suspensions = await groupService.getSuspensions()
-    const roles = await groupService.getRoles(groupId)
     const client = robloxManager.getClient(groupId)
     let cursor = null
     do {
@@ -22,8 +21,7 @@ module.exports = async groupId => {
                 await discordMessageJob('log', `Accepted **${request.requester.username}**'s join ` +
                     'request')
                 if (suspensions.find(suspension => suspension.userId === userId)) {
-                    const roleId = roles.roles.find(role => role.rank === 2).id
-                    await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId })
+                    await groupService.setRank(groupId, userId, 2)
                     await discordMessageJob('log', `Promoted **${request.requester.username}** from ` +
                         '**Customer** to **Suspended**')
                 }

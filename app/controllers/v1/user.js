@@ -38,6 +38,11 @@ exports.validate = method => {
                 param('groupId').isNumeric(),
                 param('userId').isNumeric()
             ]
+        case 'getUser':
+            return [
+                header('authorization').exists().isString(),
+                param('userId').isNumeric()
+            ]
     }
 }
 
@@ -63,4 +68,8 @@ exports.getRank = async (req, res) => {
 
 exports.getRole = async (req, res) => {
     res.json(await userService.getRole(req.params.userId, req.params.groupId))
+}
+
+exports.getUser = async (req, res) => {
+    res.json(await userService.getUser(req.params.userId))
 }
