@@ -8,7 +8,7 @@ exports.init = () => {
             connection.isAlive = false
             connection.ping()
         }
-    }, 60000)
+    }, 30000)
 }
 
 exports.addConnection = connection => {
