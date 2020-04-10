@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {})
 
     Training.associate = function (models) {
-
+        Training.hasOne(models.TrainingCancellation, { foreignKey: { allowNull: false }})
     }
 
     return Training
