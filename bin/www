@@ -10,10 +10,6 @@ const webSocketManager = require('../app/managers/web-socket')
 
 const cronConfig = require('../config/cron')
 
-const models = require('../app/models')
-
-models.User.update({ firstName: 'newFirstName'}, { where: { id: 1 }, individualHooks: true })
-
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
