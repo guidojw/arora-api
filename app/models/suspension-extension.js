@@ -16,8 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {})
 
     SuspensionExtension.associate = models => {
-        SuspensionExtension.belongsTo(models.Suspension, { foreignKey: { allowNull: false }, onDelete: 'cascade',
-            hooks: true })
+        SuspensionExtension.belongsTo(models.Suspension, {
+            foreignKey: { allowNull: false, name: 'suspensionId' },
+            onDelete: 'cascade',
+            hooks: true
+        })
     }
 
     return SuspensionExtension

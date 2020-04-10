@@ -12,8 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {})
 
     TrainingCancellation.associate = models => {
-        TrainingCancellation.belongsTo(models.Training, { foreignKey: { allowNull: false }, onDelete: 'cascade',
-            hooks: true })
+        TrainingCancellation.belongsTo(models.Training, {
+            foreignKey: { allowNull: false, name: 'trainingId' },
+            onDelete: 'cascade',
+            hooks: true
+        })
     }
 
     return TrainingCancellation

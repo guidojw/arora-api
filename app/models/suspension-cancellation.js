@@ -12,8 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {})
 
     SuspensionCancellation.associate = models => {
-        SuspensionCancellation.belongsTo(models.Suspension, { foreignKey: { allowNull: false }, onDelete:
-                'cascade', hooks: true })
+        SuspensionCancellation.belongsTo(models.Suspension, {
+            foreignKey: { allowNull: false, name: 'suspensionId' },
+            onDelete: 'cascade',
+            hooks: true
+        })
     }
 
     return SuspensionCancellation

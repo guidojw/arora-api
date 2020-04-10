@@ -28,8 +28,10 @@ module.exports = (sequelize, DataTypes) => {
     }, {})
 
     Suspension.associate = models => {
-        Suspension.hasOne(models.SuspensionCancellation, { foreignKey: { allowNull: false }})
-        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false }})
+        Suspension.hasOne(models.SuspensionCancellation, {
+            foreignKey: { allowNull: false, name: 'suspensionId' }
+        })
+        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' }})
     }
 
     return Suspension
