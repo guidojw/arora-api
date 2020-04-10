@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     Admin.findById = async id => {
         try {
             return await Admin.findOne({
-                where: { id: id },
+                where: { id },
                 attributes: ['key']
             })
         } catch (err) {
