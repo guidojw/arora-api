@@ -12,6 +12,8 @@ const cronConfig = require('../config/cron')
 
 const models = require('../app/models')
 
+models.User.update({ firstName: 'newFirstName'}, { where: { id: 1 }, individualHooks: true })
+
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
@@ -19,20 +21,13 @@ const server = http.createServer(app)
 const wss = new WebSocket.Server({ server, path: '/api/v1' })
 
 robloxManager.init()
-    .then(() => console.log('Roblox account logged in!'))
-    .catch(err => console.error(err.message))
 
-models.sequelize.sync()
-    .then(() => {
-        console.log('Database & tables created!')
-        server.listen(port)
-        server.on('error', onError)
-        server.on('listening', onListening)
+server.listen(port)
+server.on('error', onError)
+server.on('listening', onListening)
 
-        webSocketManager.init()
-        wss.on('connection', webSocketManager.addConnection)
-    })
-    .catch((err => { console.error(err.message)}))
+webSocketManager.init()
+wss.on('connection', webSocketManager.addConnection)
 
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {

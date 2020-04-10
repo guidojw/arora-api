@@ -9,6 +9,7 @@ exports.init = async () => {
     try {
         const client = new Client({ setup: { throwHttpErrors: true }})
         await client.login({ cookie: process.env.ROBLOX_COOKIE })
+        console.log('Roblox account logged in!')
         const groups = await client.user.getGroups()
         const groupIds = groups.map(group => group.id)
         for (const groupId of groupIds) {
