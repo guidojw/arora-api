@@ -9,7 +9,6 @@ const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
 const stringHelper = require('../helpers/string')
 const webSocketManager = require('../managers/web-socket')
-const models = require('../models')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'

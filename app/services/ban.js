@@ -3,7 +3,6 @@ const createError = require('http-errors')
 const trelloService = require('./trello')
 const discordMessageJob = require('../jobs/discord-message')
 const userService = require('../services/user')
-const models = require('../models')
 
 exports.getBans = async () => {
     const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')

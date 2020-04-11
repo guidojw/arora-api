@@ -1,6 +1,4 @@
 'use strict'
-const discordMessageJob = require('../jobs/discord-message')
-
 module.exports = (sequelize, DataTypes) => {
     const Suspension = sequelize.define('Suspension', {
         authorId: {
@@ -27,28 +25,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             allowNull: false
         }
-    }, {
-        hooks: {
-            afterCreate: suspension => {
-
-            },
-            afterUpdate: suspension => {
-                console.log(suspension._changed)
-                if (suspension._changed.authorId) {
-                    console.log('userId')
-                }
-                if (suspension._changed.reason) {
-                    console.log('reason')
-                }
-                if (suspension._changed.date) {
-                    console.log('date')
-                }
-                if (suspension._changed.rankBack) {
-                    console.log('rankBack')
-                }
-            }
-        }
-    })
+    }, {})
 
     Suspension.associate = models => {
         Suspension.hasOne(models.SuspensionCancellation, {
