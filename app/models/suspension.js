@@ -24,6 +24,10 @@ module.exports = (sequelize, DataTypes) => {
         rankBack: {
             type: DataTypes.BOOLEAN,
             allowNull: false
+        },
+        rank: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     }, {})
 
