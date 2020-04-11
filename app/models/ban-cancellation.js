@@ -1,4 +1,6 @@
 'use strict'
+const discordMessageJob = require('../jobs/discord-message')
+
 module.exports = (sequelize, DataTypes) => {
   const BanCancellation = sequelize.define('BanCancellation', {
     authorId: {
@@ -9,7 +11,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     }
-  }, {})
+  }, {
+    hooks: {
+      afterCreate: ban => {
+
+      }
+    }
+  })
 
   BanCancellation.associate = models => {
     BanCancellation.belongsTo(models.Ban, {

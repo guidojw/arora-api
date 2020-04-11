@@ -1,4 +1,6 @@
 'use strict'
+const discordMessageJob = require('../jobs/discord-message')
+
 module.exports = (sequelize, DataTypes) => {
     const SuspensionExtension = sequelize.define('SuspensionExtension', {
         authorId: {
@@ -13,7 +15,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         }
-    }, {})
+    }, {
+        hooks: {
+            afterCreate: extension => {
+
+            }
+        }
+    })
 
     SuspensionExtension.associate = models => {
         SuspensionExtension.belongsTo(models.Suspension, {
