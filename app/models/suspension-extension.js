@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         reason: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
         },
         duration: {
             type: DataTypes.INTEGER,

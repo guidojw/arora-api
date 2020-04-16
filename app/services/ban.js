@@ -3,18 +3,27 @@ const createError = require('http-errors')
 const trelloService = require('./trello')
 const discordMessageJob = require('../jobs/discord-message')
 const userService = require('../services/user')
+const models = require('../models')
 
-exports.getBans = async () => {
-    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-    const listId = await trelloService.getIdFromListName(boardId, 'Banned')
-    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
-    let bans = []
-    for (const card of cards) {
-        const ban = JSON.parse(card.desc)
-        ban.userId = parseInt(card.name)
-        await bans.push(ban)
-    }
-    return bans
+exports.getBans = () => {
+    // const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
+    // const listId = await trelloService.getIdFromListName(boardId, 'Banned')
+    // const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
+    // let bans = []
+    // for (const card of cards) {
+    //     const ban = JSON.parse(card.desc)
+    //     ban.userId = parseInt(card.name)
+    //     await bans.push(ban)
+    // }
+    // return bans
+
+    return models.Ban.findAll({
+        include: [{
+            model: models.BanCancellation,
+            through: { attributes: [] },
+            where: { id: null }
+        }]
+    })
 }
 
 exports.ban = async (groupId, userId, by, reason) => {

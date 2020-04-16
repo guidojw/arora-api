@@ -14,7 +14,10 @@ module.exports = {
             },
             reason: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
+                validate: {
+                    notEmpty: true
+                }
             },
             date: {
                 type: Sequelize.DATE,
