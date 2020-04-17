@@ -17,13 +17,7 @@ exports.getBans = () => {
     // }
     // return bans
 
-    return models.Ban.findAll({
-        include: [{
-            model: models.BanCancellation,
-            through: { attributes: [] },
-            where: { id: null }
-        }]
-    })
+    return models.Ban.findAll()
 }
 
 exports.ban = async (groupId, userId, by, reason) => {

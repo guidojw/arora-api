@@ -29,6 +29,12 @@ Object.keys(db).forEach(modelName => {
         db[modelName].associate(db)
     }
 })
+Object.keys(db).forEach(modelName => {
+    if (db[modelName].loadScopes) {
+        db[modelName].loadScopes(db)
+    }
+})
+
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize

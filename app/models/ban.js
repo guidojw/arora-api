@@ -30,5 +30,15 @@ module.exports = (sequelize, DataTypes) => {
       Ban.hasOne(models.BanCancellation, { foreignKey: { allowNull: false, name: 'banId' }})
   }
 
+  Ban.loadScopes = models => {
+    Ban.addScope('defaultScope', {
+      where: { '$BanCancellation.id$': null },
+      include: [{
+        model: models.BanCancellation,
+        attributes: []
+      }]
+    })
+  }
+
   return Ban
 }
