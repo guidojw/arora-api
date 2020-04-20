@@ -41,5 +41,15 @@ module.exports = (sequelize, DataTypes) => {
         Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' }})
     }
 
+    Suspension.loadScopes = models => {
+        Suspension.addScope('defaultScope', {
+            where: { '$SuspensionCancellation.id$': null },
+            include: [{
+                model: models.SuspensionCancellation,
+                attributes: []
+            }]
+        })
+    }
+
     return Suspension
 }
