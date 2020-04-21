@@ -1,87 +1,56 @@
 'use strict'
 const createError = require('http-errors')
-const trelloService = require('./trello')
 const discordMessageJob = require('../jobs/discord-message')
 const userService = require('../services/user')
 const models = require('../models')
 
 exports.getBans = () => {
-    // const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-    // const listId = await trelloService.getIdFromListName(boardId, 'Banned')
-    // const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
-    // let bans = []
-    // for (const card of cards) {
-    //     const ban = JSON.parse(card.desc)
-    //     ban.userId = parseInt(card.name)
-    //     await bans.push(ban)
-    // }
-    // return bans
-
     return models.Ban.findAll()
 }
 
-exports.ban = async (groupId, userId, by, reason) => {
+exports.ban = async (groupId, userId, authorId, reason) => {
     const rank = await userService.getRank(userId, groupId)
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
-    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-    const listId = await trelloService.getIdFromListName(boardId, 'Banned')
-    const cards = await trelloService.getCards(listId, {fields: 'name'})
-    for (const card of cards) {
-        if (parseInt(card.name) === userId) throw createError(409, 'User is already banned')
-    }
-    const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService.getUsername(
-        by)])
-    await discordMessageJob('log', `**${byUsername}** banned **${username}** with reason "*${reason}*"`)
-    return trelloService.postCard({
-        idList: listId,
-        name: userId.toString(),
-        desc: JSON.stringify({
-            rank,
-            by,
-            reason,
-            at: Math.round(Date.now() / 1000)
-        })
+    const ban = await models.Ban.findOne({ where: { userId }})
+    if (ban) throw createError(409, 'User is already banned')
+    const [username, authorUsername] = await Promise.all([userService.getUsername(userId), userService
+        .getUsername(authorId)])
+    await discordMessageJob('log', `**${authorUsername}** banned **${username}** with reason "*${reason
+    }*"`)
+    return models.Ban.create({
+        userId,
+        authorId,
+        reason,
+        rank,
+        date: Date.now()
     })
 }
 
 exports.putBan = async (userId, options) => {
-    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-    const listId = await trelloService.getIdFromListName(boardId, 'Banned')
-    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
-    for (const card of cards) {
-        if (parseInt(card.name) === userId) {
-            const cardOptions = {}
-            const ban = JSON.parse(card.desc)
-            const [username, byUsername] = await Promise.all([userService.getUsername(userId), userService
-                .getUsername(options.byUserId)])
-            if (options.unbanned) {
-                cardOptions.idList = await trelloService.getIdFromListName(boardId, 'Unbanned')
-                await discordMessageJob('log', `**${byUsername}** unbanned **${username}**`)
-            } else if (options.by) {
-                ban.by = options.by
-                const newByUsername = await userService.getUsername(options.by)
-                await discordMessageJob('log', `**${byUsername}** changed the author of **${username}*` +
-                    `*'s ban to **${newByUsername}**`)
-            } else if (options.reason) {
-                ban.reason = options.reason
-                await discordMessageJob('log', `**${byUsername}** changed the reason of **${username}*` +
-                    `*'s ban to *"${options.reason}"*`)
-            }
-            cardOptions.desc = JSON.stringify(ban)
-            return trelloService.putCard(card.id, cardOptions)
+    const ban = await models.Ban.findOne({ where: { userId }})
+    if (ban) {
+        const [username, editorUsername] = await Promise.all([userService.getUsername(userId), userService
+            .getUsername(options.editorId)])
+        if (options.unbanned) {
+            await models.BanCancellation.create({ banId: ban.id, authorId: options.authorId, reason: options.reason })
+            await discordMessageJob('log', `**${editorUsername}** unbanned **${username}**`)
+        } else if (options.authorId) {
+            await ban.update({ authorId: options.authorId })
+            const newAuthorUsername = await userService.getUsername(options.authorId)
+            await discordMessageJob('log', `**${editorUsername}** changed the author of **${username}*` +
+                `*'s ban to **${newAuthorUsername}**`)
+        } else if (options.reason) {
+            await ban.update({ reason: options.reason })
+            await discordMessageJob('log', `**${editorUsername}** changed the reason of **${username}*` +
+                `*'s ban to *"${options.reason}"*`)
         }
+        return ban
     }
     throw createError(404, 'Ban not found')
 }
 
 exports.getBan = async userId => {
-    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-    const listId = await trelloService.getIdFromListName(boardId, 'Banned')
-    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
-    for (const card of cards) {
-        const ban = JSON.parse(card.desc)
-        ban.userId = parseInt(card.name)
-        if (ban.userId === userId) return ban
-    }
+    const ban = await models.Ban.findOne({ where: { userId }})
+    if (ban) return ban
     throw createError(404, 'Ban not found')
 }
