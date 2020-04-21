@@ -1,4 +1,6 @@
 'use strict'
+const { Op } = require('sequelize')
+
 module.exports = (sequelize, DataTypes) => {
     const Suspension = sequelize.define('Suspension', {
         authorId: {
@@ -14,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         date: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: false,
+            defaultValue: DataTypes.NOW
         },
         userId: {
             type: DataTypes.INTEGER,
@@ -31,6 +34,18 @@ module.exports = (sequelize, DataTypes) => {
         rank: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        endDate: {
+            type: DataTypes.VIRTUAL,
+            async get () {
+                let endDate = this.date + this.duration
+                const extensions = await sequelize.models.SuspensionExtension.findAll({ where: { suspensionId:
+                        this.id }})
+                for (const extension of extensions) {
+                    endDate += extension.duration
+                }
+                return endDate
+            }
         }
     }, {})
 
@@ -38,7 +53,8 @@ module.exports = (sequelize, DataTypes) => {
         Suspension.hasOne(models.SuspensionCancellation, {
             foreignKey: { allowNull: false, name: 'suspensionId' }
         })
-        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' }})
+        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' }}
+        )
     }
 
     Suspension.loadScopes = models => {
@@ -47,6 +63,16 @@ module.exports = (sequelize, DataTypes) => {
             include: [{
                 model: models.SuspensionCancellation,
                 attributes: []
+            }, {
+                model: models.SuspensionExtension,
+                as: 'extensions'
+            }]
+        })
+        Suspension.addScope('finished', {
+            where: { endDate: { [Op.lt]: Date.now() }},
+            include: [{
+                model: models.SuspensionExtension,
+                as: 'extensions'
             }]
         })
     }

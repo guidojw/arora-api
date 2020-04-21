@@ -9,10 +9,10 @@ exports.getBans = () => {
 }
 
 exports.ban = async (groupId, userId, authorId, reason) => {
-    const rank = await userService.getRank(userId, groupId)
-    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
     const ban = await models.Ban.findOne({ where: { userId }})
     if (ban) throw createError(409, 'User is already banned')
+    const rank = await userService.getRank(userId, groupId)
+    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
     const [username, authorUsername] = await Promise.all([userService.getUsername(userId), userService
         .getUsername(authorId)])
     await discordMessageJob('log', `**${authorUsername}** banned **${username}** with reason "*${reason
@@ -21,8 +21,7 @@ exports.ban = async (groupId, userId, authorId, reason) => {
         userId,
         authorId,
         reason,
-        rank,
-        date: Date.now()
+        rank
     })
 }
 
@@ -32,17 +31,24 @@ exports.putBan = async (userId, options) => {
         const [username, editorUsername] = await Promise.all([userService.getUsername(userId), userService
             .getUsername(options.editorId)])
         if (options.unbanned) {
-            await models.BanCancellation.create({ banId: ban.id, authorId: options.authorId, reason: options.reason })
-            await discordMessageJob('log', `**${editorUsername}** unbanned **${username}**`)
-        } else if (options.authorId) {
-            await ban.update({ authorId: options.authorId })
+            const cancellation = await models.BanCancellation.create({
+                banId: ban.id,
+                authorId: options.editorId,
+                reason: options.reason
+            })
+            await discordMessageJob('log', `**${editorUsername}** unbanned **${username}** with reason` +
+                ` "*${cancellation.reason}*"`)
+        }
+        if (options.authorId) {
             const newAuthorUsername = await userService.getUsername(options.authorId)
+            await ban.update({ authorId: options.authorId })
             await discordMessageJob('log', `**${editorUsername}** changed the author of **${username}*` +
                 `*'s ban to **${newAuthorUsername}**`)
-        } else if (options.reason) {
+        }
+        if (options.reason) {
             await ban.update({ reason: options.reason })
             await discordMessageJob('log', `**${editorUsername}** changed the reason of **${username}*` +
-                `*'s ban to *"${options.reason}"*`)
+                `*'s ban to *"${ban.reason}"*`)
         }
         return ban
     }

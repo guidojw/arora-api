@@ -13,7 +13,7 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 body('userId').exists().isNumeric(),
-                body('by').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('reason').exists().isString(),
                 body('groupId').exists().isNumeric()
             ]
@@ -22,17 +22,18 @@ exports.validate = method => {
                 [
                     header('authorization').exists().isString(),
                     param('userId').exists().isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('unbanned').exists().isBoolean()
+                    body('editorId').exists().isNumeric(),
+                    body('unbanned').exists().isBoolean(),
+                    body('reason').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('userId').exists().isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('by').exists().isNumeric()
+                    body('editorId').exists().isNumeric(),
+                    body('authorId').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('userId').exists().isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('reason').exists().isString()
                 ]
             ])
@@ -49,15 +50,15 @@ exports.getBans = async (req, res) => {
 }
 
 exports.ban = async (req, res) => {
-    res.json(await banService.ban(req.body.groupId, req.body.userId, req.body.by, req.body.reason))
+    res.json(await banService.ban(req.body.groupId, req.body.userId, req.body.authorId, req.body.reason))
 }
 
 exports.putBan = async (req, res) => {
     res.json(await banService.putBan(req.params.userId, {
         unbanned: req.body.unbanned,
-        by: req.body.by,
+        editorId: req.body.editorId,
         reason: req.body.reason,
-        byUserId: req.body.byUserId
+        authorId: req.body.authorId
     }))
 }
 

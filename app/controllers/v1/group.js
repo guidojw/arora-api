@@ -10,7 +10,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 body('userId').exists().isNumeric(),
-                body('by').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('reason').exists().isString(),
                 body('duration').exists().isNumeric(),
                 body('rankback').exists().isNumeric()
@@ -20,7 +20,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
-                body('by').optional().isNumeric()
+                body('authorId').optional().isNumeric()
             ]
         case 'getShout':
             return [
@@ -41,10 +41,10 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('by').exists().isString(),
+                body('authorId').exists().isString(),
                 body('type').exists().isString(),
                 body('date').exists().isNumeric(),
-                body('specialnotes').optional().isString()
+                body('notes').optional().isString()
             ]
         case 'getExiles':
             return [
@@ -67,7 +67,7 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('by').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('message').exists().isString()
             ]
         case 'putTraining': // This is ugly because epxress-validator doesn't support nested oneOfs
@@ -76,62 +76,50 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('type').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('date').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('specialnotes').exists().isString()
+                    body('editorId').exists().isNumeric(),
+                    body('notes').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('by').exists().isString()
+                    body('editorId').exists().isNumeric(),
+                    body('authorId').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('cancelled').exists().isBoolean(),
                     body('reason').exists().isBoolean(),
-                    body('by').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('finished').exists().isBoolean(),
-                    body('by').exists().isString()
                 ]
             ])
             /*return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
+                body('editorId').exists().isNumeric(),
                 oneOf([
                     body('type').exists().isString(),
                     body('date').exists().isNumeric(),
-                    body('specialnotes').exists().isString(),
-                    body('by').exists().isString()
+                    body('notes').exists().isString(),
+                    body('authorId').exists().isNumeric()
                     [
                         body('cancelled').exists().isBoolean(),
-                            body('reason').exists().isBoolean(),
-                            body('by').exists().isString()
-                        ],
-                    [
-                        body('finished').exists().isBoolean(),
-                        body('by').exists().isString()
+                        body('reason').exists().isBoolean()
                     ]
-                    ])
+                ])
             ]*/
         case 'putSuspension':
             return oneOf([
@@ -139,57 +127,53 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('by').exists().isNumeric()
+                    body('editorId').exists().isNumeric(),
+                    body('authorId').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('reason').exists().isString()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('rankback').exists().isNumeric()
+                    body('editorId').exists().isNumeric(),
+                    body('rankBack').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('cancelled').exists().isBoolean(),
-                    body('reason').exists().isBoolean(),
-                    body('by').exists().isNumeric()
+                    body('reason').exists().isBoolean()
                 ], [
                     header('authorization').exists().isString(),
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
+                    body('editorId').exists().isNumeric(),
                     body('extended').exists().isBoolean(),
                     body('duration').exists().isNumeric(),
-                    body('reason').exists().isString(),
-                    body('by').exists().isNumeric()
+                    body('reason').exists().isString()
                 ]
             ])
             /*return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
+                body('editorId').exists().isNumeric(),
                 oneOf([
-                    body('by').exists().isNumeric(),
+                    body('authorId').exists().isNumeric(),
                     body('reason').exists().isString(),
-                    body('rankback').exists().isNumeric(),
-                        [
-                        body('cancelled').exists().isBoolean(),
-                            body('reason').exists().isBoolean(),
-                            body('by').exists().isNumeric()
-                        ],
+                    body('rankBack').exists().isNumeric(),
                     [
+                        body('cancelled').exists().isBoolean(),
+                        body('reason').exists().isBoolean()
+                    ], [
                         body('extended').exists().isBoolean(),
                         body('duration').exists().isNumeric(),
-                        body('reason').exists().isString(),
-                        body('by').exists().isNumeric()
+                        body('reason').exists().isString()
                     ]
                 ])
             ]*/
@@ -208,7 +192,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
-                body('byUserId').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('medium').optional().isString()
             ]
     }
@@ -216,15 +200,15 @@ exports.validate = method => {
 
 exports.suspend = async (req, res) => {
     res.json(await groupService.suspend(req.params.groupId, req.body.userId, {
-        by: req.body.by,
+        authorId: req.body.authorId,
         reason: req.body.reason,
         duration: req.body.duration,
-        rankback: req.body.rankback
+        rankBack: req.body.rankBack
     }))
 }
 
 exports.promote = async (req, res) => {
-    res.json(await groupService.promote(req.params.groupId, req.params.userId, req.body.by))
+    res.json(await groupService.promote(req.params.groupId, req.params.userId, req.body.authorId))
 }
 
 exports.getShout = async (req, res) => {
@@ -241,10 +225,10 @@ exports.getTrainings = async (req, res) => {
 
 exports.scheduleTraining = async (req, res) => {
     res.json(await groupService.scheduleTraining({
-        by: req.body.by,
+        author: req.body.authorId,
         type: req.body.type,
         date: req.body.date,
-        specialnotes: req.body.specialnotes
+        notes: req.body.notes
     }))
 }
 
@@ -261,31 +245,31 @@ exports.getTraining = async (req, res) => {
 }
 
 exports.shout = async (req, res) => {
-    res.json(await groupService.shout(req.params.groupId, req.body.by, req.body.message))
+    res.json(await groupService.shout(req.params.groupId, req.body.authorId, req.body.message))
 }
 
 exports.putTraining = async (req, res) => {
     res.json(await groupService.putTraining(req.params.groupId, req.params.trainingId, {
-        by: req.body.by,
+        editorId: req.body.editorId,
         type: req.body.type,
         date: req.body.date,
-        specialnotes: req.body.specialnotes,
+        notes: req.body.notes,
         cancelled: req.body.cancelled,
         reason: req.body.reason,
         finished: req.body.finished,
-        byUserId: req.body.byUserId
+        authorId: req.body.authorId
     }))
 }
 
 exports.putSuspension = async (req, res) => {
     res.json(await groupService.putSuspension(req.params.groupId, req.params.userId, {
-        by: req.body.by,
+        editorId: req.body.editorId,
         reason: req.body.reason,
-        rankback: req.body.rankback,
+        rankBack: req.body.rankBack,
         cancelled: req.body.cancelled,
         extended: req.body.extended,
         duration: req.body.duration,
-        byUserId: req.body.byUserId
+        authorId: req.body.authorId
     }))
 }
 
@@ -300,6 +284,6 @@ exports.getFinishedSuspensions = async (req, res) => {
 exports.announceTraining = async (req, res) => {
     res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, {
         medium: req.body.medium,
-        byUserId: req.body.byUserId
+        authorId: req.body.authorId
     }))
 }
