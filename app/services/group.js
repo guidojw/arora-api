@@ -215,7 +215,7 @@ exports.getGroup = groupId => {
 }
 
 exports.getFinishedSuspensions = async () => {
-    return models.Suspension.scope('finished').findAll()
+    return models.Suspension.scope('defaultScope', 'finished').findAll()
 }
 
 exports.announceTraining = async (groupId, trainingId, options) => {

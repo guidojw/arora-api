@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Suspension.loadScopes = models => {
         Suspension.addScope('defaultScope', {
-            where: { '$SuspensionCancellation.id$': null },
+            where: { '$SuspensionCancellation.id$': null, endDate: { [Op.gt]: Date.now() }},
             include: [{
                 model: models.SuspensionCancellation,
                 attributes: []
