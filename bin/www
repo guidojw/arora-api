@@ -3,7 +3,7 @@
 const app = require('../app')
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
-const cron = require('node-cron')
+const cron = require('node-schedule')
 const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
@@ -19,6 +19,7 @@ const { Op } = require('sequelize')
 // models.SuspensionCancellation.create({ authorId: 1, reason: 'reason', suspensionId: 1 }).then(console.log)
 // models.Ban.create({ userId: 1, reason: 'reason', rank: 2, authorId: 1, date: Date.now() })
 // models.BanCancellation.findAll().then(console.log)
+// models.BanCancellation.create({ banId: 1, reason: 'reason', authorId: 1 }).then(console.log)
 models.Ban.findAll().then(console.log)
 
 const port = normalizePort(process.env.PORT || '3000')
@@ -39,9 +40,9 @@ wss.on('connection', webSocketManager.addConnection)
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
         const [...args] = job.args
-        cron.schedule(job.expression, () => job.job(...args))
+        cron.scheduleJob(job.expression, () => job.job(...args))
     } else {
-        cron.schedule(job.expression, job.job)
+        cron.scheduleJob(job.expression, job.job)
     }
 }
 

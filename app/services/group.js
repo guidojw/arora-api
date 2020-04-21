@@ -9,6 +9,8 @@ const userService = require('../services/user')
 const stringHelper = require('../helpers/string')
 const webSocketManager = require('../managers/web-socket')
 const models = require('../models')
+const finishSuspensionJob = require('../jobs/finish-suspension')
+const cron = require('node-schedule')
 
 exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
@@ -20,13 +22,14 @@ exports.suspend = async (groupId, userId, options) => {
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable')
     if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
     const suspension = await models.Suspension.create({
-        userId,
-        rank,
         rankBack: options.rankBack,
         duration: options.duration,
         authorId: options.authorId,
-        reason: options.reason
+        reason: options.reason,
+        userId,
+        rank
     })
+    cron.scheduleJob(suspension.endDate, finishSuspensionJob.bind(null, suspension))
     const days = options.duration / 86400000
     const [username, authorUsername] = await Promise.all([userService.getUsername(userId), userService
         .getUsername(options.authorId)])
