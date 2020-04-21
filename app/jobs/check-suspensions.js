@@ -10,11 +10,11 @@ module.exports = async groupId => {
     const roles = await groupService.getRoles(groupId)
     const role = roles.roles.find(role => role.rank === 2)
     const suspendeds = await client.apis.groups.getMembersWithRole({ groupId, roleId: role.id })
-    for (const suspended of suspendeds) {
+    for (const suspended of suspendeds.data) {
         const suspension = await models.Suspension.unscoped().findAll({
             where: { userId: suspended.userId },
-            attributes: [[sequelize.fn('MAX', sequelize.col('id'))]]
+            attributes: [sequelize.fn('MAX', sequelize.col('id'))]
         })[0]
-        if (suspension.endDate < Date.now()) finishSuspensionJob(suspension)
+        if (suspension && suspension.endDate < Date.now()) finishSuspensionJob(suspension)
     }
 }

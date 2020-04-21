@@ -7,7 +7,7 @@ const models = require('../models')
 const robloxConfig = require('../../config/roblox')
 
 module.exports = async suspension => {
-    if (suspension && !models.SuspensionCancellation.findOne({ where: { suspensionId: suspension.id }})) {
+    if (!models.SuspensionCancellation.findOne({ where: { suspensionId: suspension.id }})) {
         const rank = await userService.getRank(suspension.userId, robloxConfig.defaultGroup)
         if (rank !== 0) {
             await groupService.setRank(robloxConfig.defaultGroup, suspension.userId, suspension.rankBack ?

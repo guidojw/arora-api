@@ -53,7 +53,8 @@ module.exports = (sequelize, DataTypes) => {
         Suspension.hasOne(models.SuspensionCancellation, {
             foreignKey: { allowNull: false, name: 'suspensionId' }
         })
-        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' }}
+        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' },
+            as: 'extensions'}
         )
     }
 
