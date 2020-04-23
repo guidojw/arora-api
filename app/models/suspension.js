@@ -1,5 +1,8 @@
 'use strict'
 const { Op } = require('sequelize')
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
+const pluralize = require('pluralize')
 
 module.exports = (sequelize, DataTypes) => {
     const Suspension = sequelize.define('Suspension', {
@@ -49,11 +52,29 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: suspension => {
-
+            afterCreate: async suspension => {
+                const days = suspension.duration / 86400000
+                const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
+                    userService.getUsername(suspension.authorId)])
+                discordMessageJob('log', `**${authorName}** suspended **${username}** for **${days}** ` +
+                    `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
             },
-            afterUpdate: (suspension, options) => {
-
+            afterUpdate: async (suspension, options) => {
+                const [username, editorName] = await Promise.all([userService.getUsername(suspension.userId),
+                    userService.getUsername(options.editorId)])
+                if (suspension.changed('authorId')) {
+                    const authorName = await userService.getUsername(suspension.authorId)
+                    discordMessageJob('log', `**${editorName}** changed the author of **${username}*` +
+                        `*'s suspension to **${authorName}**`)
+                }
+                if (suspension.changed('reason')) {
+                    discordMessageJob('log', `**${editorName}** changed the reason of **${username}*` +
+                        `*'s suspension to *"${suspension.reason}"*`)
+                }
+                if (suspension.changed('rankBack')) {
+                    discordMessageJob('log', `**${editorName}** changed the rankBack option of **${
+                        username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
+                }
             }
         }
     })

@@ -1,4 +1,7 @@
 'use strict'
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
+
 module.exports = (sequelize, DataTypes) => {
     const Ban = sequelize.define('Ban', {
         userId: {
@@ -27,11 +30,24 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: ban => {
-
+            afterCreate: async ban => {
+                const [username, authorUsername] = await Promise.all([userService.getUsername(ban.userId),
+                    userService.getUsername(ban.authorId)])
+                discordMessageJob('log', `**${authorUsername}** banned **${username}** with reason`
+                + `"*${ban.reason}*"`)
             },
-            afterUpdate: (ban, options) => {
-
+            afterUpdate: async (ban, options) => {
+                const [username, editorName] = await Promise.all([userService.getUsername(ban.userId),
+                    userService.getUsername(options.editorId)])
+                if (ban.changed('reason')) {
+                    await discordMessageJob('log', `**${editorName}** changed the reason of **${username
+                    }**'s ban to *"${ban.reason}"*`)
+                }
+                if (ban.changed('authorId')) {
+                    const authorName = await userService.getUsername(ban.authorId)
+                    discordMessageJob('log', `**${editorName}** changed the author of **${username}**` +
+                        `'s ban to **${authorName}**`)
+                }
             }
         }
     })

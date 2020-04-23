@@ -1,4 +1,7 @@
 'use strict'
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
+
 module.exports = (sequelize, DataTypes) => {
     const TrainingCancellation = sequelize.define('TrainingCancellation', {
         authorId: {
@@ -14,8 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: cancellation => {
-
+            afterCreate: async cancellation => {
+                const authorName = await userService.getUsername(cancellation.authorId)
+                discordMessageJob('log', `**${authorName}** cancelled training **${cancellation
+                    .trainingId}** with reason "*${cancellation.reason}*"`)
             }
         }
     })

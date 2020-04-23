@@ -1,4 +1,7 @@
 'use strict'
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
+
 module.exports = (sequelize, DataTypes) => {
     const BanCancellation = sequelize.define('BanCancellation', {
         authorId: {
@@ -14,8 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: cancellation => {
-
+            afterCreate: async cancellation => {
+                const ban = await sequelize.models.Ban.findByPk(cancellation.banId)
+                const [username, authorName] = await Promise.all([userService.getUsername(ban.userId),
+                    userService.getUsername(cancellation.authorId)])
+                discordMessageJob('log', `**${authorName}** unbanned **${username}** with reason "*${
+                    cancellation.reason}*"`)
             }
         }
     })

@@ -18,4 +18,7 @@ router.put('/:userId', banController.validate('putBan'), handleValidationResult,
 router.get('/:userId', banController.validate('getBan'), handleValidationResult, authenticate, parseParams,
     banController.getBan)
 
+router.post('/:userId/cancel', banController.validate('cancelBan'), handleValidationResult, authenticate,
+    parseParams, banController.cancelBan)
+
 module.exports = router

@@ -23,12 +23,6 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('userId').exists().isNumeric(),
                     body('editorId').exists().isNumeric(),
-                    body('unbanned').exists().isBoolean(),
-                    body('reason').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('userId').exists().isNumeric(),
-                    body('editorId').exists().isNumeric(),
                     body('authorId').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
@@ -41,6 +35,13 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('userId').exists().isNumeric()
+            ]
+        case 'cancelBan':
+            return [
+                header('authorization').exists().isString(),
+                param('userId').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('reason').exists().isString()
             ]
     }
 }
@@ -64,4 +65,8 @@ exports.putBan = async (req, res) => {
 
 exports.getBan = async (req, res) => {
     res.json(await banService.getBan(req.params.userId))
+}
+
+exports.cancelBan = async (req, res) => {
+    res.json(await banService.cancelBan(req.params.userId, req.body.editorId, req.body.reason))
 }

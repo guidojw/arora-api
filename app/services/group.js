@@ -1,6 +1,5 @@
 'use strict'
 const createError = require('http-errors')
-const pluralize = require('pluralize')
 const axios = require('axios')
 const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
@@ -30,11 +29,6 @@ exports.suspend = async (groupId, userId, options) => {
         rank
     })
     cron.scheduleJob(suspension.endDate, finishSuspensionJob.bind(null, suspension))
-    const days = options.duration / 86400000
-    const [username, authorUsername] = await Promise.all([userService.getUsername(userId), userService
-        .getUsername(options.authorId)])
-    await discordMessageJob('log', `**${authorUsername}** suspended **${username}** for **${days}** ${
-        pluralize('day', days)} with reason "*${suspension.reason}*"`)
     return suspension
 }
 
@@ -72,20 +66,13 @@ exports.getTrainings = () => {
     return models.Training.findAll()
 }
 
-exports.scheduleTraining = async options => {
-    const training = await models.Training.create({
+exports.scheduleTraining = options => {
+    return models.Training.create({
         type: options.type.toLowerCase(),
         authorId: options.authorId,
         date: options.date,
         notes: options.notes
     })
-    const dateString = timeHelper.getDate(options.date)
-    const timeString = timeHelper.getTime(options.date)
-    const authorUsername = await userService.getUsername(options.authorId)
-    await discordMessageJob('log', `**${authorUsername}** scheduled a **${training.type.toUpperCase()}**`
-        + ` training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`
-        + `${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
-    return training
 }
 
 exports.getExiles = () => {
@@ -118,97 +105,13 @@ exports.shout = async (groupId, authorId, message) => {
 
 exports.putTraining = async (groupId, trainingId, options) => {
     const training = await models.Training.findByPk(trainingId)
-    if (training) {
-        const editorUsername = await userService.getUsername(options.editorId)
-        if (options.authorId) {
-            const newAuthorUsername = await userService.getUsername(training.authorId)
-            await training.update({ authorId: options.authorId })
-            await discordMessageJob('log', `**${editorUsername}** changed training **${trainingId}**'s` +
-                ` host to **${newAuthorUsername}**`)
-        }
-        if (options.type) {
-            await training.update({ type: options.type.toLowerCase() })
-            await discordMessageJob('log', `**${editorUsername}** changed training **${trainingId}**'s` +
-                ` type to **${training.type.toUpperCase()}**`)
-        }
-        if (options.date) {
-            await training.update({ date: options.date })
-            const dateString = timeHelper.getDate(training.date)
-            const timeString = timeHelper.getTime(training.date)
-            await discordMessageJob('log', `**${editorUsername}** changed training **${trainingId}**'s` +
-                ` date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
-        }
-        if (options.notes) {
-            await training.update({ notes: options.notes })
-            await discordMessageJob('log', `**${editorUsername}** changed training **${trainingId}**'s` +
-                ` notes to "*${training.notes}*"`)
-        }
-        if (options.cancelled) {
-            const cancellation = await models.TrainingCancellation.create({
-                trainingId: training.id,
-                authorId: options.editorId,
-                reason: options.reason
-            })
-            await discordMessageJob('log', `**${editorUsername}** cancelled training **${trainingId}**` +
-                `with reason "*${cancellation.reason}*"`)
-        }
-        return training
-    }
+    if (training) return training.update(options)
     throw createError(404, 'Training not found')
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (suspension) {
-        const [username, editorUsername] = await Promise.all([userService.getUsername(userId), userService
-            .getUsername(options.editorId)])
-        if (options.authorId) {
-            const newAuthorUsername = await userService.getUsername(options.authorId)
-            await suspension.update({ authorId: options.authorId })
-            await discordMessageJob('log', `**${editorUsername}** changed the author of **${username}*` +
-                `*'s suspension to **${newAuthorUsername}**`)
-        }
-        if (options.reason && options.cancelled === undefined && options.extended === undefined) {
-            await suspension.update({ reason: options.reason })
-            await discordMessageJob('log', `**${editorUsername}** changed the reason of **${username}*` +
-                `*'s suspension to *"${suspension.reason}"*`)
-        }
-        if (options.rankBack === true || options.rankBack === false) {
-            await suspension.update({ rankBack: options.rankBack })
-            await discordMessageJob('log', `**${editorUsername}** changed the rankBack option of **${
-                username}**'s suspension to **${options.rankBack ? 'yes' : 'no'}**`)
-        }
-        if (options.cancelled) {
-            await exports.setRank(groupId, userId, suspension.rank)
-            await models.SuspensionCancellation.create({
-                suspensionId: suspension.id,
-                authorId: options.editorId,
-                reason: options.reason
-            })
-            await discordMessageJob('log', `**${editorUsername}** cancelled **${username}**'s ` +
-                `suspension with reason "*${options.reason}*"`)
-        }
-        if (options.extended) {
-            let days = suspension.duration / 86400000
-            if (!suspension.extensions) suspension.extensions = []
-            for (const extension of suspension.extensions) {
-                days += extension.duration / 86400000
-            }
-            days += options.duration
-            if (days < 1) throw createError(403, 'Insufficient amount of days')
-            if (days > 7) throw createError(403, 'Too many days')
-            const extension = await models.SuspensionExtension.create({
-                suspensionId: suspension.id,
-                authorId: options.editorId,
-                reason: options.reason,
-                duration: options.duration
-            })
-            const extensionDays = extension.duration / 86400000
-            await discordMessageJob('log', `**${editorUsername}** extended **${username}**'s ` +
-                `suspension with **${extensionDays}** ${pluralize('day', extensionDays)}`)
-        }
-        return suspension
-    }
+    if (suspension) return suspension.update(options)
     throw createError(404, 'Suspension not found')
 }
 
@@ -217,7 +120,7 @@ exports.getGroup = groupId => {
     return client.apis.groups.getGroupInfo(groupId)
 }
 
-exports.getFinishedSuspensions = async () => {
+exports.getFinishedSuspensions = () => {
     return models.Suspension.scope('defaultScope', 'finished').findAll()
 }
 
@@ -289,4 +192,41 @@ exports.setRank = async (groupId, userId, rank) => {
     await client.apis.groups.updateMemberInGroup({ groupId, userId, roleId: role.id })
     webSocketManager.broadcast('rankChanged', { groupId, userId, rank })
     return role
+}
+
+exports.cancelSuspension = async (groupId, userId, options) => {
+    const suspension = await models.Suspension.findOne({ where: { userId }})
+    await exports.setRank(groupId, userId, suspension.rank)
+    return models.SuspensionCancellation.create({
+        authorId: options.authorId,
+        reason: options.reason,
+        suspensionId: suspension.id
+    })
+}
+
+exports.cancelTraining = (groupId, trainingId, options) => {
+    return models.TrainingCancellation.create({
+        authorId: options.authorId,
+        reason: options.reason,
+        trainingId
+    })
+
+}
+
+exports.extendSuspension = async (groupId, userId, options) => {
+    const suspension = await models.Suspension.findOne({ where: { userId }})
+    let days = suspension.duration / 86400000
+    if (!suspension.extensions) suspension.extensions = []
+    for (const extension of suspension.extensions) {
+        days += extension.duration / 86400000
+    }
+    days += options.duration
+    if (days < 1) throw createError(403, 'Insufficient amount of days')
+    if (days > 7) throw createError(403, 'Too many days')
+    return models.SuspensionExtension.create({
+        authorId: options.authorId,
+        duration: options.duration,
+        reason: options.reason,
+        suspensionId: suspension.id
+    })
 }

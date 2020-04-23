@@ -13,7 +13,7 @@ exports.validate = method => {
                 body('authorId').exists().isNumeric(),
                 body('reason').exists().isString(),
                 body('duration').exists().isNumeric(),
-                body('rankback').exists().isNumeric()
+                body('rankBack').exists().isNumeric()
             ]
         case 'promote':
             return [
@@ -70,7 +70,7 @@ exports.validate = method => {
                 body('authorId').exists().isNumeric(),
                 body('message').exists().isString()
             ]
-        case 'putTraining': // This is ugly because epxress-validator doesn't support nested oneOfs
+        case 'putTraining': // This is ugly because express-validator doesn't support nested oneOfs
             return oneOf([
                 [
                     header('authorization').exists().isString(),
@@ -96,13 +96,6 @@ exports.validate = method => {
                     param('trainingId').isNumeric(),
                     body('editorId').exists().isNumeric(),
                     body('authorId').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('cancelled').exists().isBoolean(),
-                    body('reason').exists().isBoolean(),
                 ]
             ])
             /*return [
@@ -115,10 +108,6 @@ exports.validate = method => {
                     body('date').exists().isNumeric(),
                     body('notes').exists().isString(),
                     body('authorId').exists().isNumeric()
-                    [
-                        body('cancelled').exists().isBoolean(),
-                        body('reason').exists().isBoolean()
-                    ]
                 ])
             ]*/
         case 'putSuspension':
@@ -140,22 +129,7 @@ exports.validate = method => {
                     param('groupId').isNumeric(),
                     param('userId').isNumeric(),
                     body('editorId').exists().isNumeric(),
-                    body('rankBack').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('cancelled').exists().isBoolean(),
-                    body('reason').exists().isBoolean()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('extended').exists().isBoolean(),
-                    body('duration').exists().isNumeric(),
-                    body('reason').exists().isString()
+                    body('rankBack').exists().isBoolean()
                 ]
             ])
             /*return [
@@ -166,15 +140,7 @@ exports.validate = method => {
                 oneOf([
                     body('authorId').exists().isNumeric(),
                     body('reason').exists().isString(),
-                    body('rankBack').exists().isNumeric(),
-                    [
-                        body('cancelled').exists().isBoolean(),
-                        body('reason').exists().isBoolean()
-                    ], [
-                        body('extended').exists().isBoolean(),
-                        body('duration').exists().isNumeric(),
-                        body('reason').exists().isString()
-                    ]
+                    body('rankBack').exists().isNumeric()
                 ])
             ]*/
         case 'getGroup':
@@ -194,6 +160,31 @@ exports.validate = method => {
                 param('trainingId').isNumeric(),
                 body('authorId').exists().isNumeric(),
                 body('medium').optional().isString()
+            ]
+        case 'cancelSuspension':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('reason').exists().isString()
+            ]
+        case 'cancelTraining':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('trainingId').isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('reason').exists().isString()
+            ]
+        case 'extendSuspension':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('duration').exists().isNumeric(),
+                body('reason').exists().isString()
             ]
     }
 }
@@ -285,5 +276,27 @@ exports.announceTraining = async (req, res) => {
     res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, {
         medium: req.body.medium,
         authorId: req.body.authorId
+    }))
+}
+
+exports.cancelSuspension = async (req, res) => {
+    res.json(await groupService.cancelSuspension(req.params.groupId, req.params.userId, {
+        authorId: req.body.authorId,
+        reason: req.body.reason
+    }))
+}
+
+exports.cancelTraining = async (req, res) => {
+    res.json(await groupService.cancelTraining(req.params.groupId, req.params.trainingId, {
+        authorId: req.body.authorId,
+        reason: req.body.reason
+    }))
+}
+
+exports.extendSuspension = async (req, res) => {
+    res.json(await groupService.extendSuspension(req.params.groupId, req.params.userId, {
+        authorId: req.body.authorId,
+        duration: req.body.duration,
+        reason: req.body.reason
     }))
 }
