@@ -25,7 +25,16 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         }
-    }, {})
+    }, {
+        hooks: {
+            afterCreate: ban => {
+
+            },
+            afterUpdate: (ban, options) => {
+
+            }
+        }
+    })
 
     Ban.associate = models => {
         Ban.hasOne(models.BanCancellation, { foreignKey: { allowNull: false, name: 'banId' }})

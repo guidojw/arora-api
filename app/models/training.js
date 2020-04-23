@@ -17,7 +17,16 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             allowNull: false
         }
-    }, {})
+    }, {
+        hooks: {
+            afterCreate: training => {
+
+            },
+            afterUpdate: (training, options) => {
+
+            }
+        }
+    })
 
     Training.associate = models => {
         Training.hasOne(models.TrainingCancellation, { foreignKey: { allowNull: false, name: 'trainingId' }})

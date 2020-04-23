@@ -47,7 +47,16 @@ module.exports = (sequelize, DataTypes) => {
                 return endDate
             }
         }
-    }, {})
+    }, {
+        hooks: {
+            afterCreate: suspension => {
+
+            },
+            afterUpdate: (suspension, options) => {
+
+            }
+        }
+    })
 
     Suspension.associate = models => {
         Suspension.hasOne(models.SuspensionCancellation, {

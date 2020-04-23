@@ -12,7 +12,13 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         }
-    }, {})
+    }, {
+        hooks: {
+            afterCreate: cancellation => {
+
+            }
+        }
+    })
 
     SuspensionCancellation.associate = models => {
         SuspensionCancellation.belongsTo(models.Suspension, {

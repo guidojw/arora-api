@@ -16,7 +16,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         }
-    }, {})
+    }, {
+        hooks: {
+            afterCreate: extension => {
+
+            }
+        }
+    })
 
     SuspensionExtension.associate = models => {
         SuspensionExtension.belongsTo(models.Suspension, {
