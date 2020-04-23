@@ -66,7 +66,7 @@ exports.getTrainings = () => {
     return models.Training.findAll()
 }
 
-exports.scheduleTraining = options => {
+exports.postTraining = options => {
     return models.Training.create({
         type: options.type.toLowerCase(),
         authorId: options.authorId,

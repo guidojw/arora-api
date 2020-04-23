@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
                     .toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 
                     'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
             },
+
             afterUpdate: async (training, options) => {
                 const editorName = await userService.getUsername(options.editorId)
                 if (training.changed('authorId')) {

@@ -37,7 +37,7 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
-        case 'scheduleTraining':
+        case 'postTraining':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
@@ -190,12 +190,12 @@ exports.validate = method => {
 }
 
 exports.suspend = async (req, res) => {
-    res.json(await groupService.suspend(req.params.groupId, req.body.userId, {
+    res.json((await groupService.suspend(req.params.groupId, req.body.userId, {
         authorId: req.body.authorId,
         reason: req.body.reason,
         duration: req.body.duration,
         rankBack: req.body.rankBack
-    }))
+    })).get({ raw: true }))
 }
 
 exports.promote = async (req, res) => {
@@ -207,32 +207,32 @@ exports.getShout = async (req, res) => {
 }
 
 exports.getSuspensions = async (req, res) => {
-    res.json(await groupService.getSuspensions())
+    res.json((await groupService.getSuspensions()).map(suspension => suspension.get({ raw: true })))
 }
 
 exports.getTrainings = async (req, res) => {
-    res.json(await groupService.getTrainings())
+    res.json((await groupService.getTrainings()).get({ raw: true }))
 }
 
-exports.scheduleTraining = async (req, res) => {
-    res.json(await groupService.scheduleTraining({
+exports.postTraining = async (req, res) => {
+    res.json((await groupService.postTraining({
         author: req.body.authorId,
         type: req.body.type,
         date: req.body.date,
         notes: req.body.notes
-    }))
+    })).get({ raw: true }))
 }
 
 exports.getExiles = async (req, res) => {
-    res.json(await groupService.getExiles())
+    res.json((await groupService.getExiles()).map(exile => exile.get({ raw: true })))
 }
 
 exports.getSuspension = async (req, res) => {
-    res.json(await groupService.getSuspension(req.params.userId))
+    res.json((await groupService.getSuspension(req.params.userId)).get({ raw: true }))
 }
 
 exports.getTraining = async (req, res) => {
-    res.json(await groupService.getTraining(req.params.trainingId))
+    res.json((await groupService.getTraining(req.params.trainingId)).get({ raw: true }))
 }
 
 exports.shout = async (req, res) => {
@@ -240,7 +240,7 @@ exports.shout = async (req, res) => {
 }
 
 exports.putTraining = async (req, res) => {
-    res.json(await groupService.putTraining(req.params.groupId, req.params.trainingId, {
+    res.json((await groupService.putTraining(req.params.groupId, req.params.trainingId, {
         editorId: req.body.editorId,
         changes: {
             authorId: req.body.authorId,
@@ -249,11 +249,11 @@ exports.putTraining = async (req, res) => {
             notes: req.body.notes,
             reason: req.body.reason
         }
-    }))
+    })).get({ raw: true }))
 }
 
 exports.putSuspension = async (req, res) => {
-    res.json(await groupService.putSuspension(req.params.groupId, req.params.userId, {
+    res.json((await groupService.putSuspension(req.params.groupId, req.params.userId, {
         editorId: req.body.editorId,
         changes: {
             authorId: req.body.authorId,
@@ -261,7 +261,7 @@ exports.putSuspension = async (req, res) => {
             rankBack: req.body.rankBack,
             duration: req.body.duration
         }
-    }))
+    })).get({ raw: true }))
 }
 
 exports.getGroup = async (req, res) => {
@@ -269,7 +269,7 @@ exports.getGroup = async (req, res) => {
 }
 
 exports.getFinishedSuspensions = async (req, res) => {
-    res.json(await groupService.getFinishedSuspensions())
+    res.json((await groupService.getFinishedSuspensions()).map(suspension => suspension.get({ raw: true })))
 }
 
 exports.announceTraining = async (req, res) => {
@@ -280,23 +280,23 @@ exports.announceTraining = async (req, res) => {
 }
 
 exports.cancelSuspension = async (req, res) => {
-    res.json(await groupService.cancelSuspension(req.params.groupId, req.params.userId, {
+    res.json((await groupService.cancelSuspension(req.params.groupId, req.params.userId, {
         authorId: req.body.authorId,
         reason: req.body.reason
-    }))
+    })).get({ raw: true }))
 }
 
 exports.cancelTraining = async (req, res) => {
-    res.json(await groupService.cancelTraining(req.params.groupId, req.params.trainingId, {
+    res.json((await groupService.cancelTraining(req.params.groupId, req.params.trainingId, {
         authorId: req.body.authorId,
         reason: req.body.reason
-    }))
+    })).get({ raw: true }))
 }
 
 exports.extendSuspension = async (req, res) => {
-    res.json(await groupService.extendSuspension(req.params.groupId, req.params.userId, {
+    res.json((await groupService.extendSuspension(req.params.groupId, req.params.userId, {
         authorId: req.body.authorId,
         duration: req.body.duration,
         reason: req.body.reason
-    }))
+    })).get({ raw: true }))
 }

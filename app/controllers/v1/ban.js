@@ -47,31 +47,31 @@ exports.validate = method => {
 }
 
 exports.getBans = async (req, res) => {
-    res.json(await banService.getBans())
+    res.json((await banService.getBans()).map(ban => ban.get({ raw: true })))
 }
 
 exports.ban = async (req, res) => {
-    res.json(await banService.ban(req.body.groupId, req.body.userId, {
+    res.json((await banService.ban(req.body.groupId, req.body.userId, {
         authorId: req.body.authorId,
         reason: req.body.reason
-    }))
+    })).get({ raw: true }))
 }
 
 exports.putBan = async (req, res) => {
-    res.json(await banService.putBan(req.params.userId, {
+    res.json((await banService.putBan(req.params.userId, {
         editorId: req.body.editorId,
         changes: {
             unbanned: req.body.unbanned,
             authorId: req.body.authorId,
             reason: req.body.reason
         }
-    }))
+    })).get({ raw: true }))
 }
 
 exports.getBan = async (req, res) => {
-    res.json(await banService.getBan(req.params.userId))
+    res.json((await banService.getBan(req.params.userId)).get({ raw: true }))
 }
 
 exports.cancelBan = async (req, res) => {
-    res.json(await banService.cancelBan(req.params.userId, req.body.authorId, req.body.reason))
+    res.json((await banService.cancelBan(req.params.userId, req.body.authorId, req.body.reason)).get({ raw: true }))
 }

@@ -41,13 +41,21 @@ module.exports = (sequelize, DataTypes) => {
         endDate: {
             type: DataTypes.VIRTUAL,
             async get () {
-                let endDate = this.date + this.duration
-                const extensions = await sequelize.models.SuspensionExtension.findAll({ where: { suspensionId:
-                        this.id }})
+                let duration = this.duration
+                const extensions = await sequelize.models.SuspensionExtension.findAll({
+                    where: { suspensionId: this.id }
+                })
                 for (const extension of extensions) {
-                    endDate += extension.duration
+                    duration += extension.duration
                 }
-                return endDate
+                return new Date(this.date.getTime() + duration)
+            }
+        },
+        cancelled: {
+            type: DataTypes.VIRTUAL,
+            async get() {
+                return await sequelize.models.SuspensionCancellation.findOne({ where: { suspensionId: this.id }}) !==
+                    null
             }
         }
     }, {
@@ -59,6 +67,7 @@ module.exports = (sequelize, DataTypes) => {
                 discordMessageJob('log', `**${authorName}** suspended **${username}** for **${days}** ` +
                     `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
             },
+
             afterUpdate: async (suspension, options) => {
                 const [username, editorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(options.editorId)])

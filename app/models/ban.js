@@ -31,17 +31,19 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         hooks: {
             afterCreate: async ban => {
-                const [username, authorUsername] = await Promise.all([userService.getUsername(ban.userId),
+                const [username, authorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(ban.authorId)])
-                discordMessageJob('log', `**${authorUsername}** banned **${username}** with reason`
-                + `"*${ban.reason}*"`)
+                console.log(username, authorName)
+                discordMessageJob('log', `**${authorName}** banned **${username}** with reason  "*${ban
+                    .reason}*"`)
             },
+
             afterUpdate: async (ban, options) => {
                 const [username, editorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(options.editorId)])
                 if (ban.changed('reason')) {
-                    await discordMessageJob('log', `**${editorName}** changed the reason of **${username
-                    }**'s ban to *"${ban.reason}"*`)
+                    discordMessageJob('log', `**${editorName}** changed the reason of **${username}**'s`
+                        + ` ban to *"${ban.reason}"*`)
                 }
                 if (ban.changed('authorId')) {
                     const authorName = await userService.getUsername(ban.authorId)
@@ -59,10 +61,7 @@ module.exports = (sequelize, DataTypes) => {
     Ban.loadScopes = models => {
         Ban.addScope('defaultScope', {
             where: { '$BanCancellation.id$': null },
-            include: [{
-                model: models.BanCancellation,
-                attributes: []
-            }]
+            include: [{ model: models.BanCancellation, attributes: [] }]
         })
     }
 
