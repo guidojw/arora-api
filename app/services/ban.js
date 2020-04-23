@@ -30,7 +30,7 @@ exports.putBan = async (userId, options) => {
     if (ban) {
         const [username, editorUsername] = await Promise.all([userService.getUsername(userId), userService
             .getUsername(options.editorId)])
-        if (options.unbanned) {
+        if (options.cancelled) {
             const cancellation = await models.BanCancellation.create({
                 banId: ban.id,
                 authorId: options.editorId,
@@ -45,7 +45,7 @@ exports.putBan = async (userId, options) => {
             await discordMessageJob('log', `**${editorUsername}** changed the author of **${username}*` +
                 `*'s ban to **${newAuthorUsername}**`)
         }
-        if (options.reason) {
+        if (options.reason && options.cancelled === undefined) {
             await ban.update({ reason: options.reason })
             await discordMessageJob('log', `**${editorUsername}** changed the reason of **${username}*` +
                 `*'s ban to *"${ban.reason}"*`)

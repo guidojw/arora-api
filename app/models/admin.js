@@ -1,6 +1,6 @@
 'use strict'
 module.exports = (sequelize, DataTypes) => {
-    const Admin = sequelize.define('Admin', {
+    return sequelize.define('Admin', {
         key: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -10,17 +10,4 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
     })
-
-    Admin.findById = async id => {
-        try {
-            return await Admin.findOne({
-                where: { id },
-                attributes: ['key']
-            })
-        } catch (err) {
-            return null
-        }
-    }
-
-    return Admin
 }

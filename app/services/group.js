@@ -99,7 +99,7 @@ exports.getSuspension = async userId => {
 }
 
 exports.getTraining = async trainingId => {
-    const training = await models.Training.findById(trainingId)
+    const training = await models.Training.findByPk(trainingId)
     if (training) return training
     throw createError(404, 'Training not found')
 }
@@ -117,7 +117,7 @@ exports.shout = async (groupId, authorId, message) => {
 }
 
 exports.putTraining = async (groupId, trainingId, options) => {
-    const training = await models.Training.findById(trainingId)
+    const training = await models.Training.findByPk(trainingId)
     if (training) {
         const editorUsername = await userService.getUsername(options.editorId)
         if (options.authorId) {
@@ -168,7 +168,7 @@ exports.putSuspension = async (groupId, userId, options) => {
             await discordMessageJob('log', `**${editorUsername}** changed the author of **${username}*` +
                 `*'s suspension to **${newAuthorUsername}**`)
         }
-        if (options.reason) {
+        if (options.reason && options.cancelled === undefined && options.extended === undefined) {
             await suspension.update({ reason: options.reason })
             await discordMessageJob('log', `**${editorUsername}** changed the reason of **${username}*` +
                 `*'s suspension to *"${suspension.reason}"*`)

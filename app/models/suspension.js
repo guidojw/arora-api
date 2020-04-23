@@ -53,30 +53,31 @@ module.exports = (sequelize, DataTypes) => {
         Suspension.hasOne(models.SuspensionCancellation, {
             foreignKey: { allowNull: false, name: 'suspensionId' }
         })
-        Suspension.hasMany(models.SuspensionExtension, { foreignKey: { allowNull: false, name: 'suspensionId' },
-            as: 'extensions'}
-        )
+        Suspension.hasMany(models.SuspensionExtension, {
+            foreignKey: { allowNull: false, name: 'suspensionId' },
+            as: 'extensions'
+        })
     }
 
-    Suspension.loadScopes = models => {
-        Suspension.addScope('defaultScope', {
-            where: { '$SuspensionCancellation.id$': null, endDate: { [Op.gt]: Date.now() }},
-            include: [{
-                model: models.SuspensionCancellation,
-                attributes: []
-            }, {
-                model: models.SuspensionExtension,
-                as: 'extensions'
-            }]
-        })
-        Suspension.addScope('finished', {
-            where: { endDate: { [Op.lt]: Date.now() }},
-            include: [{
-                model: models.SuspensionExtension,
-                as: 'extensions'
-            }]
-        })
-    }
+    // Suspension.loadScopes = models => {
+    //     Suspension.addScope('defaultScope', {
+    //         where: { '$SuspensionCancellation.id$': null, endDate: { [Op.gt]: Date.now() }},
+    //         include: [{
+    //             model: models.SuspensionCancellation,
+    //             attributes: []
+    //         }, {
+    //             model: models.SuspensionExtension,
+    //             as: 'extensions'
+    //         }]
+    //     })
+    //     Suspension.addScope('finished', {
+    //         where: { endDate: { [Op.lt]: Date.now() }},
+    //         include: [{
+    //             model: models.SuspensionExtension,
+    //             as: 'extensions'
+    //         }]
+    //     })
+    // }
 
     return Suspension
 }
