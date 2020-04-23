@@ -7,15 +7,15 @@ exports.getBans = () => {
     return models.Ban.findAll()
 }
 
-exports.ban = async (groupId, userId, authorId, reason) => {
+exports.ban = async (groupId, userId, options) => {
     const ban = await models.Ban.findOne({ where: { userId }})
     if (ban) throw createError(409, 'User is already banned')
     const rank = await userService.getRank(userId, groupId)
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
     return models.Ban.create({
+        authorId: options.authorId,
+        reason: options.reason,
         userId,
-        authorId,
-        reason,
         rank
     }, { individualHooks: true })
 }
