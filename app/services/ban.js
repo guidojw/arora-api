@@ -17,13 +17,13 @@ exports.ban = async (groupId, userId, authorId, reason) => {
         authorId,
         reason,
         rank
-    })
+    }, { individualHooks: true })
 }
 
 exports.putBan = async (userId, options) => {
     const ban = await models.Ban.findOne({ where: { userId }})
     if (!ban) throw createError(404, 'Ban not found')
-    return ban.update(options)
+    return ban.update(options.changes, { individualHooks: true, editorId: options.editorId })
 }
 
 exports.getBan = async userId => {
@@ -32,12 +32,7 @@ exports.getBan = async userId => {
     return ban
 }
 
-exports.cancelBan = async (userId, options) => {
+exports.cancelBan = async (userId, authorId, reason) => {
     const ban = await models.Ban.findOne({ where: { userId }})
-    await models.BanCancellation.create({
-        authorId: options.authorId,
-        reason: options.reason,
-        banId: ban.id
-    })
-
+    return models.BanCancellation.create({ banId: ban.id, authorId, reason }, { individualHooks: true })
 }

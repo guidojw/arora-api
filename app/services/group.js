@@ -27,7 +27,7 @@ exports.suspend = async (groupId, userId, options) => {
         reason: options.reason,
         userId,
         rank
-    })
+    }, { individualHooks: true })
     cron.scheduleJob(suspension.endDate, finishSuspensionJob.bind(null, suspension))
     return suspension
 }
@@ -42,8 +42,8 @@ exports.promote = async (groupId, userId, authorId) => {
     const roles = await exports.getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === rank)
     if (authorId) {
-        const authorUsername = await userService.getUsername(authorId)
-        await discordMessageJob('log', `**${authorUsername}** promoted **${username}** from **${oldRole
+        const authorName = await userService.getUsername(authorId)
+        await discordMessageJob('log', `**${authorName}** promoted **${username}** from **${oldRole
             .name}** to **${newRole.name}**`)
     } else {
         await discordMessageJob('log', `Promoted **${username}** from **${oldRole.name}** to **${newRole
@@ -72,7 +72,7 @@ exports.scheduleTraining = options => {
         authorId: options.authorId,
         date: options.date,
         notes: options.notes
-    })
+    }, { individualHooks: true })
 }
 
 exports.getExiles = () => {
@@ -81,14 +81,14 @@ exports.getExiles = () => {
 
 exports.getSuspension = async userId => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (suspension) return suspension
-    throw createError(404, 'Suspension not found')
+    if (!suspension) throw createError(404, 'Suspension not found')
+    return suspension
 }
 
 exports.getTraining = async trainingId => {
     const training = await models.Training.findByPk(trainingId)
-    if (training) return training
-    throw createError(404, 'Training not found')
+    if (!training) throw createError(404, 'Training not found')
+    return training
 }
 
 exports.shout = async (groupId, authorId, message) => {
@@ -105,14 +105,14 @@ exports.shout = async (groupId, authorId, message) => {
 
 exports.putTraining = async (groupId, trainingId, options) => {
     const training = await models.Training.findByPk(trainingId)
-    if (training) return training.update(options)
-    throw createError(404, 'Training not found')
+    if (!training) throw createError(404, 'Training not found')
+    return training.update(options.changes, { individualHooks: true, editorId: options.editorId })
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (suspension) return suspension.update(options)
-    throw createError(404, 'Suspension not found')
+    if (!suspension) throw createError(404, 'Suspension not found')
+    return suspension.update(options.changes, { individualHooks: true, editorId: options.editorId })
 }
 
 exports.getGroup = groupId => {
@@ -201,16 +201,12 @@ exports.cancelSuspension = async (groupId, userId, options) => {
         authorId: options.authorId,
         reason: options.reason,
         suspensionId: suspension.id
-    })
+    }, { individualHooks: true })
 }
 
 exports.cancelTraining = (groupId, trainingId, options) => {
-    return models.TrainingCancellation.create({
-        authorId: options.authorId,
-        reason: options.reason,
-        trainingId
-    })
-
+    return models.TrainingCancellation.create({ authorId: options.authorId, reason: options.reason, trainingId },
+        { individualHooks: true })
 }
 
 exports.extendSuspension = async (groupId, userId, options) => {
@@ -228,5 +224,5 @@ exports.extendSuspension = async (groupId, userId, options) => {
         duration: options.duration,
         reason: options.reason,
         suspensionId: suspension.id
-    })
+    }, { individualHooks: true })
 }

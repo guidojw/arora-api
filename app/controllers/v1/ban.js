@@ -56,10 +56,12 @@ exports.ban = async (req, res) => {
 
 exports.putBan = async (req, res) => {
     res.json(await banService.putBan(req.params.userId, {
-        unbanned: req.body.unbanned,
-        authorId: req.body.authorId,
-        reason: req.body.reason,
-        editorId: req.body.editorId
+        editorId: req.body.editorId,
+        changes: {
+            unbanned: req.body.unbanned,
+            authorId: req.body.authorId,
+            reason: req.body.reason
+        }
     }))
 }
 
@@ -68,5 +70,5 @@ exports.getBan = async (req, res) => {
 }
 
 exports.cancelBan = async (req, res) => {
-    res.json(await banService.cancelBan(req.params.userId, req.body.editorId, req.body.reason))
+    res.json(await banService.cancelBan(req.params.userId, req.body.authorId, req.body.reason))
 }

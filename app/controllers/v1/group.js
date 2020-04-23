@@ -241,26 +241,26 @@ exports.shout = async (req, res) => {
 
 exports.putTraining = async (req, res) => {
     res.json(await groupService.putTraining(req.params.groupId, req.params.trainingId, {
-        authorId: req.body.authorId,
-        type: req.body.type,
-        date: req.body.date,
-        notes: req.body.notes,
-        cancelled: req.body.cancelled,
-        reason: req.body.reason,
-        finished: req.body.finished,
-        editorId: req.body.editorId
+        editorId: req.body.editorId,
+        changes: {
+            authorId: req.body.authorId,
+            type: req.body.type,
+            date: req.body.date,
+            notes: req.body.notes,
+            reason: req.body.reason
+        }
     }))
 }
 
 exports.putSuspension = async (req, res) => {
     res.json(await groupService.putSuspension(req.params.groupId, req.params.userId, {
-        authorId: req.body.authorId,
-        reason: req.body.reason,
-        rankBack: req.body.rankBack,
-        cancelled: req.body.cancelled,
-        extended: req.body.extended,
-        duration: req.body.duration,
-        editorId: req.body.editorId
+        editorId: req.body.editorId,
+        changes: {
+            authorId: req.body.authorId,
+            reason: req.body.reason,
+            rankBack: req.body.rankBack,
+            duration: req.body.duration
+        }
     }))
 }
 
