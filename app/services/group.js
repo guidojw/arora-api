@@ -28,7 +28,8 @@ exports.suspend = async (groupId, userId, options) => {
         userId,
         rank
     }, { individualHooks: true })
-    cron.scheduleJob(suspension.endDate, finishSuspensionJob.bind(null, suspension))
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+        suspension))
     return suspension
 }
 
@@ -198,6 +199,8 @@ exports.cancelSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found')
     await exports.setRank(groupId, userId, suspension.rank)
+    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
+    if (job) job.cancel()
     return models.SuspensionCancellation.create({
         authorId: options.authorId,
         reason: options.reason,
@@ -226,6 +229,10 @@ exports.extendSuspension = async (groupId, userId, options) => {
     const days = duration / 86400000
     if (days < 1) throw createError(403, 'Insufficient amount of days')
     if (days > 7) throw createError(403, 'Too many days')
+    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
+    if (job) job.cancel()
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+        suspension))
     return models.SuspensionExtension.create({
         authorId: options.authorId,
         duration: options.duration,

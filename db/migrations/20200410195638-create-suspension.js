@@ -38,6 +38,10 @@ module.exports = {
             rank: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            finished: {
+                type: Sequelize.INTEGER,
+                allowNull: false
             }
         })
     },

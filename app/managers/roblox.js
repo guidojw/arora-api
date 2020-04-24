@@ -2,12 +2,7 @@
 require('dotenv').config()
 
 const { Client } = require('bloxy')
-const models = require('../models')
-const cron = require('node-schedule')
-const finishSuspensionJob = require('../jobs/finish-suspension')
 const checkSuspensionsJob = require('../jobs/check-suspensions')
-
-const robloxConfig = require('../../config/roblox')
 
 const clients = { authenticated: {} }
 
@@ -26,10 +21,7 @@ exports.init = async () => {
     }
     clients.unauthenticated = new Client({ setup: { throwHttpErrors: true }})
 
-    checkSuspensionsJob(robloxConfig.defaultGroup)
-    for (const suspension in await models.Suspension.findAll()) {
-        cron.scheduleJob(suspension.endDate, finishSuspensionJob.bind(null, suspension))
-    }
+    checkSuspensionsJob()
 }
 
 exports.getClient = groupId => {

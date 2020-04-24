@@ -2,6 +2,7 @@
 const timeHelper = require('../helpers/time')
 const userService = require('../services/user')
 const discordMessageJob = require('../jobs/discord-message')
+const { Op } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
     const Training = sequelize.define('Training', {
@@ -64,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Training.loadScopes = models => {
         Training.addScope('defaultScope', {
-            where: { '$TrainingCancellation.id$': null },
+            where: { '$TrainingCancellation.id$': null, date: { [Op.gt]: Date.now() }},
             include: [{
                 model: models.TrainingCancellation,
                 attributes: []

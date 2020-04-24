@@ -2,6 +2,7 @@
 const acceptJoinRequestsJob = require('../app/jobs/accept-join-requests')
 const acceptMtJoinRequestsJob = require('../app/jobs/accept-mt-join-requests')
 const backupJob = require('../app/jobs/backup')
+const checkSuspensionsJob = require('../app/jobs/check-suspensions')
 
 module.exports = {
   'acceptJoinRequestsJob': {
@@ -17,5 +18,9 @@ module.exports = {
   'backupJob': {
     'expression': '0 0 */1 * *',
     'job': backupJob
+  },
+  'checkSuspensionsJob': {
+    'expression': '0 */1 * * *',
+    'job': checkSuspensionsJob
   }
 }

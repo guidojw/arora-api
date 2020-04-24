@@ -1,5 +1,4 @@
 'use strict'
-const { Op } = require('sequelize')
 const userService = require('../services/user')
 const discordMessageJob = require('../jobs/discord-message')
 const pluralize = require('pluralize')
@@ -38,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        finished: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
         endDate: {
             type: DataTypes.VIRTUAL,
             async get () {
@@ -49,13 +53,6 @@ module.exports = (sequelize, DataTypes) => {
                     duration += extension.duration
                 }
                 return new Date(this.date.getTime() + duration)
-            }
-        },
-        cancelled: {
-            type: DataTypes.VIRTUAL,
-            async get() {
-                return await sequelize.models.SuspensionCancellation.findOne({ where: { suspensionId: this.id }}) !==
-                    null
             }
         }
     }, {
@@ -98,25 +95,22 @@ module.exports = (sequelize, DataTypes) => {
         })
     }
 
-    // Suspension.loadScopes = models => {
-    //     Suspension.addScope('defaultScope', {
-    //         where: { '$SuspensionCancellation.id$': null, endDate: { [Op.gt]: Date.now() }},
-    //         include: [{
-    //             model: models.SuspensionCancellation,
-    //             attributes: []
-    //         }, {
-    //             model: models.SuspensionExtension,
-    //             as: 'extensions'
-    //         }]
-    //     })
-    //     Suspension.addScope('finished', {
-    //         where: { endDate: { [Op.lt]: Date.now() }},
-    //         include: [{
-    //             model: models.SuspensionExtension,
-    //             as: 'extensions'
-    //         }]
-    //     })
-    // }
+    Suspension.loadScopes = models => {
+        Suspension.addScope('defaultScope', {
+            where: { '$SuspensionCancellation.id$': null, finished: false },
+            include: [{
+                model: models.SuspensionCancellation,
+                attributes: [],
+            }]
+        })
+        Suspension.addScope('finished', {
+            where: { '$SuspensionCancellation.id$': null, finished: true },
+            include: [{
+                model: models.SuspensionCancellation,
+                attributes: [],
+            }]
+        })
+    }
 
     return Suspension
 }

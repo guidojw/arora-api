@@ -13,7 +13,7 @@ exports.validate = method => {
                 body('authorId').exists().isNumeric(),
                 body('reason').exists().isString(),
                 body('duration').exists().isNumeric(),
-                body('rankBack').exists().isNumeric()
+                body('rankBack').exists().isBoolean()
             ]
         case 'promote':
             return [
@@ -92,7 +92,7 @@ exports.validate = method => {
                 oneOf([
                     body('changes.authorId').exists().isNumeric(),
                     body('changes.reason').exists().isString(),
-                    body('changes.rankBack').exists().isNumeric()
+                    body('changes.rankBack').exists().isBoolean()
                 ])
             ]
         case 'getGroup':
