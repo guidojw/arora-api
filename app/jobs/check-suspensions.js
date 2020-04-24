@@ -10,9 +10,8 @@ module.exports = async () => {
             finishSuspensionJob(suspension)
         } else {
             const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-            if (job) job.cancel()
-            cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-                suspension))
+            if (!job) cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob
+                .bind(null, suspension))
         }
     }
 }
