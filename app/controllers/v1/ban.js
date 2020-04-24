@@ -23,12 +23,12 @@ exports.validate = method => {
                     header('authorization').exists().isString(),
                     param('userId').exists().isNumeric(),
                     body('editorId').exists().isNumeric(),
-                    body('authorId').exists().isNumeric()
+                    body('changes.authorId').exists().isNumeric()
                 ], [
                     header('authorization').exists().isString(),
                     param('userId').exists().isNumeric(),
                     body('editorId').exists().isNumeric(),
-                    body('reason').exists().isString()
+                    body('changes.reason').exists().isString()
                 ]
             ])
         case 'getBan':
@@ -60,11 +60,7 @@ exports.ban = async (req, res) => {
 exports.putBan = async (req, res) => {
     res.json((await banService.putBan(req.params.userId, {
         editorId: req.body.editorId,
-        changes: {
-            unbanned: req.body.unbanned,
-            authorId: req.body.authorId,
-            reason: req.body.reason
-        }
+        changes: req.body.changes
     })).get({ raw: true }))
 }
 

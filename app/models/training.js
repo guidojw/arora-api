@@ -26,8 +26,8 @@ module.exports = (sequelize, DataTypes) => {
             afterCreate: async training => {
                 const dateString = timeHelper.getDate(training.date)
                 const timeString = timeHelper.getTime(training.date)
-                const authorUsername = await userService.getUsername(training.authorId)
-                discordMessageJob('log', `**${authorUsername}** scheduled a **${training.type
+                const authorName = await userService.getUsername(training.authorId)
+                discordMessageJob('log', `**${authorName}** scheduled a **${training.type
                     .toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 
                     'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
             },

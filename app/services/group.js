@@ -94,11 +94,11 @@ exports.getTraining = async trainingId => {
 exports.shout = async (groupId, authorId, message) => {
     const client = robloxManager.getClient(groupId)
     const shout = await client.apis.groups.updateGroupShout({ groupId, message })
-    const authorUsername = await userService.getUsername(authorId)
+    const authorName = await userService.getUsername(authorId)
     if (shout.body === '') {
-        await discordMessageJob('log', `**${authorUsername}** cleared the shout`)
+        await discordMessageJob('log', `**${authorName}** cleared the shout`)
     } else {
-        await discordMessageJob('log', `**${authorUsername}** shouted "*${shout.body}*"`)
+        await discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
     }
     return shout
 }
@@ -106,13 +106,13 @@ exports.shout = async (groupId, authorId, message) => {
 exports.putTraining = async (groupId, trainingId, options) => {
     const training = await models.Training.findByPk(trainingId)
     if (!training) throw createError(404, 'Training not found')
-    return training.update(options.changes, { individualHooks: true, editorId: options.editorId })
+    return training.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found')
-    return suspension.update(options.changes, { individualHooks: true, editorId: options.editorId })
+    return suspension.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
 exports.getGroup = groupId => {
@@ -196,6 +196,7 @@ exports.setRank = async (groupId, userId, rank) => {
 
 exports.cancelSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
+    if (!suspension) throw createError(404, 'Suspension not found')
     await exports.setRank(groupId, userId, suspension.rank)
     return models.SuspensionCancellation.create({
         authorId: options.authorId,
@@ -204,19 +205,25 @@ exports.cancelSuspension = async (groupId, userId, options) => {
     }, { individualHooks: true })
 }
 
-exports.cancelTraining = (groupId, trainingId, options) => {
-    return models.TrainingCancellation.create({ authorId: options.authorId, reason: options.reason, trainingId },
-        { individualHooks: true })
+exports.cancelTraining = async (groupId, trainingId, options) => {
+    const training = await models.Training.findByPk(trainingId)
+    if (!training) throw createError(404, 'Training not found')
+    return models.TrainingCancellation.create({
+        authorId: options.authorId,
+        reason: options.reason,
+        trainingId: training.id
+    }, { individualHooks: true })
 }
 
 exports.extendSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    let days = suspension.duration / 86400000
+    if (!suspension) throw createError(404, 'Suspension not found')
+    let duration = suspension.duration + options.duration
     if (!suspension.extensions) suspension.extensions = []
     for (const extension of suspension.extensions) {
-        days += extension.duration / 86400000
+        duration += extension.duration
     }
-    days += options.duration
+    const days = duration / 86400000
     if (days < 1) throw createError(403, 'Insufficient amount of days')
     if (days > 7) throw createError(403, 'Too many days')
     return models.SuspensionExtension.create({

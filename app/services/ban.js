@@ -3,6 +3,8 @@ const createError = require('http-errors')
 const userService = require('../services/user')
 const models = require('../models')
 
+const robloxConfig = require('../../config/roblox')
+
 exports.getBans = () => {
     return models.Ban.findAll()
 }
@@ -23,7 +25,7 @@ exports.ban = async (groupId, userId, options) => {
 exports.putBan = async (userId, options) => {
     const ban = await models.Ban.findOne({ where: { userId }})
     if (!ban) throw createError(404, 'Ban not found')
-    return ban.update(options.changes, { individualHooks: true, editorId: options.editorId })
+    return ban.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
 exports.getBan = async userId => {
@@ -33,6 +35,8 @@ exports.getBan = async userId => {
 }
 
 exports.cancelBan = async (userId, authorId, reason) => {
+    if (authorId !== robloxConfig.ownerId) createError(403, 'Only the owner can unban')
     const ban = await models.Ban.findOne({ where: { userId }})
+    if (!ban) throw createError(404, 'Ban not found')
     return models.BanCancellation.create({ banId: ban.id, authorId, reason }, { individualHooks: true })
 }

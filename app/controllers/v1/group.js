@@ -41,7 +41,7 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('authorId').exists().isString(),
+                body('authorId').exists().isNumeric(),
                 body('type').exists().isString(),
                 body('date').exists().isNumeric(),
                 body('notes').optional().isString()
@@ -70,79 +70,31 @@ exports.validate = method => {
                 body('authorId').exists().isNumeric(),
                 body('message').exists().isString()
             ]
-        case 'putTraining': // This is ugly because express-validator doesn't support nested oneOfs
-            return oneOf([
-                [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('type').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('date').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('notes').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('authorId').exists().isString()
-                ]
-            ])
-            /*return [
+        case 'putTraining':
+            return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
                 body('editorId').exists().isNumeric(),
                 oneOf([
-                    body('type').exists().isString(),
-                    body('date').exists().isNumeric(),
-                    body('notes').exists().isString(),
-                    body('authorId').exists().isNumeric()
+                    body('changes.type').exists().isString(),
+                    body('changes.date').exists().isNumeric(),
+                    body('changes.notes').exists().isString(),
+                    body('changes.authorId').exists().isNumeric()
                 ])
-            ]*/
+            ]
         case 'putSuspension':
-            return oneOf([
-                [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('authorId').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('reason').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('rankBack').exists().isBoolean()
-                ]
-            ])
-            /*return [
+            return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
                 body('editorId').exists().isNumeric(),
                 oneOf([
-                    body('authorId').exists().isNumeric(),
-                    body('reason').exists().isString(),
-                    body('rankBack').exists().isNumeric()
+                    body('changes.authorId').exists().isNumeric(),
+                    body('changes.reason').exists().isString(),
+                    body('changes.rankBack').exists().isNumeric()
                 ])
-            ]*/
+            ]
         case 'getGroup':
             return [
                 header('authorization').exists().isString(),
@@ -216,7 +168,7 @@ exports.getTrainings = async (req, res) => {
 
 exports.postTraining = async (req, res) => {
     res.json((await groupService.postTraining({
-        author: req.body.authorId,
+        authorId: req.body.authorId,
         type: req.body.type,
         date: req.body.date,
         notes: req.body.notes
@@ -242,25 +194,14 @@ exports.shout = async (req, res) => {
 exports.putTraining = async (req, res) => {
     res.json((await groupService.putTraining(req.params.groupId, req.params.trainingId, {
         editorId: req.body.editorId,
-        changes: {
-            authorId: req.body.authorId,
-            type: req.body.type,
-            date: req.body.date,
-            notes: req.body.notes,
-            reason: req.body.reason
-        }
+        changes: req.body.changes
     })).get({ raw: true }))
 }
 
 exports.putSuspension = async (req, res) => {
     res.json((await groupService.putSuspension(req.params.groupId, req.params.userId, {
         editorId: req.body.editorId,
-        changes: {
-            authorId: req.body.authorId,
-            reason: req.body.reason,
-            rankBack: req.body.rankBack,
-            duration: req.body.duration
-        }
+        changes: req.body.changes
     })).get({ raw: true }))
 }
 
