@@ -76,10 +76,6 @@ exports.postTraining = options => {
     }, { individualHooks: true })
 }
 
-exports.getExiles = () => {
-    return models.Exile.findAll()
-}
-
 exports.getSuspension = async userId => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found')
