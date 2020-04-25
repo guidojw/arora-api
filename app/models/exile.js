@@ -1,6 +1,11 @@
 'use strict'
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('Exile', {
-        userId: DataTypes.STRING,
-    }, {})
+        userId: {
+            type: DataTypes.STRING,
+            field: 'user_id'
+        }
+    }, {
+        tableName: 'exiles'
+    })
 }

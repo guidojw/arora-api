@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     const SuspensionCancellation = sequelize.define('SuspensionCancellation', {
         authorId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'author_id'
         },
         reason: {
             type: DataTypes.STRING,
@@ -24,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
                 discordMessageJob('log', `**${authorName}** cancelled **${username}**'s suspension with `
                     + `reason "*${cancellation.reason}*"`)
             }
-        }
+        },
+        tableName: 'suspension_cancellations'
     })
 
     SuspensionCancellation.associate = models => {

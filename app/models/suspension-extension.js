@@ -7,7 +7,8 @@ module.exports = (sequelize, DataTypes) => {
     const SuspensionExtension = sequelize.define('SuspensionExtension', {
         authorId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'author_id'
         },
         reason: {
             type: DataTypes.STRING,
@@ -30,7 +31,8 @@ module.exports = (sequelize, DataTypes) => {
                 discordMessageJob('log', `**${authorName}** extended **${username}**'s suspension with` +
                     `**${extensionDays}** ${pluralize('day', extensionDays)}`)
             }
-        }
+        },
+        tableName: 'suspension_extensions'
     })
 
     SuspensionExtension.associate = models => {

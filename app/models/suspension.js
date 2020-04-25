@@ -7,7 +7,8 @@ module.exports = (sequelize, DataTypes) => {
     const Suspension = sequelize.define('Suspension', {
         authorId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'author_id'
         },
         reason: {
             type: DataTypes.STRING,
@@ -23,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         userId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'user_id'
         },
         duration: {
             type: DataTypes.INTEGER,
@@ -31,7 +33,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         rankBack: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            allowNull: false,
+            field: 'rank_back'
         },
         rank: {
             type: DataTypes.INTEGER,
@@ -82,7 +85,8 @@ module.exports = (sequelize, DataTypes) => {
                         username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
                 }
             }
-        }
+        },
+        tableName: 'suspensions'
     })
 
     Suspension.associate = models => {

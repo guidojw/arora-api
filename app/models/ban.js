@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     const Ban = sequelize.define('Ban', {
         userId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'user_id'
         },
         reason: {
             type: DataTypes.STRING,
@@ -26,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         authorId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'author_id'
         }
     }, {
         hooks: {
@@ -51,7 +53,8 @@ module.exports = (sequelize, DataTypes) => {
                         `'s ban to **${authorName}**`)
                 }
             }
-        }
+        },
+        tableName: 'bans'
     })
 
     Ban.associate = models => {

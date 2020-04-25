@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
     const Training = sequelize.define('Training', {
         authorId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'author_id'
         },
         notes: {
             type: DataTypes.STRING
@@ -56,7 +57,8 @@ module.exports = (sequelize, DataTypes) => {
 
                 }
             }
-        }
+        },
+        tableName: 'trainings'
     })
 
     Training.associate = models => {

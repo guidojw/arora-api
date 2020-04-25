@@ -1,7 +1,7 @@
 'use strict'
 module.exports = {
     up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('Suspensions', {
+        return queryInterface.createTable('suspensions', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -10,7 +10,8 @@ module.exports = {
             },
             authorId: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
+                field: 'author_id'
             },
             reason: {
                 type: Sequelize.STRING,
@@ -25,7 +26,8 @@ module.exports = {
             },
             userId: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
+                field: 'user_id'
             },
             duration: {
                 type: Sequelize.INTEGER,
@@ -33,7 +35,8 @@ module.exports = {
             },
             rankBack: {
                 type: Sequelize.BOOLEAN,
-                allowNull: false
+                allowNull: false,
+                field: 'rank_back'
             },
             rank: {
                 type: Sequelize.INTEGER,
@@ -46,6 +49,6 @@ module.exports = {
         })
     },
     down: (queryInterface /* , Sequelize */) => {
-        return queryInterface.dropTable('Suspensions')
+        return queryInterface.dropTable('suspensions')
     }
 }

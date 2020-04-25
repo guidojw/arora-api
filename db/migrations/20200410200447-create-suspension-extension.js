@@ -1,7 +1,7 @@
 'use strict'
 module.exports = {
     up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('SuspensionExtensions', {
+        return queryInterface.createTable('suspension_extensions', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -10,7 +10,8 @@ module.exports = {
             },
             authorId: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
+                field: 'author_id'
             },
             reason: {
                 type: Sequelize.STRING,
@@ -26,6 +27,6 @@ module.exports = {
         })
     },
     down: (queryInterface /* , Sequelize */) => {
-        return queryInterface.dropTable('SuspensionExtensions')
+        return queryInterface.dropTable('suspension_extensions')
     }
 }
