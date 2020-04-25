@@ -10,17 +10,17 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 body('userId').exists().isNumeric(),
-                body('by').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('reason').exists().isString(),
                 body('duration').exists().isNumeric(),
-                body('rankback').exists().isNumeric()
+                body('rankBack').exists().isBoolean()
             ]
         case 'promote':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
-                body('by').optional().isNumeric()
+                body('authorId').optional().isNumeric()
             ]
         case 'getShout':
             return [
@@ -37,14 +37,14 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric()
             ]
-        case 'scheduleTraining':
+        case 'postTraining':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('by').exists().isString(),
+                body('authorId').exists().isNumeric(),
                 body('type').exists().isString(),
                 body('date').exists().isNumeric(),
-                body('specialnotes').optional().isString()
+                body('notes').optional().isString()
             ]
         case 'getExiles':
             return [
@@ -67,132 +67,34 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
-                body('by').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('message').exists().isString()
             ]
-        case 'putTraining': // This is ugly because epxress-validator doesn't support nested oneOfs
-            return oneOf([
-                [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('type').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('date').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('specialnotes').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('by').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('cancelled').exists().isBoolean(),
-                    body('reason').exists().isBoolean(),
-                    body('by').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('trainingId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('finished').exists().isBoolean(),
-                    body('by').exists().isString()
-                ]
-            ])
-            /*return [
+        case 'putTraining':
+            return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
+                body('editorId').exists().isNumeric(),
                 oneOf([
-                    body('type').exists().isString(),
-                    body('date').exists().isNumeric(),
-                    body('specialnotes').exists().isString(),
-                    body('by').exists().isString()
-                    [
-                        body('cancelled').exists().isBoolean(),
-                            body('reason').exists().isBoolean(),
-                            body('by').exists().isString()
-                        ],
-                    [
-                        body('finished').exists().isBoolean(),
-                        body('by').exists().isString()
-                    ]
-                    ])
-            ]*/
+                    body('changes.type').exists().isString(),
+                    body('changes.date').exists().isNumeric(),
+                    body('changes.notes').exists().isString(),
+                    body('changes.authorId').exists().isNumeric()
+                ])
+            ]
         case 'putSuspension':
-            return oneOf([
-                [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('by').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('reason').exists().isString()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('rankback').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('cancelled').exists().isBoolean(),
-                    body('reason').exists().isBoolean(),
-                    body('by').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('groupId').isNumeric(),
-                    param('userId').isNumeric(),
-                    body('byUserId').exists().isNumeric(),
-                    body('extended').exists().isBoolean(),
-                    body('duration').exists().isNumeric(),
-                    body('reason').exists().isString(),
-                    body('by').exists().isNumeric()
-                ]
-            ])
-            /*return [
+            return [
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('userId').isNumeric(),
+                body('editorId').exists().isNumeric(),
                 oneOf([
-                    body('by').exists().isNumeric(),
-                    body('reason').exists().isString(),
-                    body('rankback').exists().isNumeric(),
-                        [
-                        body('cancelled').exists().isBoolean(),
-                            body('reason').exists().isBoolean(),
-                            body('by').exists().isNumeric()
-                        ],
-                    [
-                        body('extended').exists().isBoolean(),
-                        body('duration').exists().isNumeric(),
-                        body('reason').exists().isString(),
-                        body('by').exists().isNumeric()
-                    ]
+                    body('changes.authorId').exists().isNumeric(),
+                    body('changes.reason').exists().isString(),
+                    body('changes.rankBack').exists().isBoolean()
                 ])
-            ]*/
+            ]
         case 'getGroup':
             return [
                 header('authorization').exists().isString(),
@@ -208,23 +110,48 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isNumeric(),
                 param('trainingId').isNumeric(),
-                body('byUserId').exists().isNumeric(),
+                body('authorId').exists().isNumeric(),
                 body('medium').optional().isString()
+            ]
+        case 'cancelSuspension':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('reason').exists().isString()
+            ]
+        case 'cancelTraining':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('trainingId').isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('reason').exists().isString()
+            ]
+        case 'extendSuspension':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric(),
+                body('authorId').exists().isNumeric(),
+                body('duration').exists().isNumeric(),
+                body('reason').exists().isString()
             ]
     }
 }
 
 exports.suspend = async (req, res) => {
-    res.json(await groupService.suspend(req.params.groupId, req.body.userId, {
-        by: req.body.by,
+    res.json((await groupService.suspend(req.params.groupId, req.body.userId, {
+        authorId: req.body.authorId,
         reason: req.body.reason,
         duration: req.body.duration,
-        rankback: req.body.rankback
-    }))
+        rankBack: req.body.rankBack
+    })).get({ raw: true }))
 }
 
 exports.promote = async (req, res) => {
-    res.json(await groupService.promote(req.params.groupId, req.params.userId, req.body.by))
+    res.json(await groupService.promote(req.params.groupId, req.params.userId, req.body.authorId))
 }
 
 exports.getShout = async (req, res) => {
@@ -232,61 +159,50 @@ exports.getShout = async (req, res) => {
 }
 
 exports.getSuspensions = async (req, res) => {
-    res.json(await groupService.getSuspensions())
+    res.json((await groupService.getSuspensions()).map(suspension => suspension.get({ raw: true })))
 }
 
 exports.getTrainings = async (req, res) => {
-    res.json(await groupService.getTrainings())
+    res.json((await groupService.getTrainings()).map(training => training.get({ raw: true })))
 }
 
-exports.scheduleTraining = async (req, res) => {
-    res.json(await groupService.scheduleTraining({
-        by: req.body.by,
+exports.postTraining = async (req, res) => {
+    res.json((await groupService.postTraining({
+        authorId: req.body.authorId,
         type: req.body.type,
         date: req.body.date,
-        specialnotes: req.body.specialnotes
-    }))
+        notes: req.body.notes
+    })).get({ raw: true }))
 }
 
 exports.getExiles = async (req, res) => {
-    res.json(await groupService.getExiles())
+    res.json((await groupService.getExiles()).map(exile => exile.get({ raw: true })))
 }
 
 exports.getSuspension = async (req, res) => {
-    res.json(await groupService.getSuspension(req.params.userId))
+    res.json((await groupService.getSuspension(req.params.userId)).get({ raw: true }))
 }
 
 exports.getTraining = async (req, res) => {
-    res.json(await groupService.getTraining(req.params.trainingId))
+    res.json((await groupService.getTraining(req.params.trainingId)).get({ raw: true }))
 }
 
 exports.shout = async (req, res) => {
-    res.json(await groupService.shout(req.params.groupId, req.body.by, req.body.message))
+    res.json(await groupService.shout(req.params.groupId, req.body.authorId, req.body.message))
 }
 
 exports.putTraining = async (req, res) => {
-    res.json(await groupService.putTraining(req.params.groupId, req.params.trainingId, {
-        by: req.body.by,
-        type: req.body.type,
-        date: req.body.date,
-        specialnotes: req.body.specialnotes,
-        cancelled: req.body.cancelled,
-        reason: req.body.reason,
-        finished: req.body.finished,
-        byUserId: req.body.byUserId
-    }))
+    res.json((await groupService.putTraining(req.params.groupId, req.params.trainingId, {
+        editorId: req.body.editorId,
+        changes: req.body.changes
+    })).get({ raw: true }))
 }
 
 exports.putSuspension = async (req, res) => {
-    res.json(await groupService.putSuspension(req.params.groupId, req.params.userId, {
-        by: req.body.by,
-        reason: req.body.reason,
-        rankback: req.body.rankback,
-        cancelled: req.body.cancelled,
-        extended: req.body.extended,
-        duration: req.body.duration,
-        byUserId: req.body.byUserId
-    }))
+    res.json((await groupService.putSuspension(req.params.groupId, req.params.userId, {
+        editorId: req.body.editorId,
+        changes: req.body.changes
+    })).get({ raw: true }))
 }
 
 exports.getGroup = async (req, res) => {
@@ -294,12 +210,34 @@ exports.getGroup = async (req, res) => {
 }
 
 exports.getFinishedSuspensions = async (req, res) => {
-    res.json(await groupService.getFinishedSuspensions())
+    res.json((await groupService.getFinishedSuspensions()).map(suspension => suspension.get({ raw: true })))
 }
 
 exports.announceTraining = async (req, res) => {
     res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, {
         medium: req.body.medium,
-        byUserId: req.body.byUserId
+        authorId: req.body.authorId
     }))
+}
+
+exports.cancelSuspension = async (req, res) => {
+    res.json((await groupService.cancelSuspension(req.params.groupId, req.params.userId, {
+        authorId: req.body.authorId,
+        reason: req.body.reason
+    })).get({ raw: true }))
+}
+
+exports.cancelTraining = async (req, res) => {
+    res.json((await groupService.cancelTraining(req.params.groupId, req.params.trainingId, {
+        authorId: req.body.authorId,
+        reason: req.body.reason
+    })).get({ raw: true }))
+}
+
+exports.extendSuspension = async (req, res) => {
+    res.json((await groupService.extendSuspension(req.params.groupId, req.params.userId, {
+        authorId: req.body.authorId,
+        duration: req.body.duration,
+        reason: req.body.reason
+    })).get({ raw: true }))
 }

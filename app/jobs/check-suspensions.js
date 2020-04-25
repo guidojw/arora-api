@@ -1,32 +1,17 @@
 'use strict'
-const discordMessageJob = require('./discord-message')
-const trelloService = require('../services/trello')
-const userService = require('../services/user')
-const groupService = require('../services/group')
+const finishSuspensionJob = require('../jobs/finish-suspension')
+const models = require('../models')
+const cron = require('node-schedule')
 
-module.exports = async groupId => {
-    const boardId = await trelloService.getIdFromBoardName('[NS] Ongoing Suspensions')
-    const listId = await trelloService.getIdFromListName(boardId, 'Current')
-    const newListId = await trelloService.getIdFromListName(boardId, 'Done')
-    const cards = await trelloService.getCards(listId, {fields: 'name,desc'})
-    for (const card of cards) {
-        const suspension = JSON.parse(card.desc)
-        suspension.userId = parseInt(card.name)
-        let duration = suspension.duration
-        if (suspension.extended) {
-            for (const extension of suspension.extended) {
-                duration += extension.duration
-            }
-        }
-        if (suspension.at + duration <= Math.round(Date.now() / 1000)) {
-            const rank = await userService.getRank(suspension.userId, groupId)
-            if (rank !== 0) {
-                const newRank = suspension.rankback ? suspension.rank : 1
-                await groupService.setRank(groupId, suspension.userId, newRank)
-            }
-            await trelloService.putCard(card.id, { idList: newListId })
-            const username = await userService.getUsername(suspension.userId)
-            await discordMessageJob('log', `Finished **${username}**'s suspension`)
+module.exports = async () => {
+    const suspensions = await models.Suspension.findAll()
+    for (const suspension of suspensions) {
+        const endDate = await suspension.endDate
+        if (endDate <= Date.now()) {
+            finishSuspensionJob(suspension)
+        } else {
+            const job = cron.scheduledJobs[`suspension_${suspension.id}`]
+            if (!job) cron.scheduleJob(`suspension_${suspension.id}`, endDate, finishSuspensionJob.bind(null, suspension))
         }
     }
 }
