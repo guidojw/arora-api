@@ -105,6 +105,9 @@ module.exports = (sequelize, DataTypes) => {
             include: [{
                 model: models.SuspensionCancellation,
                 attributes: [],
+            }, {
+                model: models.SuspensionExtension,
+                as: 'extensions'
             }]
         })
         Suspension.addScope('finished', {
@@ -112,6 +115,9 @@ module.exports = (sequelize, DataTypes) => {
             include: [{
                 model: models.SuspensionCancellation,
                 attributes: [],
+            }, {
+                model: models.SuspensionExtension,
+                as: 'extensions'
             }]
         })
     }
