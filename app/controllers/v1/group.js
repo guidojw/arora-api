@@ -163,7 +163,7 @@ exports.getSuspensions = async (req, res) => {
 }
 
 exports.getTrainings = async (req, res) => {
-    res.json((await groupService.getTrainings()).get({ raw: true }))
+    res.json((await groupService.getTrainings()).map(training => training.get({ raw: true })))
 }
 
 exports.postTraining = async (req, res) => {
