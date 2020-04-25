@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
                     .trainingId}** with reason "*${cancellation.reason}*"`)
             }
         },
-        tableName: 'suspension_extensions'
+        tableName: 'training_cancellations'
     })
 
     TrainingCancellation.associate = models => {

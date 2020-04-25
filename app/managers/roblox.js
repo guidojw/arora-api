@@ -6,7 +6,11 @@ const checkSuspensionsJob = require('../jobs/check-suspensions')
 
 const clients = { authenticated: {} }
 
+let initiated = false
+
 exports.init = async () => {
+    if (initiated) return
+    initiated = true
     try {
         const client = new Client({ setup: { throwHttpErrors: true }})
         await client.login({ cookie: process.env.ROBLOX_COOKIE })
