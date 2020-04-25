@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         hooks: {
             afterCreate: async cancellation => {
-                const suspension = await sequelize.models.Suspension.findByPk(cancellation.suspensionId)
+                const suspension = await sequelize.models.Suspension.unscoped().findByPk(cancellation.suspensionId)
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(cancellation.authorId)])
                 discordMessageJob('log', `**${authorName}** cancelled **${username}**'s suspension with `

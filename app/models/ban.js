@@ -35,7 +35,6 @@ module.exports = (sequelize, DataTypes) => {
             afterCreate: async ban => {
                 const [username, authorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(ban.authorId)])
-                console.log(username, authorName)
                 discordMessageJob('log', `**${authorName}** banned **${username}** with reason  "*${ban
                     .reason}*"`)
             },

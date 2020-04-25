@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
                     userService.getUsername(extension.authorId)])
                 const extensionDays = extension.duration / 86400000
                 discordMessageJob('log', `**${authorName}** extended **${username}**'s suspension with` +
-                    `**${extensionDays}** ${pluralize('day', extensionDays)}`)
+                    ` **${extensionDays}** ${pluralize('day', extensionDays)}`)
             }
         },
         tableName: 'suspension_extensions'
