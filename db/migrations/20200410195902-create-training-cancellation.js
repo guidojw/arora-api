@@ -19,6 +19,15 @@ module.exports = {
                 validate: {
                     notEmpty: true
                 }
+            },
+            trainingId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'trainings',
+                    key: 'id'
+                },
+                field: 'training_id'
             }
         })
     },

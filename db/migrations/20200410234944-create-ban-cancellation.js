@@ -19,6 +19,15 @@ module.exports = {
                 validate: {
                     notEmpty: true
                 }
+            },
+            banId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'bans',
+                    key: 'id'
+                },
+                field: 'ban_id'
             }
         })
     },

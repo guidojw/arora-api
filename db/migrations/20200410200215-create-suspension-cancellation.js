@@ -19,6 +19,15 @@ module.exports = {
                 validate: {
                     notEmpty: true
                 }
+            },
+            suspensionId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'suspensions',
+                    key: 'id'
+                },
+                field: 'suspension_id'
             }
         })
     },

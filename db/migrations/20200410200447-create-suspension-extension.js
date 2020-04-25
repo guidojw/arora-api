@@ -23,6 +23,15 @@ module.exports = {
             duration: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            suspensionId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'suspensions',
+                    key: 'id'
+                },
+                field: 'suspension_id'
             }
         })
     },
