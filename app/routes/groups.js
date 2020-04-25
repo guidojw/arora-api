@@ -23,8 +23,8 @@ router.get('/:groupId/suspensions', groupController.validate('getSuspensions'), 
 router.get('/:groupId/trainings', groupController.validate('getTrainings'), handleValidationResult,
     authenticate, parseParams, groupController.getTrainings)
 
-router.post('/:groupId/trainings', groupController.validate('scheduleTraining'), handleValidationResult,
-    authenticate, parseParams, groupController.scheduleTraining)
+router.post('/:groupId/trainings', groupController.validate('postTraining'), handleValidationResult,
+    authenticate, parseParams, groupController.postTraining)
 
 router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult, authenticate,
     parseParams, groupController.getExiles)
@@ -52,5 +52,14 @@ router.get('/:groupId', groupController.validate('getGroup'), handleValidationRe
 
 router.post('/:groupId/trainings/:trainingId/announce', groupController.validate('announceTraining'),
     handleValidationResult, authenticate, parseParams, groupController.announceTraining)
+
+router.post('/:groupId/suspensions/:userId/cancel', groupController.validate('cancelSuspension'),
+    handleValidationResult, authenticate, parseParams, groupController.cancelSuspension)
+
+router.post('/:groupId/trainings/:userId/cancel', groupController.validate('cancelTraining'),
+    handleValidationResult, authenticate, parseParams, groupController.cancelTraining)
+
+router.post('/:groupId/suspensions/:userId/extend', groupController.validate('extendSuspension'),
+    handleValidationResult, authenticate, parseParams, groupController.extendSuspension)
 
 module.exports = router

@@ -3,14 +3,12 @@
 const app = require('../app')
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
-const cron = require('node-cron')
+const cron = require('node-schedule')
 const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
 
 const cronConfig = require('../config/cron')
-
-const models = require('../app/models')
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
@@ -19,27 +17,20 @@ const server = http.createServer(app)
 const wss = new WebSocket.Server({ server, path: '/api/v1' })
 
 robloxManager.init()
-    .then(() => console.log('Roblox account logged in!'))
-    .catch(err => console.error(err.message))
 
-models.sequelize.sync()
-    .then(() => {
-        console.log('Database & tables created!')
-        server.listen(port)
-        server.on('error', onError)
-        server.on('listening', onListening)
+server.listen(port)
+server.on('error', onError)
+server.on('listening', onListening)
 
-        webSocketManager.init()
-        wss.on('connection', webSocketManager.addConnection)
-    })
-    .catch((err => { console.error(err.message)}))
+webSocketManager.init()
+wss.on('connection', webSocketManager.addConnection)
 
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
         const [...args] = job.args
-        cron.schedule(job.expression, () => job.job(...args))
+        cron.scheduleJob(job.expression, () => job.job(...args))
     } else {
-        cron.schedule(job.expression, job.job)
+        cron.scheduleJob(job.expression, job.job)
     }
 }
 
