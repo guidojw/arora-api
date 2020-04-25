@@ -18,19 +18,15 @@ exports.validate = method => {
                 body('groupId').exists().isNumeric()
             ]
         case 'putBan':
-            return oneOf([
-                [
-                    header('authorization').exists().isString(),
-                    param('userId').exists().isNumeric(),
-                    body('editorId').exists().isNumeric(),
-                    body('changes.authorId').exists().isNumeric()
-                ], [
-                    header('authorization').exists().isString(),
-                    param('userId').exists().isNumeric(),
-                    body('editorId').exists().isNumeric(),
+            return [
+                header('authorization').exists().isString(),
+                param('userId').exists().isNumeric(),
+                body('editorId').exists().isNumeric(),
+                oneOf([
+                    body('changes.authorId').exists().isNumeric(),
                     body('changes.reason').exists().isString()
-                ]
-            ])
+                ])
+            ]
         case 'getBan':
             return [
                 header('authorization').exists().isString(),
