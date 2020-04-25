@@ -108,7 +108,8 @@ module.exports = (sequelize, DataTypes) => {
             }, {
                 model: models.SuspensionExtension,
                 as: 'extensions'
-            }]
+            }],
+            subQuery: false
         })
         Suspension.addScope('finished', {
             where: { '$SuspensionCancellation.id$': null, finished: true },
@@ -118,7 +119,8 @@ module.exports = (sequelize, DataTypes) => {
             }, {
                 model: models.SuspensionExtension,
                 as: 'extensions'
-            }]
+            }],
+            subQuery: false
         })
     }
 
