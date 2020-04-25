@@ -22,7 +22,7 @@ module.exports = {
             },
             date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: false,
             },
             userId: {
                 type: Sequelize.INTEGER,
@@ -43,8 +43,9 @@ module.exports = {
                 allowNull: false
             },
             finished: {
-                type: Sequelize.INTEGER,
-                allowNull: false
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
         })
     },
