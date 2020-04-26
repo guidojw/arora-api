@@ -1,14 +1,18 @@
 'use strict'
 const robloxManager = require('../managers/roblox')
 
-const developerTrains = {
-    '32851718': [1371397, 1547370], // Supersnel11
-    '7050507': [1373258, 2300769, 3886194, 4787242], // AmericanKay
-    '21753709': [1399819], // DerailingOn
-    '6882179': [1399819], // Happywalker
-    '49248891': [1492453], // BuildIntoTrains
-    '5775031': [1426909, 2297243] // COEN1000
-}
+const trainProducts = [
+    { id: 1371397, developerIds: [32851718] }, // Supersnel11
+    { id: 1547370, developerIds: [32851718] },
+    { id: 1373258, developerIds: [7050507] }, // AmericanKay
+    { id: 2300769, developerIds: [7050507] },
+    { id: 3886194, developerIds: [7050507] },
+    { id: 4787242, developerIds: [7050507] },
+    { id: 1399819, developerIds: [21753709, 6882179] }, // DerailingOn, Happywalker
+    { id: 1492453, developerIds: [49248891] }, // BuildIntoTrains
+    { id: 1426909, developerIds: [5775031] }, // COEN1000
+    { id: 2297243, developerIds: [5775031] }
+]
 
 const PAY_RATE = 0.5
 
@@ -39,10 +43,6 @@ module.exports = async groupId => {
         count++
     } while (cursor && count < 50)
 
-    const trainTransactions = transactions.filter(transaction => {
-        for (const trains of Object.values(developerTrains)) {
-            if (trains.includes(transaction.details.id)) return true
-        }
-        return false
-    })
+    const trainTransactions = transactions.filter(transaction => trainProducts.find(product => product.id ===
+        transaction.details.id))
 }
