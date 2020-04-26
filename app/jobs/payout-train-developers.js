@@ -30,7 +30,8 @@ module.exports = async groupId => {
         if (!lastTransaction) {
             transactions.push(...transactionHistory.data)
         } else {
-            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(lastTransaction) + 1))
+            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(lastTransaction) +
+                1))
             break
         }
 
@@ -43,5 +44,5 @@ module.exports = async groupId => {
             if (trains.includes(transaction.details.id)) return true
         }
         return false
-})
+    })
 }
