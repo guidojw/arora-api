@@ -21,7 +21,6 @@ module.exports = async groupId => {
     const client = robloxManager.getClient(groupId)
     const transactions = []
     let cursor = null
-    let count = 0
     do {
         const transactionHistory = await client.apis.economy.getGroupTransactions({
             transactionType: 'Sale',
@@ -40,8 +39,7 @@ module.exports = async groupId => {
         }
 
         cursor = transactionHistory.nextPageCursor
-        count++
-    } while (cursor && count < 50)
+    } while (cursor)
 
     const trainTransactions = transactions.filter(transaction => trainProducts.find(product => product.id ===
         transaction.details.id))
