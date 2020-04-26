@@ -19,8 +19,10 @@ const products = [
 const PAY_RATE = 0.5
 
 module.exports = async groupId => {
-    // TODO Get timestamp from model and update to new most recent one when done.
-    const lastTimestamp = '2020-02-17T15:16:35.707Z'
+    // Get last payout and its last transaction.
+    const lastPayout = await models.Payout.getLast()
+    if (!lastPayout) throw new Error('Could not get last transaction!')
+    const lastTransactionDate = lastPayout.until
 
     // Get train transactions.
     const client = robloxManager.getClient(groupId)
@@ -34,12 +36,12 @@ module.exports = async groupId => {
             cursor
         })
 
-        const lastTransaction = transactionHistory.data.find(transaction => transaction.created === lastTimestamp)
+        const lastTransaction = transactionHistory.data.find(transaction => new Date(transaction.created).getTime() ===
+            lastTransactionDate.getTime())
         if (!lastTransaction) {
             transactions.push(...transactionHistory.data)
         } else {
-            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(lastTransaction) +
-                1))
+            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(lastTransaction)))
             break
         }
 
@@ -53,8 +55,8 @@ module.exports = async groupId => {
     const developersSales = {}
     for (const product of products) {
         for (const id of product.developerIds) {
-            if (!developersSales[id]) developersSales[id] = { total: { amount: 0, robux: 0 }}
-            developersSales[id][product.id] = { amount: 0, robux: 0 }
+            if (!developersSales[id]) developersSales[id] = { total: { amount: 0, robux: 0 }, sales: {}}
+            developersSales[id].sales[product.id] = { amount: 0, robux: 0 }
         }
     }
 
@@ -63,7 +65,7 @@ module.exports = async groupId => {
         const gainings = transaction.currency.amount * 0.7 * PAY_RATE * (1 / product.developerIds.length)
         for (const id of product.developerIds) {
             const developerSales = developersSales[id]
-            const productSales = developerSales[product.id]
+            const productSales = developerSales.sales[product.id]
             productSales.amount++
             developerSales.total.amount++
             productSales.robux += gainings
@@ -71,20 +73,26 @@ module.exports = async groupId => {
         }
     }
 
-    // Build a PayoutRequest from the developer sales information.
-    const recipients = []
-    for (const [id, developerSales] of Object.entries(developersSales)) {
-        recipients.push({
-            recipientId: parseInt(id),
-            recipientType: 'User',
-            amount: Math.ceil(developerSales.total.robux)
-        })
-    }
-    const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
+    // Only continue with payout logic if there are train transactions.
+    if (trainTransactions.length > 0) {
+        // Build a PayoutRequest from the developer sales information.
+        // const recipients = []
+        // for (const [id, developerSales] of Object.entries(developersSales)) {
+        //     recipients.push({
+        //         recipientId: parseInt(id),
+        //         recipientType: 'User',
+        //         amount: Math.ceil(developerSales.total.robux)
+        //     })
+        // }
+        // const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
 
-    // Make the payouts.
-    // await client.apis.groups.payoutUser({ groupId, payoutRequest })
+        // Make the payouts.
+        // await client.apis.groups.payoutUser({ groupId, payoutRequest })
+
+        // Add new payout row.
+        await models.Payout.create({ until: new Date(trainTransactions[0].created) })
+    }
 
     // Broadcast information about the payouts over the WebSocket.
-    webSocketManager.broadcast('trainDeveloperPayoutReport', developersSales)
+    webSocketManager.broadcast('trainDeveloperPayoutReport', { developersSales })
 }

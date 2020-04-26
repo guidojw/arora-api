@@ -1,12 +1,19 @@
 'use strict'
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('Payout', {
-        date: {
+    const Payout = sequelize.define('Payout', {
+        until: {
             type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
+            allowNull: false
         }
     }, {
         tableName: 'payouts'
     })
+
+    Payout.getLast = async () => {
+        return (await Payout.findAll({
+            attributes: [[sequelize.fn('MAX', sequelize.col('until')), 'until']]
+        }))[0]
+    }
+
+    return Payout
 }
