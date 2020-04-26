@@ -126,8 +126,8 @@ exports.announceTraining = async (groupId, trainingId, options) => {
     if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
         'Invalid medium')
     const training = await exports.getTraining(trainingId)
-    const username = await userService.getUsername(options.userId)
-    await discordMessageJob('log', `**${username}** announced training **${trainingId}**${medium !== 
+    const authorName = await userService.getUsername(options.authorId)
+    await discordMessageJob('log', `**${authorName}** announced training **${trainingId}**${medium !== 
     'both' ? ' on ' + stringHelper.toPascalCase(medium) : ''}`)
     return {
         shout: medium === 'both' || medium === 'roblox' ? await exports.announceRoblox(groupId) : undefined,
