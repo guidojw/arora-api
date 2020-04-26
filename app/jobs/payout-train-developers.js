@@ -1,7 +1,7 @@
 'use strict'
 const robloxManager = require('../managers/roblox')
 
-const trainProducts = [
+const products = [
     { id: 1371397, developerIds: [32851718] }, // Supersnel11
     { id: 1547370, developerIds: [32851718] },
     { id: 1373258, developerIds: [7050507] }, // AmericanKay
@@ -18,6 +18,7 @@ const PAY_RATE = 0.5
 
 module.exports = async groupId => {
     const lastTimestamp = '2020-02-17T15:16:35.707Z'
+    // Get train transactions.
     const client = robloxManager.getClient(groupId)
     const transactions = []
     let cursor = null
@@ -41,6 +42,36 @@ module.exports = async groupId => {
         cursor = transactionHistory.nextPageCursor
     } while (cursor)
 
-    const trainTransactions = transactions.filter(transaction => trainProducts.find(product => product.id ===
+    const trainTransactions = transactions.filter(transaction => products.find(product => product.id ===
         transaction.details.id))
+
+    // Get developer specific sales information from the train transactions.
+    const developersSales = {}
+    for (const product of products) {
+        for (const id of product.developerIds) {
+            if (!developersSales[id]) developersSales[id] = {}
+            developersSales[id][product.id] = { amount: 0, robux: 0 }
+        }
+    }
+
+    for (const transaction of trainTransactions) {
+        const product = products.find(product => product.id === transaction.details.id)
+        for (const id of product.developerIds) {
+            const developerSales = developersSales[id][product.id]
+            developerSales.amount++
+            developerSales.robux += transaction.currency.amount * 0.7 * PAY_RATE * (1 / product.developerIds.length)
+        }
+    }
+
+    // Build a PayoutRequest from the developer sales information.
+    const recipients = []
+    for (const [id, sales] of Object.entries(developersSales)) {
+        const recipient = { recipientId: id, recipientType: 'User', amount: 0 }
+        recipients.push(recipient)
+        for (const saleInfo of Object.values(sales)) {
+            recipient.amount += saleInfo.robux
+        }
+    }
+    recipients.map(recipient => recipient.amount = Math.ceil(recipient.amount))
+    const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
 }
