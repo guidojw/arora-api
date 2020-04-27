@@ -143,20 +143,21 @@ exports.announceRoblox = async groupId => {
 }
 
 exports.announceDiscord = async (groupId, training) => {
-    const announcement = exports.getTrainingAnnouncement(training)
+    const announcement = await exports.getTrainingAnnouncement(training)
     await discordMessageJob('training', announcement)
     return announcement
 }
 
-exports.getTrainingAnnouncement = training => {
+exports.getTrainingAnnouncement = async training => {
     const role = exports.getRoleByAbbreviation(training.type.toUpperCase())
     const dateString = timeHelper.getDate(training.date)
     const timeString = timeHelper.getTime(training.date)
-    const specialNotes = training.specialnotes
+    const authorName = await userService.getUsername(training.authorId)
+    const notes = training.notes
     return `<:ns:248922413599817728> **TRAINING**\nThere will be a *${role}* training on **` +
-        `${dateString}**.\nTime: **${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**.` +
-        `\n${specialNotes ? specialNotes + '\n' : ''}Hosted by **${training.by}**.\n<@&${training.type === 'cd' ? 
-            '673950073716998177' : '673950095250554920'}>`
+        `${dateString}**.\nTime: **${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**.\n${notes ? notes 
+            + '\n' : ''}Hosted by **${authorName}**.\n<@&${training.type === 'cd' ? '673950073716998177' : 
+            '673950095250554920'}>`
 }
 
 exports.getRoleByAbbreviation = str => {
