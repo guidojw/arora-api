@@ -56,7 +56,7 @@ router.post('/:groupId/trainings/:trainingId/announce', groupController.validate
 router.post('/:groupId/suspensions/:userId/cancel', groupController.validate('cancelSuspension'),
     handleValidationResult, authenticate, parseParams, groupController.cancelSuspension)
 
-router.post('/:groupId/trainings/:userId/cancel', groupController.validate('cancelTraining'),
+router.post('/:groupId/trainings/:trainingId/cancel', groupController.validate('cancelTraining'),
     handleValidationResult, authenticate, parseParams, groupController.cancelTraining)
 
 router.post('/:groupId/suspensions/:userId/extend', groupController.validate('extendSuspension'),
