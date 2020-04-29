@@ -30,7 +30,7 @@
     "pg-hstore": "^2.3.3",
     "pluralize": "^8.0.0",
     "sequelize": "^5.21.7",
-    "ws": "^7.2.3"
+    "ws": "^7.2.5"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
