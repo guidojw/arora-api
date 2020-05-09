@@ -36,7 +36,7 @@ module.exports = async groupId => {
             cursor
         })
 
-        const lastTransaction = transactionHistory.data.find(transaction => new Date(transaction.created).getTime() ===
+        const lastTransaction = transactionHistory.data.find(transaction => new Date(transaction.created).getTime() <=
             lastTransactionDate.getTime())
         if (!lastTransaction) {
             transactions.push(...transactionHistory.data)
