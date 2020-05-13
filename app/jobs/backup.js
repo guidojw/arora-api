@@ -34,7 +34,7 @@ module.exports = () => {
 
     fs.readdir('~/storage/backups', (err, files) => {
         if (err) throw err
-        for (let file of files) {
+        for (const file of files) {
             const date = fileHelper.getBackupDate(file)
             if (date.getTime() < Date.now() - KEEP) {
                 fs.unlink(`~/storage/backups/${file}`, err => {
