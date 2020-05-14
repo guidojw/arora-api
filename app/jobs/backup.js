@@ -7,6 +7,8 @@ const fileHelper = require('../helpers/file')
 
 const databaseConfig = require('../../config/database')[process.env.NODE_ENV || 'development']
 
+const home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+
 const KEEP = 7 * 60 * 60 * 24 * 1000 // keep backups 7 days
 
 module.exports = () => {
@@ -32,12 +34,12 @@ module.exports = () => {
         }
     )
 
-    fs.readdir('~/storage/backups', (err, files) => {
+    fs.readdir(path.resolve(home, 'storage/backups'), (err, files) => {
         if (err) throw err
         for (const file of files) {
             const date = fileHelper.getBackupDate(file)
             if (date.getTime() < Date.now() - KEEP) {
-                fs.unlink(`~/storage/backups/${file}`, err => {
+                fs.unlink(path.resolve(home, 'storage/backups', file), err => {
                     if (err) throw err
                 })
             }
