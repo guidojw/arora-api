@@ -5,12 +5,10 @@ const models = require('../models')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getBans = () => {
-    return models.Ban.findAll()
-}
+exports.getBans = () => models.Ban.findAll()
 
-exports.ban = async (groupId, userId, options) => {
-    const ban = await models.Ban.findOne({ where: { userId }})
+exports.ban = async (groupId, userId, options, query) => {
+    const ban = await models.Ban.scope(query.scope).findOne({ where: { userId }})
     if (ban) throw createError(409, 'User is already banned')
     const rank = await userService.getRank(userId, groupId)
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
@@ -28,8 +26,8 @@ exports.putBan = async (userId, options) => {
     return ban.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
-exports.getBan = async userId => {
-    const ban = await models.Ban.findOne({ where: { userId }})
+exports.getBan = async (userId, query) => {
+    const ban = await models.Ban.scope(query.scope).findOne({ where: { userId }})
     if (!ban) throw createError(404, 'Ban not found')
     return ban
 }

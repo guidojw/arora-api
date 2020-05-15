@@ -22,9 +22,6 @@ router.post('/:groupId/trainings', groupController.validate('postTraining'), han
 router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult, groupController
     .getExiles)
 
-router.get('/:groupId/suspensions/finished', groupController.validate('getFinishedSuspensions'),
-    handleValidationResult, groupController.getFinishedSuspensions)
-
 router.get('/:groupId/suspensions/:userId', groupController.validate('getSuspension'), handleValidationResult,
     groupController.getSuspension)
 

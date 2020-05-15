@@ -39,13 +39,9 @@ exports.getShout = async groupId => {
     return info.shout
 }
 
-exports.getSuspensions = () => {
-    return models.Suspension.findAll()
-}
+exports.getSuspensions = (query) => models.Suspension.scope(query.scope).findAll()
 
-exports.getTrainings = () => {
-    return models.Training.findAll()
-}
+exports.getTrainings = (query) => models.Training.scope(query.scope).findAll()
 
 exports.postTraining = options => {
     return models.Training.create({
@@ -56,14 +52,14 @@ exports.postTraining = options => {
     }, { individualHooks: true })
 }
 
-exports.getSuspension = async userId => {
-    const suspension = await models.Suspension.findOne({ where: { userId }})
+exports.getSuspension = async (userId, query) => {
+    const suspension = await models.Suspension.scope(query.scope).findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found')
     return suspension
 }
 
-exports.getTraining = async trainingId => {
-    const training = await models.Training.findByPk(trainingId)
+exports.getTraining = async (trainingId, query) => {
+    const training = await models.Trainin.scope(query.scope).findByPk(trainingId)
     if (!training) throw createError(404, 'Training not found')
     return training
 }
@@ -95,10 +91,6 @@ exports.putSuspension = async (groupId, userId, options) => {
 exports.getGroup = groupId => {
     const client = robloxManager.getClient(groupId)
     return client.apis.groups.getGroupInfo(groupId)
-}
-
-exports.getFinishedSuspensions = () => {
-    return models.Suspension.scope('defaultScope', 'finished').findAll()
 }
 
 exports.announceTraining = async (groupId, trainingId, options) => {
