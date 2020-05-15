@@ -220,12 +220,16 @@ exports.extendSuspension = async (groupId, userId, options) => {
 
 exports.changeRank = async (groupId, userId, options) => {
     const rank = await userService.getRank(userId, groupId)
-    if (rank === 0) throw createError(403, 'Can only change rank of group members')
-    if (rank >= 100) throw createError(403, 'Can\'t change rank of MRs or higher')
-    const newRank = rank === 1 ? 3 : rank + 1
-    const newRole = await exports.setRank(groupId, userId, newRank)
+    if (rank === 0) throw createError(403, 'Can\'t change rank of non members')
+    if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members')
+    if (rank === 99) throw createError(403, 'Can\'t change rank of partners')
+    if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs')
+    if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
+        throw createError(403, 'Invalid rank')
+    }
+    const newRole = await exports.setRank(groupId, userId, options.rank)
     const roles = await exports.getRoles(groupId)
-    const oldRole = roles.roles.find(role => role.rank === options.rank)
+    const oldRole = roles.roles.find(role => role.rank === rank)
     const username = await userService.getUsername(userId)
     if (options.authorId) {
         const authorName = await userService.getUsername(options.authorId)
