@@ -5,10 +5,12 @@ const models = require('../models')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getBans = () => models.Ban.findAll()
+exports.getBans = (query) => {
+    return models.Ban.scope(query.scope).findAll()
+}
 
-exports.ban = async (groupId, userId, options, query) => {
-    const ban = await models.Ban.scope(query.scope).findOne({ where: { userId }})
+exports.ban = async (groupId, userId, options) => {
+    const ban = await models.Ban.findOne({ where: { userId }})
     if (ban) throw createError(409, 'User is already banned')
     const rank = await userService.getRank(userId, groupId)
     if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unbannable')
