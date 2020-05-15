@@ -221,6 +221,7 @@ exports.extendSuspension = async (groupId, userId, options) => {
 exports.changeRank = async (groupId, userId, options) => {
     const rank = await userService.getRank(userId, groupId)
     if (rank === 0) throw createError(403, 'Can\'t change rank of non members')
+    if (rank === 1) throw createError(403, 'Can\'t change rank of customers.')
     if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members')
     if (rank === 99) throw createError(403, 'Can\'t change rank of partners')
     if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs')
