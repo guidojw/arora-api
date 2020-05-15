@@ -5,8 +5,8 @@ const createError = require('http-errors')
 const express = require('express')
 const logger = require('morgan')
 const Sentry = require('@sentry/node')
-
 const { sendError } = require('./app/middlewares/error')
+const { authenticate } = require('./app/middlewares/auth')
 
 require('express-async-errors')
 
@@ -27,11 +27,11 @@ app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.use('/api/v1/groups', groupsRouter)
-app.use('/api/v1/users', usersRouter)
-app.use('/api/v1/bans', bansRouter)
+app.use('/api/v1/groups', authenticate, groupsRouter)
+app.use('/api/v1/users', authenticate, usersRouter)
+app.use('/api/v1/bans', authenticate, bansRouter)
+app.use('/api/v1/catalog', authenticate, catalogRouter)
 app.use('/api/v1/trello', trelloRouter)
-app.use('/api/v1/catalog', catalogRouter)
 
 app.use(() => {
     throw createError(404)
