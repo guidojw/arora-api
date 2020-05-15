@@ -9,9 +9,9 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 query('CatalogContext').optional().isNumeric(),
-                query('Category').optional.isNumeric(),
-                query('CreatorID').optional.isNumeric(),
-                query('ResultsPerPage').optional.isNumeric(),
+                query('Category').optional().isNumeric(),
+                query('CreatorID').optional().isNumeric(),
+                query('ResultsPerPage').optional().isNumeric(),
                 query('Keyword').optional().isString(),
                 query('SortType').optional().isString(),
                 query('PageNumber').optional().isNumeric()
