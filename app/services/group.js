@@ -33,26 +33,6 @@ exports.suspend = async (groupId, userId, options) => {
     return suspension
 }
 
-exports.promote = async (groupId, userId, authorId) => {
-    const rank = await userService.getRank(userId, groupId)
-    if (rank === 0) throw createError(403, 'Can only promote group members')
-    if (rank >= 100) throw createError(403, 'Can\'t promote MRs or higher')
-    const username = await userService.getUsername(userId)
-    const newRank = rank === 1 ? 3 : rank + 1
-    const newRole = await exports.setRank(groupId, userId, newRank)
-    const roles = await exports.getRoles(groupId)
-    const oldRole = roles.roles.find(role => role.rank === rank)
-    if (authorId) {
-        const authorName = await userService.getUsername(authorId)
-        await discordMessageJob('log', `**${authorName}** promoted **${username}** from **${oldRole
-            .name}** to **${newRole.name}**`)
-    } else {
-        await discordMessageJob('log', `Promoted **${username}** from **${oldRole.name}** to **${newRole
-            .name}**`)
-    }
-    return { oldRole, newRole }
-}
-
 exports.getShout = async groupId => {
     const client = robloxManager.getClient(groupId)
     const info = await client.apis.groups.getGroupInfo(groupId)
@@ -236,4 +216,28 @@ exports.extendSuspension = async (groupId, userId, options) => {
         reason: options.reason,
         suspensionId: suspension.id
     }, { individualHooks: true })
+}
+
+exports.changeRank = async (groupId, userId, options) => {
+    const rank = await userService.getRank(userId, groupId)
+    if (rank === 0) throw createError(403, 'Can\'t change rank of non members')
+    if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members')
+    if (rank === 99) throw createError(403, 'Can\'t change rank of partners')
+    if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs')
+    if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
+        throw createError(400, 'Invalid rank')
+    }
+    const newRole = await exports.setRank(groupId, userId, options.rank)
+    const roles = await exports.getRoles(groupId)
+    const oldRole = roles.roles.find(role => role.rank === rank)
+    const username = await userService.getUsername(userId)
+    if (options.authorId) {
+        const authorName = await userService.getUsername(options.authorId)
+        await discordMessageJob('log', `**${authorName}** ${options.rank > rank ? 'promoted' : 
+            'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+    } else {
+        await discordMessageJob('log', `${options.rank > rank ? 'Promoted' : 'demoted'} **${username}` +
+            `** from **${oldRole.name}** to **${newRole.name}**`)
+    }
+    return { oldRole, newRole }
 }
