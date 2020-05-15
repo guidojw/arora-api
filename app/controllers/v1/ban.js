@@ -13,32 +13,32 @@ exports.validate = method => {
         case 'ban':
             return [
                 header('authorization').exists().isString(),
-                body('userId').exists().isNumeric().toInt(),
-                body('authorId').exists().isNumeric().toInt(),
+                body('userId').exists().isInt().toInt(),
+                body('authorId').exists().isInt().toInt(),
                 body('reason').exists().isString(),
-                body('groupId').exists().isNumeric().toInt()
+                body('groupId').exists().isInt().toInt()
             ]
         case 'putBan':
             return [
                 header('authorization').exists().isString(),
-                param('userId').exists().isNumeric().toInt(),
-                body('editorId').exists().isNumeric().toInt(),
+                param('userId').exists().isInt().toInt(),
+                body('editorId').exists().isInt().toInt(),
                 oneOf([
-                    body('changes.authorId').exists().isNumeric().toInt(),
+                    body('changes.authorId').exists().isInt().toInt(),
                     body('changes.reason').exists().isString()
                 ])
             ]
         case 'getBan':
             return [
                 header('authorization').exists().isString(),
-                param('userId').exists().isNumeric().toInt(),
+                param('userId').exists().isInt().toInt(),
                 query('scope').customSanitizer(decodeQuery)
             ]
         case 'cancelBan':
             return [
                 header('authorization').exists().isString(),
-                param('userId').exists().isNumeric().toInt(),
-                body('authorId').exists().isNumeric().toInt(),
+                param('userId').exists().isInt().toInt(),
+                body('authorId').exists().isInt().toInt(),
                 body('reason').exists().isString()
             ]
     }

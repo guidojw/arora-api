@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
                     discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
                         `type to **${training.type.toUpperCase()}**`)
                 }
-                if (training.changed('time')) {
+                if (training.changed('date')) {
                     const dateString = timeHelper.getDate(training.date)
                     const timeString = timeHelper.getTime(training.date)
                     discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +

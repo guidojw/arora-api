@@ -12,31 +12,31 @@ exports.validate = method => {
         case 'hasBadge':
             return [
                 header('authorization').exists().isString(),
-                param('userId').isNumeric().toInt(),
-                param('badgeId').isNumeric().toInt()
+                param('userId').isInt().toInt(),
+                param('badgeId').isInt().toInt()
             ]
         case 'getUsers':
             return [
                 header('authorization').exists().isString(),
                 body('userIds').exists(),
-                body('userIds.*').isNumeric().toInt()
+                body('userIds.*').isInt().toInt()
             ]
         case 'getRank':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric().toInt(),
-                param('userId').isNumeric().toInt()
+                param('groupId').isInt().toInt(),
+                param('userId').isInt().toInt()
             ]
         case 'getRole':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric().toInt(),
-                param('userId').isNumeric().toInt()
+                param('groupId').isInt().toInt(),
+                param('userId').isInt().toInt()
             ]
         case 'getUser':
             return [
                 header('authorization').exists().isString(),
-                param('userId').isNumeric().toInt()
+                param('userId').isInt().toInt()
             ]
     }
 }

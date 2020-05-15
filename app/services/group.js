@@ -15,10 +15,10 @@ exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted
     'Scheduler in the Group Center for more info!'
 
 exports.suspend = async (groupId, userId, options) => {
-    if (await models.Suspension.findOne({ where: { userId }})) throw createError(409, 'User is already suspended')
+    if (await models.Suspension.findOne({ where: { userId }})) throw createError(409, 'User is already suspended.')
     const rank = await userService.getRank(userId, groupId)
-    if (rank === 2) throw createError(409, 'User is already suspended')
-    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable')
+    if (rank === 2) throw createError(409, 'User is already suspended.')
+    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable.')
     if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
     const suspension = await models.Suspension.create({
         rankBack: options.rankBack,
@@ -54,13 +54,13 @@ exports.postTraining = options => {
 
 exports.getSuspension = async (userId, query) => {
     const suspension = await models.Suspension.scope(query.scope || 'defaultScope').findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found')
+    if (!suspension) throw createError(404, 'Suspension not found.')
     return suspension
 }
 
 exports.getTraining = async (trainingId, query) => {
     const training = await models.Trainin.scope(query.scope || 'defaultScope').findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found')
+    if (!training) throw createError(404, 'Training not found.')
     return training
 }
 
@@ -78,13 +78,13 @@ exports.shout = async (groupId, authorId, message) => {
 
 exports.putTraining = async (groupId, trainingId, options) => {
     const training = await models.Training.findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found')
+    if (!training) throw createError(404, 'Training not found.')
     return training.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found')
+    if (!suspension) throw createError(404, 'Suspension not found.')
     return suspension.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
@@ -166,7 +166,7 @@ exports.setRank = async (groupId, userId, rank) => {
 
 exports.cancelSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found')
+    if (!suspension) throw createError(404, 'Suspension not found.')
     await exports.setRank(groupId, userId, suspension.rank > 0 ? suspension.rank : 1)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
@@ -179,7 +179,7 @@ exports.cancelSuspension = async (groupId, userId, options) => {
 
 exports.cancelTraining = async (groupId, trainingId, options) => {
     const training = await models.Training.findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found')
+    if (!training) throw createError(404, 'Training not found.')
     return models.TrainingCancellation.create({
         authorId: options.authorId,
         reason: options.reason,
@@ -189,15 +189,15 @@ exports.cancelTraining = async (groupId, trainingId, options) => {
 
 exports.extendSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found')
+    if (!suspension) throw createError(404, 'Suspension not found.')
     let duration = suspension.duration + options.duration
     if (!suspension.extensions) suspension.extensions = []
     for (const extension of suspension.extensions) {
         duration += extension.duration
     }
     const days = duration / 86400000
-    if (days < 1) throw createError(403, 'Insufficient amount of days')
-    if (days > 7) throw createError(403, 'Too many days')
+    if (days < 1) throw createError(403, 'Insufficient amount of days.')
+    if (days > 7) throw createError(403, 'Too many days.')
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
     cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
@@ -212,13 +212,13 @@ exports.extendSuspension = async (groupId, userId, options) => {
 
 exports.changeRank = async (groupId, userId, options) => {
     const rank = await userService.getRank(userId, groupId)
-    if (rank === 0) throw createError(403, 'Can\'t change rank of non members')
+    if (rank === 0) throw createError(403, 'Can\'t change rank of non members.')
     if (rank === 1 && options.authorId) throw createError(403, 'Can\'t change rank of customers.')
-    if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members')
-    if (rank === 99) throw createError(403, 'Can\'t change rank of partners')
-    if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs')
+    if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members.')
+    if (rank === 99) throw createError(403, 'Can\'t change rank of partners.')
+    if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs.')
     if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
-        throw createError(400, 'Invalid rank')
+        throw createError(400, 'Invalid rank.')
     }
     const newRole = await exports.setRank(groupId, userId, options.rank)
     const roles = await exports.getRoles(groupId)

@@ -8,9 +8,9 @@ exports.handleValidationResult = async (req, res, next) => {
 }
 
 exports.sendError = (res, statusCode, message) => {
-    exports.sendErrors(res, statusCode, [{ message: message }])
+    exports.sendErrors(res, statusCode, [{ message }])
 }
 
 exports.sendErrors = (res, statusCode, errors) => {
-    res.status(statusCode).send({ errors: errors })
+    res.status(statusCode).send({ errors })
 }
