@@ -39,9 +39,9 @@ exports.getShout = async groupId => {
     return info.shout
 }
 
-exports.getSuspensions = (query) => models.Suspension.scope(query.scope).findAll()
+exports.getSuspensions = (query) => models.Suspension.scope(query.scope || 'defaultScope').findAll()
 
-exports.getTrainings = (query) => models.Training.scope(query.scope).findAll()
+exports.getTrainings = (query) => models.Training.scope(query.scope || 'defaultScope').findAll()
 
 exports.postTraining = options => {
     return models.Training.create({
@@ -53,13 +53,13 @@ exports.postTraining = options => {
 }
 
 exports.getSuspension = async (userId, query) => {
-    const suspension = await models.Suspension.scope(query.scope).findOne({ where: { userId }})
+    const suspension = await models.Suspension.scope(query.scope || 'defaultScope').findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found')
     return suspension
 }
 
 exports.getTraining = async (trainingId, query) => {
-    const training = await models.Trainin.scope(query.scope).findByPk(trainingId)
+    const training = await models.Trainin.scope(query.scope || 'defaultScope').findByPk(trainingId)
     if (!training) throw createError(404, 'Training not found')
     return training
 }
