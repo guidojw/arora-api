@@ -38,7 +38,7 @@ exports.validate = method => {
                 param('groupId').isNumeric().toInt(),
                 body('authorId').exists().isNumeric().toInt(),
                 body('type').exists().isString(),
-                body('date').exists().toDate(),
+                body('date').exists(),
                 body('notes').optional().isString()
             ]
         case 'getExiles':
