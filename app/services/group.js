@@ -225,7 +225,7 @@ exports.changeRank = async (groupId, userId, options) => {
     if (rank === 99) throw createError(403, 'Can\'t change rank of partners')
     if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs')
     if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
-        throw createError(403, 'Invalid rank')
+        throw createError(400, 'Invalid rank')
     }
     const newRole = await exports.setRank(groupId, userId, options.rank)
     const roles = await exports.getRoles(groupId)
