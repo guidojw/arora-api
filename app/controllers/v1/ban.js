@@ -1,6 +1,5 @@
 'use strict'
 const { param, body, header, oneOf } = require('express-validator')
-
 const banService = require('../../services/ban')
 
 exports.validate = method => {
@@ -12,31 +11,31 @@ exports.validate = method => {
         case 'ban':
             return [
                 header('authorization').exists().isString(),
-                body('userId').exists().isNumeric(),
-                body('authorId').exists().isNumeric(),
+                body('userId').exists().isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('reason').exists().isString(),
-                body('groupId').exists().isNumeric()
+                body('groupId').exists().isNumeric().toInt()
             ]
         case 'putBan':
             return [
                 header('authorization').exists().isString(),
-                param('userId').exists().isNumeric(),
-                body('editorId').exists().isNumeric(),
+                param('userId').exists().isNumeric().toInt(),
+                body('editorId').exists().isNumeric().toInt(),
                 oneOf([
-                    body('changes.authorId').exists().isNumeric(),
+                    body('changes.authorId').exists().isNumeric().toInt(),
                     body('changes.reason').exists().isString()
                 ])
             ]
         case 'getBan':
             return [
                 header('authorization').exists().isString(),
-                param('userId').exists().isNumeric()
+                param('userId').exists().isNumeric().toInt()
             ]
         case 'cancelBan':
             return [
                 header('authorization').exists().isString(),
-                param('userId').exists().isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('userId').exists().isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('reason').exists().isString()
             ]
     }

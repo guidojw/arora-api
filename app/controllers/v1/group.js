@@ -1,6 +1,5 @@
 'use strict'
 const { param, body, header, oneOf } = require('express-validator')
-
 const groupService = require('../../services/group')
 
 exports.validate = method => {
@@ -8,136 +7,136 @@ exports.validate = method => {
         case 'suspend':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                body('userId').exists().isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                body('userId').exists().isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('reason').exists().isString(),
-                body('duration').exists().isNumeric(),
-                body('rankBack').exists().isBoolean()
+                body('duration').exists().isNumeric().toInt(),
+                body('rankBack').exists().isBoolean().toBoolean()
             ]
         case 'getShout':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric()
+                param('groupId').isNumeric().toInt()
             ]
         case 'getSuspensions':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric()
+                param('groupId').isNumeric().toInt()
             ]
         case 'getTrainings':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric()
+                param('groupId').isNumeric().toInt()
             ]
         case 'postTraining':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('type').exists().isString(),
-                body('date').exists().isNumeric(),
+                body('date').exists().toDate(),
                 body('notes').optional().isString()
             ]
         case 'getExiles':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric()
+                param('groupId').isNumeric().toInt()
             ]
         case 'getSuspension':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('userId').isNumeric()
+                param('groupId').isNumeric().toInt(),
+                param('userId').isNumeric().toInt()
             ]
         case 'getTraining':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('trainingId').isNumeric()
+                param('groupId').isNumeric().toInt(),
+                param('trainingId').isNumeric().toInt()
             ]
         case 'shout':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('message').exists().isString()
             ]
         case 'putTraining':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('trainingId').isNumeric(),
-                body('editorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                param('trainingId').isNumeric().toInt(),
+                body('editorId').exists().isNumeric().toInt(),
                 oneOf([
                     body('changes.type').exists().isString(),
-                    body('changes.date').exists().isNumeric(),
+                    body('changes.date').exists().isNumeric().toInt(),
                     body('changes.notes').exists().isString(),
-                    body('changes.authorId').exists().isNumeric()
+                    body('changes.authorId').exists().isNumeric().toInt()
                 ])
             ]
         case 'putSuspension':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('userId').isNumeric(),
-                body('editorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                param('userId').isNumeric().toInt(),
+                body('editorId').exists().isNumeric().toInt(),
                 oneOf([
-                    body('changes.authorId').exists().isNumeric(),
+                    body('changes.authorId').exists().isNumeric().toInt(),
                     body('changes.reason').exists().isString(),
-                    body('changes.rankBack').exists().isBoolean()
+                    body('changes.rankBack').exists().isBoolean().toBoolean()
                 ])
             ]
         case 'getGroup':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric()
+                param('groupId').isNumeric().toInt()
             ]
         case 'getFinishedSuspensions':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric()
+                param('groupId').isNumeric().toInt()
             ]
         case 'announceTraining':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('trainingId').isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                param('trainingId').isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('medium').optional().isString()
             ]
         case 'cancelSuspension':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('userId').isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                param('userId').isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('reason').exists().isString()
             ]
         case 'cancelTraining':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('trainingId').isNumeric(),
-                body('authorId').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                param('trainingId').isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
                 body('reason').exists().isString()
             ]
         case 'extendSuspension':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('userId').isNumeric(),
-                body('authorId').exists().isNumeric(),
-                body('duration').exists().isNumeric(),
+                param('groupId').isNumeric().toInt(),
+                param('userId').isNumeric().toInt(),
+                body('authorId').exists().isNumeric().toInt(),
+                body('duration').exists().isNumeric().toInt(),
                 body('reason').exists().isString()
             ]
         case 'putUser':
             return [
                 header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('userId').isNumeric(),
-                body('rank').exists().isNumeric(),
-                body('authorId').optional().isNumeric()
+                param('groupId').isNumeric().toInt(),
+                param('userId').isNumeric().toInt(),
+                body('rank').exists().isNumeric().toInt(),
+                body('authorId').optional().isNumeric().toInt()
             ]
     }
 }
