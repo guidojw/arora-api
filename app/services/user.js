@@ -8,12 +8,6 @@ exports.getUserId = username => {
     return client.getUserId(username)
 }
 
-exports.getJoinDate = async userId => {
-    const client = robloxManager.getClient()
-    const info = await client.apis.users.getUserInfo(userId)
-    return info.created
-}
-
 exports.hasBadge = async (userId, badgeId) => {
     const client = robloxManager.getClient(robloxConfig.defaultGroup)
     return (await client.apis.inventory.getUserOwnedItems({
