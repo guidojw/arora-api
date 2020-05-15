@@ -1,5 +1,5 @@
 'use strict'
-const { param, body, header, oneOf } = require('express-validator')
+const { param, body, header, oneOf, query } = require('express-validator')
 const banService = require('../../services/ban')
 const { decodeQuery } = require('../../helpers/request')
 
