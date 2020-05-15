@@ -15,13 +15,6 @@ exports.validate = method => {
                 body('duration').exists().isNumeric(),
                 body('rankBack').exists().isBoolean()
             ]
-        case 'promote':
-            return [
-                header('authorization').exists().isString(),
-                param('groupId').isNumeric(),
-                param('userId').isNumeric(),
-                body('authorId').optional().isNumeric()
-            ]
         case 'getShout':
             return [
                 header('authorization').exists().isString(),
@@ -138,6 +131,14 @@ exports.validate = method => {
                 body('duration').exists().isNumeric(),
                 body('reason').exists().isString()
             ]
+        case 'putUser':
+            return [
+                header('authorization').exists().isString(),
+                param('groupId').isNumeric(),
+                param('userId').isNumeric(),
+                body('rank').exists().isNumeric(),
+                body('authorId').optional().isNumeric()
+            ]
     }
 }
 
@@ -148,10 +149,6 @@ exports.suspend = async (req, res) => {
         duration: req.body.duration,
         rankBack: req.body.rankBack
     })).get({ raw: true }))
-}
-
-exports.promote = async (req, res) => {
-    res.json(await groupService.promote(req.params.groupId, req.params.userId, req.body.authorId))
 }
 
 exports.getShout = async (req, res) => {
@@ -240,4 +237,11 @@ exports.extendSuspension = async (req, res) => {
         duration: req.body.duration,
         reason: req.body.reason
     })).get({ raw: true }))
+}
+
+exports.putUser = async (req, res) => {
+    res.json(await groupService.changeRank(req.params.groupId, req.params.userId, {
+        rank: req.body.rank,
+        authorId: req.body.authorId
+    }))
 }

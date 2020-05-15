@@ -11,9 +11,6 @@ const { authenticate } = require('../middlewares/auth')
 router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult, authenticate,
     parseParams, groupController.suspend)
 
-router.post('/:groupId/promote/:userId', groupController.validate('promote'), handleValidationResult,
-    authenticate, parseParams, groupController.promote)
-
 router.get('/:groupId/shout', groupController.validate('getShout'), handleValidationResult, authenticate,
     parseParams, groupController.getShout)
 
@@ -61,5 +58,8 @@ router.post('/:groupId/trainings/:trainingId/cancel', groupController.validate('
 
 router.post('/:groupId/suspensions/:userId/extend', groupController.validate('extendSuspension'),
     handleValidationResult, authenticate, parseParams, groupController.extendSuspension)
+
+router.put('/:groupId/users/:userId', groupController.validate('putUser'), handleValidationResult,
+    authenticate, parseParams, groupController.putUser)
 
 module.exports = router
