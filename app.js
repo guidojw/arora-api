@@ -6,6 +6,8 @@ const express = require('express')
 const logger = require('morgan')
 const Sentry = require('@sentry/node')
 const { sendError } = require('./app/middlewares/error')
+const helmet = require('helmet')
+const hpp = require('hpp')
 
 require('express-async-errors')
 
@@ -25,6 +27,8 @@ if (process.env.SENTRY_DSN) {
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+app.use(helmet())
+app.use(hpp())
 
 app.use('/api/v1/groups', groupsRouter)
 app.use('/api/v1/users', usersRouter)
