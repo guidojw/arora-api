@@ -59,7 +59,7 @@ exports.getSuspension = async (userId, query) => {
 }
 
 exports.getTraining = async (trainingId, query) => {
-    const training = await models.Trainin.scope(query.scope || 'defaultScope').findByPk(trainingId)
+    const training = await models.Training.scope(query.scope || 'defaultScope').findByPk(trainingId)
     if (!training) throw createError(404, 'Training not found.')
     return training
 }
