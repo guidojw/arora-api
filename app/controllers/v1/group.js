@@ -150,11 +150,11 @@ exports.getShout = async (req, res) => {
 }
 
 exports.getSuspensions = async (req, res) => {
-    res.json((await groupService.getSuspensions(req.query)).map(suspension => suspension.get({ raw: true })))
+    res.json((await groupService.getSuspensions(req.query.scope)).map(suspension => suspension.get({ raw: true })))
 }
 
 exports.getTrainings = async (req, res) => {
-    res.json((await groupService.getTrainings(req.query)).map(training => training.get({ raw: true })))
+    res.json((await groupService.getTrainings(req.query.scope)).map(training => training.get({ raw: true })))
 }
 
 exports.postTraining = async (req, res) => {
@@ -166,11 +166,11 @@ exports.getExiles = async (req, res) => {
 }
 
 exports.getSuspension = async (req, res) => {
-    res.json((await groupService.getSuspension(req.params.userId, req.query)).get({ raw: true }))
+    res.json((await groupService.getSuspension(req.params.userId, req.query.scope)).get({ raw: true }))
 }
 
 exports.getTraining = async (req, res) => {
-    res.json((await groupService.getTraining(req.params.trainingId, req.query)).get({ raw: true }))
+    res.json((await groupService.getTraining(req.params.trainingId, req.query.scope)).get({ raw: true }))
 }
 
 exports.shout = async (req, res) => {

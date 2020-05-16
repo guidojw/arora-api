@@ -5,9 +5,7 @@ const models = require('../models')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getBans = (query) => {
-    return models.Ban.scope(query.scope || 'defaultScope').findAll()
-}
+exports.getBans = scope => models.Ban.scope(scope || 'defaultScope').findAll()
 
 exports.ban = async (groupId, userId, options) => {
     const ban = await models.Ban.findOne({ where: { userId }})
@@ -28,8 +26,8 @@ exports.putBan = async (userId, options) => {
     return ban.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
-exports.getBan = async (userId, query) => {
-    const ban = await models.Ban.scope(query.scope || 'defaultScope').findOne({ where: { userId }})
+exports.getBan = async (userId, scope) => {
+    const ban = await models.Ban.scope(scope || 'defaultScope').findOne({ where: { userId }})
     if (!ban) throw createError(404, 'Ban not found.')
     return ban
 }
