@@ -7,7 +7,7 @@ exports.validate = method => {
     switch (method) {
         case 'postWebhook':
             return [
-                body('action').exists().isString(),
+                body('action').exists(),
                 body('model').exists()
             ]
     }
