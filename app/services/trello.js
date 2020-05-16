@@ -13,7 +13,8 @@ const ACTION_TYPES = {
     addAttachmentToCard: 'new attachment',
     addChecklistToCard: 'new checklist',
     addLabelToCard: 'label added',
-    removeLabelFromCard: 'label removed'
+    removeLabelFromCard: 'label removed',
+    deleteCard: 'card deleted'
 }
 
 exports.getMember = (memberId, options) => {
