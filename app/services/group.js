@@ -77,14 +77,12 @@ exports.shout = async (groupId, authorId, message) => {
 }
 
 exports.putTraining = async (groupId, trainingId, options) => {
-    const training = await models.Training.findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found.')
+    const training = await exports.getTraining(trainingId)
     return training.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
 exports.putSuspension = async (groupId, userId, options) => {
-    const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
+    const suspension = await exports.getSuspension(userId)
     return suspension.update(options.changes, { editorId: options.editorId, individualHooks: true })
 }
 
