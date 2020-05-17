@@ -13,15 +13,15 @@ async function run (groupId) {
             const userId = request.requester.userId
             if (await Exile.findOne({ where: { userId }})) {
                 await client.apis.groups.declineJoinRequest({ groupId, userId })
-                discordMessageJob('log', `Declined **${request.requester.username}**'s join ` +
+                discordMessageJob.run('log', `Declined **${request.requester.username}**'s join ` +
                     'request')
             } else {
                 await client.apis.groups.acceptJoinRequest({ groupId, userId })
-                discordMessageJob('log', `Accepted **${request.requester.username}**'s join ` +
+                discordMessageJob.run('log', `Accepted **${request.requester.username}**'s join ` +
                     'request')
                 if (await Suspension.findOne({ where: { userId }})) {
                     await groupService.setRank(groupId, userId, 2)
-                    discordMessageJob('log', `Promoted **${request.requester.username}** from ` +
+                    discordMessageJob.run('log', `Promoted **${request.requester.username}** from ` +
                         '**Customer** to **Suspended**')
                 }
             }

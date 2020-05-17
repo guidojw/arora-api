@@ -26,7 +26,7 @@ async function suspend (groupId, userId, options) {
         userId,
         rank
     }, { individualHooks: true })
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
         suspension))
     return suspension
 }
@@ -195,7 +195,7 @@ async function extendSuspension (groupId, userId, options) {
     if (days > 7) throw createError(403, 'Too many days.')
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
         suspension))
     return SuspensionExtension.create({
         authorId: options.authorId,

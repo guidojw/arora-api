@@ -14,11 +14,11 @@ async function run (groupId, mtGroupId) {
             if (rank >= 100) {
                 await client.apis.groups.acceptJoinRequest({ groupId: mtGroupId, userId })
                 await groupService.setRank(mtGroupId, userId, rank)
-                discordMessageJob('log', `Accepted **${request.requester.username}**'s MT join ` +
+                discordMessageJob.run('log', `Accepted **${request.requester.username}**'s MT join ` +
                     'request')
             } else {
                 await client.apis.groups.declineJoinRequest({ groupId: mtGroupId, userId })
-                discordMessageJob('log', `Declined **${request.requester.username}**'s MT join ` +
+                discordMessageJob.run('log', `Declined **${request.requester.username}**'s MT join ` +
                     'request')
             }
         }
