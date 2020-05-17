@@ -1,5 +1,5 @@
 'use strict'
-const { param, body, header, oneOf, query } = require('express-validator')
+const { param, body, header, query } = require('express-validator')
 const { groupService } = require('../../services')
 const { requestHelper } = require('../../helpers')
 const { decodeQuery } = requestHelper
@@ -74,12 +74,10 @@ function validate (method) {
                 param('groupId').isInt().toInt(),
                 param('trainingId').isInt().toInt(),
                 body('editorId').exists().isInt().toInt(),
-                oneOf([
-                    body('changes.type').exists().isString(),
-                    body('changes.date').exists().isInt().toInt(),
-                    body('changes.notes').exists().isString(),
-                    body('changes.authorId').exists().isInt().toInt()
-                ])
+                body('changes.type').optional().isString(),
+                body('changes.date').optional().isInt().toInt(),
+                body('changes.notes').optional().isString(),
+                body('changes.authorId').optional().isInt().toInt()
             ]
         case 'putSuspension':
             return [
@@ -87,11 +85,9 @@ function validate (method) {
                 param('groupId').isInt().toInt(),
                 param('userId').isInt().toInt(),
                 body('editorId').exists().isInt().toInt(),
-                oneOf([
-                    body('changes.authorId').exists().isInt().toInt(),
-                    body('changes.reason').exists().isString(),
-                    body('changes.rankBack').exists().isBoolean().toBoolean()
-                ])
+                body('changes.authorId').optional().isInt().toInt(),
+                body('changes.reason').optional().isString(),
+                body('changes.rankBack').optional().isBoolean().toBoolean()
             ]
         case 'getGroup':
             return [

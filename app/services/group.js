@@ -162,7 +162,8 @@ async function setRank (groupId, userId, rank) {
 async function cancelSuspension (groupId, userId, options) {
     const suspension = await Suspension.findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found.')
-    await setRank(groupId, userId, suspension.rank > 0 ? suspension.rank : 1)
+    const rank = await userService.getRank(suspension.userId, groupId)
+    if (rank !== 0) await setRank(groupId, suspension.userId, suspension.rank)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
     return SuspensionCancellation.create({
