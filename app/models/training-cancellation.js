@@ -18,16 +18,16 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: async cancellation => {
+            async afterCreate (cancellation) {
                 const authorName = await userService.getUsername(cancellation.authorId)
-                discordMessageJob('log', `**${authorName}** cancelled training **${cancellation
+                discordMessageJob.run('log', `**${authorName}** cancelled training **${cancellation
                     .trainingId}** with reason "*${cancellation.reason}*"`)
             }
         },
         tableName: 'training_cancellations'
     })
 
-    TrainingCancellation.associate = models => {
+    TrainingCancellation.associate = function (models) {
         TrainingCancellation.belongsTo(models.Training, {
             foreignKey: { allowNull: false, name: 'trainingId' },
             onDelete: 'cascade',

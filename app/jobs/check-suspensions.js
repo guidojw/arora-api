@@ -3,7 +3,7 @@ const { finishSuspensionJob } = require('./')
 const { Suspension } = require('../models')
 const cron = require('node-schedule')
 
-module.exports = async () => {
+async function run () {
     const suspensions = await Suspension.findAll()
     for (const suspension of suspensions) {
         const endDate = await suspension.endDate
@@ -14,4 +14,8 @@ module.exports = async () => {
             if (!job) cron.scheduleJob(`suspension_${suspension.id}`, endDate, finishSuspensionJob.bind(null, suspension))
         }
     }
+}
+
+module.exports = {
+    run
 }

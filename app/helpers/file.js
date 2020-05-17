@@ -1,7 +1,7 @@
 'use strict'
 const { timeHelper } = require('./')
 
-exports.getBackupDate = name => {
+function getBackupDate (name) {
     // export_2020-4-23-0-0.tar
     name = name.replace('export_', '')
     name = name.replace('.tar', '')
@@ -14,4 +14,8 @@ exports.getBackupDate = name => {
     const dateInfo = timeHelper.getDateInfo(date)
     const timeInfo = timeHelper.getTimeInfo(time)
     return new Date(dateInfo.year, dateInfo.month, dateInfo.day, timeInfo.hours, timeInfo.minutes)
+}
+
+module.exports = {
+    getBackupDate
 }

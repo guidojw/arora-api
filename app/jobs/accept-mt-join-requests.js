@@ -3,7 +3,7 @@ const { discordMessageJob } = require('./')
 const { robloxManager } = require('../managers')
 const { userService, groupService } = require('../services')
 
-module.exports = async (groupId, mtGroupId) => {
+async function run (groupId, mtGroupId) {
     const client = robloxManager.getClient(mtGroupId)
     let cursor = null
     do {
@@ -14,14 +14,18 @@ module.exports = async (groupId, mtGroupId) => {
             if (rank >= 100) {
                 await client.apis.groups.acceptJoinRequest({ groupId: mtGroupId, userId })
                 await groupService.setRank(mtGroupId, userId, rank)
-                await discordMessageJob('log', `Accepted **${request.requester.username}**'s MT join ` +
+                discordMessageJob('log', `Accepted **${request.requester.username}**'s MT join ` +
                     'request')
             } else {
                 await client.apis.groups.declineJoinRequest({ groupId: mtGroupId, userId })
-                await discordMessageJob('log', `Declined **${request.requester.username}**'s MT join ` +
+                discordMessageJob('log', `Declined **${request.requester.username}**'s MT join ` +
                     'request')
             }
         }
         cursor = requests.nextPageCursor
     } while (cursor)
+}
+
+module.exports = {
+    run
 }

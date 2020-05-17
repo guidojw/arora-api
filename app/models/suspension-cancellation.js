@@ -18,18 +18,18 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: async cancellation => {
+            async afterCreate (cancellation) {
                 const suspension = await sequelize.models.Suspension.unscoped().findByPk(cancellation.suspensionId)
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(cancellation.authorId)])
-                discordMessageJob('log', `**${authorName}** cancelled **${username}**'s suspension with `
-                    + `reason "*${cancellation.reason}*"`)
+                discordMessageJob.run('log', `**${authorName}** cancelled **${username}**'s suspension` +
+                    ` with reason "*${cancellation.reason}*"`)
             }
         },
         tableName: 'suspension_cancellations'
     })
 
-    SuspensionCancellation.associate = models => {
+    SuspensionCancellation.associate = function (models) {
         SuspensionCancellation.belongsTo(models.Suspension, {
             foreignKey: { allowNull: false, name: 'suspensionId' },
             onDelete: 'cascade',

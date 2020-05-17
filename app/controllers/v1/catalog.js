@@ -2,7 +2,7 @@
 const { header, query } = require('express-validator')
 const { catalogService } = require('../../services')
 
-exports.validate = method => {
+function validate (method) {
     switch (method) {
         case 'getItems':
             return [
@@ -18,8 +18,13 @@ exports.validate = method => {
     }
 }
 
-exports.getItems = async (req, res) => {
+async function getItems (req, res) {
     const queryStart = req.originalUrl.indexOf('?')
     const queryString = queryStart > 0 ? req.originalUrl.slice(queryStart + 1) : ''
     await res.json(await catalogService.getItems(queryString))
+}
+
+module.exports = {
+    validate,
+    getItems
 }

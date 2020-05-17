@@ -17,7 +17,7 @@ const ACTION_TYPES = {
     deleteCard: 'card deleted'
 }
 
-exports.getMember = (memberId, options) => {
+function getMember (memberId, options) {
     return new Promise((resolve, reject) => {
         trello.get(`/1/members/${memberId}`, { fields: options }, (err, member) => {
             if (err) reject(err)
@@ -26,9 +26,9 @@ exports.getMember = (memberId, options) => {
     })
 }
 
-exports.getActionEmbed = async action => {
+async function getActionEmbed (action) {
     if (ACTION_TYPES[action.type]) {
-        const member = await exports.getMember(action.idMemberCreator, 'username,avatarUrl')
+        const member = await getMember(action.idMemberCreator, 'username,avatarUrl')
         const actionUrl = `https://trello.com/c/${action.data.card.shortLink}/${action.data.card.idShort}#action-` +
             action.id
         return {
@@ -43,4 +43,8 @@ exports.getActionEmbed = async action => {
             color: 31424
         }
     }
+}
+
+module.exports = {
+    getActionEmbed
 }

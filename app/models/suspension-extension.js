@@ -23,19 +23,19 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: async extension => {
+            async afterCreate (extension) {
                 const suspension = await sequelize.models.Suspension.findByPk(extension.suspensionId)
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(extension.authorId)])
                 const extensionDays = extension.duration / 86400000
-                discordMessageJob('log', `**${authorName}** extended **${username}**'s suspension with` +
-                    ` **${extensionDays}** ${pluralize('day', extensionDays)}`)
+                discordMessageJob.run('log', `**${authorName}** extended **${username}**'s suspension ` +
+                    `with **${extensionDays}** ${pluralize('day', extensionDays)}`)
             }
         },
         tableName: 'suspension_extensions'
     })
 
-    SuspensionExtension.associate = models => {
+    SuspensionExtension.associate = function (models) {
         SuspensionExtension.belongsTo(models.Suspension, {
             foreignKey: { allowNull: false, name: 'suspensionId' },
             onDelete: 'cascade',

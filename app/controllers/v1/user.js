@@ -2,7 +2,7 @@
 const { param, header, body } = require('express-validator')
 const { userService } = require('../../services')
 
-exports.validate = method => {
+function validate (method) {
     switch (method) {
         case 'getUserId':
             return [
@@ -41,26 +41,36 @@ exports.validate = method => {
     }
 }
 
-exports.getUserId = async (req, res) => {
+async function getUserId (req, res) {
     res.json(await userService.getUserId(req.params.username))
 }
 
-exports.hasBadge = async (req, res) => {
+async function hasBadge (req, res) {
     res.json(await userService.hasBadge(req.params.userId, req.params.badgeId))
 }
 
-exports.getUsers = async (req, res) => {
+async function getUsers (req, res) {
     res.json(await userService.getUsers(req.body.userIds))
 }
 
-exports.getRank = async (req, res) => {
+async function getRank (req, res) {
     res.json(await userService.getRank(req.params.userId, req.params.groupId))
 }
 
-exports.getRole = async (req, res) => {
+async function getRole (req, res) {
     res.json(await userService.getRole(req.params.userId, req.params.groupId))
 }
 
-exports.getUser = async (req, res) => {
+async function getUser (req, res) {
     res.json(await userService.getUser(req.params.userId))
+}
+
+module.exports = {
+    validate,
+    getUserId,
+    hasBadge,
+    getUsers,
+    getRank,
+    getRole,
+    getUser
 }

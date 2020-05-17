@@ -17,7 +17,7 @@ const products = [
 
 const PAY_RATE = 0.5
 
-module.exports = async groupId => {
+async function run (groupId) {
     // Get last payout and its last transaction.
     const lastPayout = await Payout.getLast()
     if (!lastPayout) throw new Error('Could not get last transaction!')
@@ -94,4 +94,8 @@ module.exports = async groupId => {
 
     // Broadcast information about the payouts over the WebSocket.
     webSocketManager.broadcast('trainDeveloperPayoutReport', { developersSales })
+}
+
+module.exports = {
+    run
 }

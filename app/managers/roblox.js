@@ -8,7 +8,7 @@ const clients = { authenticated: {} }
 
 let initiated = false
 
-exports.init = async () => {
+async function init () {
     if (initiated) return
     initiated = true
     try {
@@ -28,6 +28,11 @@ exports.init = async () => {
     checkSuspensionsJob()
 }
 
-exports.getClient = groupId => {
+function getClient (groupId) {
     return groupId ? clients.authenticated[groupId] : clients.unauthenticated
+}
+
+module.exports = {
+    init,
+    getClient
 }

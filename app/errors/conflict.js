@@ -1,5 +1,5 @@
 'use strict'
-module.exports = class ConflictError extends Error {
+class ConflictError extends Error {
     constructor (message) {
         super(message)
 
@@ -7,3 +7,5 @@ module.exports = class ConflictError extends Error {
         this.status = 409
     }
 }
+
+module.exports = ConflictError

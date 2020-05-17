@@ -32,35 +32,35 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: async ban => {
+            async afterCreate (ban) {
                 const [username, authorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(ban.authorId)])
-                discordMessageJob('log', `**${authorName}** banned **${username}** with reason  "*${ban
-                    .reason}*"`)
+                discordMessageJob.run('log', `**${authorName}** banned **${username}** with reason  "*${
+                    ban.reason}*"`)
             },
 
-            afterUpdate: async (ban, options) => {
+            async afterUpdate (ban, options) {
                 const [username, editorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(options.editorId)])
                 if (ban.changed('reason')) {
-                    discordMessageJob('log', `**${editorName}** changed the reason of **${username}**'s`
-                        + ` ban to *"${ban.reason}"*`)
+                    discordMessageJob.run('log', `**${editorName}** changed the reason of **${
+                        username}**'s ban to *"${ban.reason}"*`)
                 }
                 if (ban.changed('authorId')) {
                     const authorName = await userService.getUsername(ban.authorId)
-                    discordMessageJob('log', `**${editorName}** changed the author of **${username}**` +
-                        `'s ban to **${authorName}**`)
+                    discordMessageJob.run('log', `**${editorName}** changed the author of **${
+                        username}**'s ban to **${authorName}**`)
                 }
             }
         },
         tableName: 'bans'
     })
 
-    Ban.associate = models => {
+    Ban.associate = function (models) {
         Ban.hasOne(models.BanCancellation, { foreignKey: { allowNull: false, name: 'banId' }})
     }
 
-    Ban.loadScopes = models => {
+    Ban.loadScopes = function (models) {
         Ban.addScope('defaultScope', {
             where: { '$BanCancellation.id$': null },
             include: [{ model: models.BanCancellation, attributes: [] }]

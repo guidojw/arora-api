@@ -4,7 +4,7 @@ const { discordMessageJob } = require('./')
 
 const robloxConfig = require('../../config/roblox')
 
-module.exports = async suspension => {
+async function run (suspension) {
     const rank = await userService.getRank(suspension.userId, robloxConfig.defaultGroup)
     if (rank !== 0) {
         await groupService.setRank(robloxConfig.defaultGroup, suspension.userId, suspension.rankBack && suspension
@@ -13,4 +13,8 @@ module.exports = async suspension => {
     suspension.update({ finished: true }, { hooks: false })
     const username = await userService.getUsername(suspension.userId)
     discordMessageJob('log', `Finished **${username}**'s suspension`)
+}
+
+module.exports = {
+    run
 }

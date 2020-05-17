@@ -1,5 +1,5 @@
 'use strict'
-module.exports = class ForbiddenError extends Error {
+class ForbiddenError extends Error {
     constructor (message) {
         super(message)
 
@@ -7,3 +7,5 @@ module.exports = class ForbiddenError extends Error {
         this.status = 403
     }
 }
+
+module.exports = ForbiddenError

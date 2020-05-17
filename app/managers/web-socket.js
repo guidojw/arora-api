@@ -1,7 +1,7 @@
 'use strict'
 const connections = []
 
-exports.init = () => {
+function init () {
     setInterval(() => {
         for (const connection of connections) {
             if (!connection.isAlive) return connection.terminate()
@@ -11,7 +11,7 @@ exports.init = () => {
     }, 30000)
 }
 
-exports.addConnection = connection => {
+function addConnection (connection) {
     console.log('New connection!')
     connection.isAlive = true
     connection.on('error', console.error)
@@ -23,12 +23,19 @@ exports.addConnection = connection => {
     connections.push(connection)
 }
 
-exports.removeConnection = connection => {
+function removeConnection (connection) {
     connections.splice(connections.indexOf(connection), 1)
 }
 
-exports.broadcast = (event, data) => {
+function broadcast (event, data) {
     for (const connection of connections) {
         connection.send(JSON.stringify({ event, data }))
     }
+}
+
+module.exports = {
+    init,
+    addConnection,
+    removeConnection,
+    broadcast
 }

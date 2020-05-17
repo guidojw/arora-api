@@ -3,7 +3,7 @@ require('dotenv').config()
 
 const axios = require('axios')
 
-module.exports = async (type, message) => {
+async function run (type, message) {
     if (type === 'log') {
         await sendLog(message)
     } else if (type === 'training') {
@@ -15,7 +15,7 @@ module.exports = async (type, message) => {
     }
 }
 
-const sendLog = async message => {
+async function sendLog (message) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_LOGS_WEBHOOK_URL,
@@ -23,7 +23,7 @@ const sendLog = async message => {
     })
 }
 
-const sendTraining = async message => {
+async function sendTraining (message) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_TRAININGS_WEBHOOK_URL,
@@ -31,7 +31,7 @@ const sendTraining = async message => {
     })
 }
 
-const sendTrello = async body => {
+async function sendTrello (body) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_TRELLO_WEBHOOK_URL,
@@ -39,10 +39,14 @@ const sendTrello = async body => {
     })
 }
 
-const sendBackupNotification = async body => {
+async function sendBackupNotification (body) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_BACKUP_NOTIFICATION_WEBHOOK_URL,
         data: body
     })
+}
+
+module.exports = {
+    run
 }

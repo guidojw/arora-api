@@ -60,28 +60,28 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         hooks: {
-            afterCreate: async suspension => {
+            async afterCreate (suspension) {
                 const days = suspension.duration / 86400000
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(suspension.authorId)])
-                discordMessageJob('log', `**${authorName}** suspended **${username}** for **${days}** ` +
-                    `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
+                discordMessageJob.run('log', `**${authorName}** suspended **${username}** for **${
+                    days}** ${pluralize('day', days)} with reason "*${suspension.reason}*"`)
             },
 
-            afterUpdate: async (suspension, options) => {
+            async afterUpdate (suspension, options) {
                 const [username, editorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(options.editorId)])
                 if (suspension.changed('authorId')) {
                     const authorName = await userService.getUsername(suspension.authorId)
-                    discordMessageJob('log', `**${editorName}** changed the author of **${username}*` +
-                        `*'s suspension to **${authorName}**`)
+                    discordMessageJob.run('log', `**${editorName}** changed the author of **${
+                        username}**'s suspension to **${authorName}**`)
                 }
                 if (suspension.changed('reason')) {
-                    discordMessageJob('log', `**${editorName}** changed the reason of **${username}*` +
-                        `*'s suspension to *"${suspension.reason}"*`)
+                    discordMessageJob.run('log', `**${editorName}** changed the reason of **${
+                        username}**'s suspension to *"${suspension.reason}"*`)
                 }
                 if (suspension.changed('rankBack')) {
-                    discordMessageJob('log', `**${editorName}** changed the rankBack option of **${
+                    discordMessageJob.run('log', `**${editorName}** changed the rankBack option of **${
                         username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
                 }
             }
@@ -89,7 +89,7 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'suspensions'
     })
 
-    Suspension.associate = models => {
+    Suspension.associate = function (models) {
         Suspension.hasOne(models.SuspensionCancellation, {
             foreignKey: { allowNull: false, name: 'suspensionId' }
         })
@@ -99,7 +99,7 @@ module.exports = (sequelize, DataTypes) => {
         })
     }
 
-    Suspension.loadScopes = models => {
+    Suspension.loadScopes = function (models) {
         Suspension.addScope('defaultScope', {
             where: { '$SuspensionCancellation.id$': null, finished: false },
             include: [{
