@@ -1,5 +1,5 @@
 'use strict'
-const { param, body, header, oneOf, query } = require('express-validator')
+const { param, body, header, query } = require('express-validator')
 const banService = require('../../services/ban')
 const { decodeQuery } = require('../../helpers/request')
 
@@ -23,10 +23,8 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('userId').exists().isInt().toInt(),
                 body('editorId').exists().isInt().toInt(),
-                oneOf([
-                    body('changes.authorId').exists().isInt().toInt(),
-                    body('changes.reason').exists().isString()
-                ])
+                body('changes.authorId').optional().isInt().toInt(),
+                body('changes.reason').optional().isString()
             ]
         case 'getBan':
             return [
