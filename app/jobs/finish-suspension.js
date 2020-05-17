@@ -1,7 +1,6 @@
 'use strict'
-const userService = require('../services/user')
-const groupService = require('../services/group')
-const discordMessageJob = require('./discord-message')
+const { userService, groupService } = require('../services')
+const { discordMessageJob } = require('./')
 
 const robloxConfig = require('../../config/roblox')
 

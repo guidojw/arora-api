@@ -1,5 +1,5 @@
 'use strict'
-const timeHelper = require('./time')
+const { timeHelper } = require('./')
 
 exports.getBackupDate = name => {
     // export_2020-4-23-0-0.tar

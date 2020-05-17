@@ -1,7 +1,8 @@
 'use strict'
 const { param, body, header, oneOf, query } = require('express-validator')
-const groupService = require('../../services/group')
-const { decodeQuery } = require('../../helpers/request')
+const { groupService } = require('../../services')
+const { requestHelper } = require('../../helpers')
+const { decodeQuery } = requestHelper
 
 exports.validate = method => {
     switch (method) {

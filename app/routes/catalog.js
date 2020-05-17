@@ -1,9 +1,10 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
-const catalogController = require('../controllers/v1/catalog')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
+const { catalogController } = require('../controllers/v1')
+const { errorMiddleware, authMiddleware } = require('../middlewares')
+const { handleValidationResult } = errorMiddleware
+const { authenticate } = authMiddleware
 
 router.get('/', catalogController.validate('getItems'), handleValidationResult, authenticate, catalogController
     .getItems)

@@ -1,7 +1,7 @@
 'use strict'
 const { body } = require('express-validator')
-const trelloService = require('../../services/trello')
-const discordMessageJob = require('../../jobs/discord-message')
+const { trelloService } = require('../../services')
+const { discordMessageJob } = require('../../jobs')
 
 exports.validate = method => {
     switch (method) {

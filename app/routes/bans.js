@@ -1,9 +1,10 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
-const banController = require('../controllers/v1/ban')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
+const { banController } = require('../controllers/v1')
+const { errorMiddleware, authMiddleware } = require('../middlewares')
+const { handleValidationResult } = errorMiddleware
+const { authenticate } = authMiddleware
 
 router.get('/', banController.validate('getBans'), handleValidationResult, authenticate, banController.getBans)
 

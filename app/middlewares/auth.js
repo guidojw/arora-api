@@ -3,7 +3,7 @@ require('dotenv').config()
 
 const createError = require('http-errors')
 const crypto = require('crypto')
-const authService = require('../services/auth')
+const { authService } = require('../services')
 
 exports.authenticate = (req, _res, next) => {
     const token = req.header('authorization').replace('Bearer ', '')

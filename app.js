@@ -5,17 +5,14 @@ const createError = require('http-errors')
 const express = require('express')
 const logger = require('morgan')
 const Sentry = require('@sentry/node')
-const { sendError } = require('./app/middlewares/error')
+const { errorMiddleware } = require('./app/middlewares')
+const { sendError } = errorMiddleware
 const helmet = require('helmet')
 const hpp = require('hpp')
 
 require('express-async-errors')
 
-const groupsRouter = require('./app/routes/groups')
-const usersRouter = require('./app/routes/users')
-const bansRouter = require('./app/routes/bans')
-const trelloRouter = require('./app/routes/trello')
-const catalogRouter = require('./app/routes/catalog')
+const { groupsRouter, usersRouter, bansRouter, trelloRouter, catalogRouter } = require('./app/routes')
 
 const app = express()
 

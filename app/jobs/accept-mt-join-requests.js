@@ -1,8 +1,7 @@
 'use strict'
-const discordMessageJob = require('./discord-message')
-const robloxManager = require('../managers/roblox')
-const userService = require('../services/user')
-const groupService = require('../services/group')
+const { discordMessageJob } = require('./')
+const { robloxManager } = require('../managers')
+const { userService, groupService } = require('../services')
 
 module.exports = async (groupId, mtGroupId) => {
     const client = robloxManager.getClient(mtGroupId)

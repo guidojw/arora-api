@@ -4,9 +4,8 @@ const app = require('../app')
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
 const cron = require('node-schedule')
-const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
-const webSocketManager = require('../app/managers/web-socket')
+const { robloxManager, webSocketManager } = require('../app/managers')
 
 const cronConfig = require('../config/cron')
 

@@ -1,6 +1,6 @@
 'use strict'
 const { header, query } = require('express-validator')
-const catalogService = require('../../services/catalog')
+const { catalogService } = require('../../services')
 
 exports.validate = method => {
     switch (method) {

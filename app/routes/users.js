@@ -1,9 +1,10 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
-const userController = require('../controllers/v1/user')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
+const { userController } = require('../controllers/v1')
+const { errorMiddleware, authMiddleware } = require('../middlewares')
+const { handleValidationResult } = errorMiddleware
+const { authenticate } = authMiddleware
 
 router.get('/:username/user-id', userController.validate('getUserId'), handleValidationResult, authenticate,
     userController.getUserId)
