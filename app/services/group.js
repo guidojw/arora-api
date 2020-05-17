@@ -168,7 +168,7 @@ exports.cancelSuspension = async (groupId, userId, options) => {
     const suspension = await models.Suspension.findOne({ where: { userId }})
     if (!suspension) throw createError(404, 'Suspension not found.')
     const rank = await userService.getRank(suspension.userId, groupId)
-    if (rank !== 0) await setRank(groupId, suspension.userId, suspension.rank)
+    if (rank !== 0) await exports.setRank(groupId, suspension.userId, suspension.rank)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
     return models.SuspensionCancellation.create({
