@@ -1,6 +1,6 @@
 'use strict'
-const { userService } = require('../services')
-const { discordMessageJob } = require('../jobs')
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
 
 module.exports = (sequelize, DataTypes) => {
     const TrainingCancellation = sequelize.define('TrainingCancellation', {

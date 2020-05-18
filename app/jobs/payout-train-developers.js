@@ -1,6 +1,7 @@
 'use strict'
-const { robloxManager, webSocketManager } = require('../managers')
-const { Payout }= require('../models')
+const robloxManager = require('../managers/roblox')
+const webSocketManager = require('../managers/web-socket')
+const { Payout } = require('../models')
 
 const products = [
     { id: 1371397, developerIds: [32851718] }, // Supersnel11

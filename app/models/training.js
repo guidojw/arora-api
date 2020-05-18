@@ -1,7 +1,7 @@
 'use strict'
-const { timeHelper } = require('../helpers')
-const { userService } = require('../services')
-const { discordMessageJob } = require('../jobs')
+const timeHelper = require('../helpers/time')
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
 const { Op } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {

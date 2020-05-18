@@ -1,5 +1,5 @@
 'use strict'
-const { finishSuspensionJob } = require('./')
+const finishSuspensionJob = require('./finish-suspension')
 const { Suspension } = require('../models')
 const cron = require('node-schedule')
 

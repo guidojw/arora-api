@@ -1,9 +1,9 @@
 'use strict'
 const { execFile } = require('child_process')
 const path = require('path')
-const { discordMessageJob } = require('./')
+const discordMessageJob = require('./discord-message')
 const fs = require('fs')
-const { fileHelper } = require('../helpers')
+const fileHelper = require('../helpers/file')
 
 const databaseConfig = require('../../config/database')[process.env.NODE_ENV || 'development']
 

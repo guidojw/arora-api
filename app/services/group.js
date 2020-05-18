@@ -2,12 +2,17 @@
 const createError = require('http-errors')
 const axios = require('axios')
 const cron = require('node-schedule')
-const { NotFoundError, ConflictError, ForbiddenError } = require('../errors')
-const { timeHelper, stringHelper } = require('../helpers')
-const { discordMessageJob, finishSuspensionJob } = require('../jobs')
-const { robloxManager, webSocketManager } = require('../managers')
-const { userService } = require('../services')
+const timeHelper = require('../helpers/time')
+const stringHelper = require('../helpers/string')
+const discordMessageJob = require('../jobs/discord-message')
+const finishSuspensionJob = require('../jobs/finish-suspension')
+const robloxManager = require('../managers/roblox')
+const webSocketManager = require('../managers/web-socket')
+const userService = require('../services/user')
 const { Suspension, SuspensionExtension, SuspensionCancellation, Training, TrainingCancellation } = require('../models')
+const NotFoundError = require('../errors/not-found')
+const ConflictError = require('../errors/conflict')
+const ForbiddenError = require('../errors/forbidden')
 
 const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'

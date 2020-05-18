@@ -1,6 +1,6 @@
 'use strict'
 const createError = require('http-errors')
-const { userService } = require('../services')
+const userService = require('../services/user')
 const { Ban, BanCancellation } = require('../models')
 
 const robloxConfig = require('../../config/roblox')

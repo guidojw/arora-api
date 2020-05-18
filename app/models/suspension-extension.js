@@ -1,6 +1,6 @@
 'use strict'
-const { userService } = require('../services')
-const { discordMessageJob } = require('../jobs')
+const userService = require('../services/user')
+const discordMessageJob = require('../jobs/discord-message')
 const pluralize = require('pluralize')
 
 module.exports = (sequelize, DataTypes) => {

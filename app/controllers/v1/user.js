@@ -1,6 +1,6 @@
 'use strict'
 const { param, header, body } = require('express-validator')
-const { userService } = require('../../services')
+const userService = require('../../services/user')
 
 function validate (method) {
     switch (method) {

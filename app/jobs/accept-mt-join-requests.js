@@ -1,7 +1,8 @@
 'use strict'
-const { discordMessageJob } = require('./')
-const { robloxManager } = require('../managers')
-const { userService, groupService } = require('../services')
+const discordMessageJob = require('./discord-message')
+const robloxManager = require('../managers/roblox')
+const userService = require('../services/user')
+const groupService = require('../services/group')
 
 async function run (groupId, mtGroupId) {
     const client = robloxManager.getClient(mtGroupId)

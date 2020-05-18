@@ -1,10 +1,9 @@
 'use strict'
 const express = require('express')
 const router = express.Router()
-const { groupController } = require('../controllers/v1')
-const { errorMiddleware, authMiddleware } = require('../middlewares')
-const { handleValidationResult } = errorMiddleware
-const { authenticate } = authMiddleware
+const groupController = require('../controllers/v1/group')
+const { handleValidationResult } = require('../middlewares/error')
+const { authenticate } = require('../middlewares/auth')
 
 router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult, authenticate,
     groupController.suspend)

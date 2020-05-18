@@ -1,5 +1,5 @@
 'use strict'
-const { robloxManager } = require('../managers')
+const robloxManager = require('../managers/roblox')
 
 const robloxConfig = require('../../config/roblox')
 

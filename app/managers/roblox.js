@@ -2,7 +2,7 @@
 require('dotenv').config()
 
 const { Client } = require('bloxy')
-const { checkSuspensionsJob } = require('../jobs')
+const checkSuspensionsJob = require('../jobs/check-suspensions')
 
 const clients = { authenticated: {} }
 
