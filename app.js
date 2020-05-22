@@ -1,13 +1,13 @@
 'use strict'
 require('dotenv').config()
 
-const createError = require('http-errors')
 const express = require('express')
 const logger = require('morgan')
 const Sentry = require('@sentry/node')
 const { sendError } = require('./app/middlewares/error')
 const helmet = require('helmet')
 const hpp = require('hpp')
+const NotFoundError = require('./app/errors/not-found')
 
 require('express-async-errors')
 
@@ -37,7 +37,7 @@ app.use('/api/v1/catalog', catalogRouter)
 app.use('/api/v1/trello', trelloRouter)
 
 app.use(() => {
-    throw createError(404)
+    throw new NotFoundError()
 })
 
 if (process.env.SENTRY_DSN) {

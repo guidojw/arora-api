@@ -1,5 +1,4 @@
 'use strict'
-const createError = require('http-errors')
 const axios = require('axios')
 const cron = require('node-schedule')
 const timeHelper = require('../helpers/time')
@@ -13,15 +12,16 @@ const { Suspension, SuspensionExtension, SuspensionCancellation, Training, Train
 const NotFoundError = require('../errors/not-found')
 const ConflictError = require('../errors/conflict')
 const ForbiddenError = require('../errors/forbidden')
+const BadRequestError = require('../errors/bad-request')
 
 const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
 
 async function suspend (groupId, userId, options) {
-    if (await Suspension.findOne({ where: { userId }})) throw createError(409, 'User is already suspended.')
+    if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
     const rank = await userService.getRank(userId, groupId)
-    if (rank === 2) throw createError(409, 'User is already suspended.')
-    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable.')
+    if (rank === 2) throw new ConflictError('User is already suspended.')
+    if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')
     if (rank > 0 && rank !== 2) await setRank(groupId, userId, 2)
     const suspension = await Suspension.create({
         rankBack: options.rankBack,
@@ -96,8 +96,9 @@ function getGroup (groupId) {
 
 async function announceTraining (groupId, trainingId, options) {
     const medium = options.medium.toLowerCase()
-    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
-        'Invalid medium')
+    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') {
+        throw new ForbiddenError('Invalid medium')
+    }
     const training = await getTraining(trainingId)
     const authorName = await userService.getUsername(options.authorId)
     await discordMessageJob.run('log', `**${authorName}** announced training **${trainingId}**${
@@ -166,7 +167,7 @@ async function setRank (groupId, userId, rank) {
 
 async function cancelSuspension (groupId, userId, options) {
     const suspension = await Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
+    if (!suspension) throw new NotFoundError('Suspension not found.')
     const rank = await userService.getRank(suspension.userId, groupId)
     if (rank !== 0) await setRank(groupId, suspension.userId, suspension.rank)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
@@ -180,7 +181,7 @@ async function cancelSuspension (groupId, userId, options) {
 
 async function cancelTraining (groupId, trainingId, options) {
     const training = await Training.findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found.')
+    if (!training) throw new NotFoundError('Training not found.')
     return TrainingCancellation.create({
         authorId: options.authorId,
         reason: options.reason,
@@ -190,15 +191,15 @@ async function cancelTraining (groupId, trainingId, options) {
 
 async function extendSuspension (groupId, userId, options) {
     const suspension = await Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
+    if (!suspension) throw new NotFoundError('Suspension not found.')
     let duration = suspension.duration + options.duration
     if (!suspension.extensions) suspension.extensions = []
     for (const extension of suspension.extensions) {
         duration += extension.duration
     }
     const days = duration / 86400000
-    if (days < 1) throw createError(403, 'Insufficient amount of days.')
-    if (days > 7) throw createError(403, 'Too many days.')
+    if (days < 1) throw new ForbiddenError('Insufficient amount of days.')
+    if (days > 7) throw new ForbiddenError('Too many days.')
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
     cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
@@ -213,13 +214,13 @@ async function extendSuspension (groupId, userId, options) {
 
 async function changeRank (groupId, userId, options) {
     const rank = await userService.getRank(userId, groupId)
-    if (rank === 0) throw createError(403, 'Can\'t change rank of non members.')
-    if (rank === 1 && options.authorId) throw createError(403, 'Can\'t change rank of customers.')
-    if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members.')
-    if (rank === 99) throw createError(403, 'Can\'t change rank of partners.')
-    if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs.')
+    if (rank === 0) throw new ForbiddenError('Can\'t change rank of non members.')
+    if (rank === 1 && options.authorId) throw new ForbiddenError('Can\'t change rank of customers.')
+    if (rank === 2) throw new ForbiddenError('Can\'t change rank of suspended members.')
+    if (rank === 99) throw new ForbiddenError('Can\'t change rank of partners.')
+    if (rank >= 200) throw new ForbiddenError('Can\'t change rank of HRs.')
     if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
-        throw createError(400, 'Invalid rank.')
+        throw new BadRequestError('Invalid rank.')
     }
     const newRole = await setRank(groupId, userId, options.rank)
     const roles = await getRoles(groupId)
@@ -237,7 +238,6 @@ async function changeRank (groupId, userId, options) {
 }
 
 module.exports = {
-    defaultTrainingShout,
     suspend,
     getShout,
     getSuspensions,

@@ -1,7 +1,7 @@
 'use strict'
 class NotFoundError extends Error {
     constructor (message) {
-        super(message)
+        super(message || 'Not Found')
 
         this.name = this.constructor.name
         this.status = 404

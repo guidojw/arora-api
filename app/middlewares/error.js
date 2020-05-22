@@ -4,11 +4,11 @@ const { validationResult } = require('express-validator')
 async function handleValidationResult (req, res, next) {
     const errors = await validationResult(req)
     if (errors.isEmpty()) return next()
-    exports.sendErrors(res, 422, errors.array())
+    sendErrors(res, 422, errors.array())
 }
 
 function sendError (res, statusCode, message) {
-    exports.sendErrors(res, statusCode, [{ message }])
+    sendErrors(res, statusCode, [{ message }])
 }
 
 function sendErrors (res, statusCode, errors) {
