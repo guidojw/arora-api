@@ -43,7 +43,7 @@ exports.validate = method => {
 }
 
 exports.getBans = async (req, res) => {
-    res.json((await banService.getBans(req.query)).map(ban => ban.get({ raw: true })))
+    res.json((await banService.getBans(req.query.scope)).map(ban => ban.get({ raw: true })))
 }
 
 exports.ban = async (req, res) => {
@@ -55,7 +55,7 @@ exports.putBan = async (req, res) => {
 }
 
 exports.getBan = async (req, res) => {
-    res.json((await banService.getBan(req.params.userId, req.query)).get({ raw: true }))
+    res.json((await banService.getBan(req.params.userId, req.query.scope)).get({ raw: true }))
 }
 
 exports.cancelBan = async (req, res) => {
