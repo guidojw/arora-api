@@ -97,6 +97,4 @@ async function run (groupId) {
     webSocketManager.broadcast('trainDeveloperPayoutReport', { developersSales })
 }
 
-module.exports = {
-    run
-}
+module.exports = run

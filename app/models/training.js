@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
                 const dateString = timeHelper.getDate(training.date)
                 const timeString = timeHelper.getTime(training.date)
                 const authorName = await userService.getUsername(training.authorId)
-                discordMessageJob.run('log', `**${authorName}** scheduled a **${training.type
+                discordMessageJob('log', `**${authorName}** scheduled a **${training.type
                     .toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 
                     'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
             },
@@ -38,23 +38,22 @@ module.exports = (sequelize, DataTypes) => {
                 const editorName = await userService.getUsername(options.editorId)
                 if (training.changed('authorId')) {
                     const authorName = await userService.getUsername(training.authorId)
-                    discordMessageJob.run('log', `**${editorName}** changed training **${training.id}` +
-                        `**'s host to **${authorName}**`)
+                    discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
+                        `host to **${authorName}**`)
                 }
                 if (training.changed('notes')) {
-                    discordMessageJob.run('log', `**${editorName}** changed training **${training.id}` +
-                        `**'s notes to "*${training.notes}*"`)
+                    discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
+                        `notes to "*${training.notes}*"`)
                 }
                 if (training.changed('type')) {
-                    discordMessageJob.run('log', `**${editorName}** changed training **${training.id}` +
-                        `**'s type to **${training.type.toUpperCase()}**`)
+                    discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
+                        `type to **${training.type.toUpperCase()}**`)
                 }
                 if (training.changed('date')) {
                     const dateString = timeHelper.getDate(training.date)
                     const timeString = timeHelper.getTime(training.date)
-                    discordMessageJob.run('log', `**${editorName}** changed training **${training.id}` +
-                        `**'s date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 
-                            'CET'}**`)
+                    discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
+                        `date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
 
                 }
             }

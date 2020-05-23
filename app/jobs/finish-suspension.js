@@ -13,9 +13,7 @@ async function run (suspension) {
     }
     suspension.update({ finished: true }, { hooks: false })
     const username = await userService.getUsername(suspension.userId)
-    discordMessageJob.run('log', `Finished **${username}**'s suspension`)
+    discordMessageJob('log', `Finished **${username}**'s suspension`)
 }
 
-module.exports = {
-    run
-}
+module.exports = run

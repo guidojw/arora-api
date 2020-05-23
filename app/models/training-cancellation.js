@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         hooks: {
             async afterCreate (cancellation) {
                 const authorName = await userService.getUsername(cancellation.authorId)
-                discordMessageJob.run('log', `**${authorName}** cancelled training **${cancellation
+                discordMessageJob('log', `**${authorName}** cancelled training **${cancellation
                     .trainingId}** with reason "*${cancellation.reason}*"`)
             }
         },

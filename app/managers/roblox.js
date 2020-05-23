@@ -25,7 +25,7 @@ async function init () {
     }
     clients.unauthenticated = new Client({ setup: { throwHttpErrors: true }})
 
-    checkSuspensionsJob.run()
+    checkSuspensionsJob()
 }
 
 function getClient (groupId) {

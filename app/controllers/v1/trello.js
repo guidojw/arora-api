@@ -19,7 +19,7 @@ function head (req, res) {
 
 async function postWebhook (req, res) {
     const embed = await trelloService.getActionEmbed(req.body.action)
-    if (embed) await discordMessageJob.run('trello', { embeds: [embed] })
+    if (embed) await discordMessageJob('trello', { embeds: [embed] })
     res.sendStatus(200)
 }
 
