@@ -98,13 +98,13 @@ function getGroup (groupId) {
     return client.apis.groups.getGroupInfo(groupId)
 }
 
-async function announceTraining (groupId, trainingId, { medium }) {
+async function announceTraining (groupId, trainingId, { medium, authorId }) {
     medium = medium.toLowerCase()
     if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') {
         throw new ForbiddenError('Invalid medium')
     }
     const training = await getTraining(trainingId)
-    const authorName = await userService.getUsername(options.authorId)
+    const authorName = await userService.getUsername(authorId)
     await discordMessageJob('log', `**${authorName}** announced training **${trainingId}**${
         medium !== 'both' ? ' on ' + stringHelper.toPascalCase(medium) : ''}`)
     return {
