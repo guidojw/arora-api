@@ -1,5 +1,4 @@
 'use strict'
-const createError = require('http-errors')
 const axios = require('axios')
 const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
@@ -7,24 +6,28 @@ const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
 const stringHelper = require('../helpers/string')
 const webSocketManager = require('../managers/web-socket')
-const models = require('../models')
+const { Suspension, SuspensionExtension, SuspensionCancellation, Training, TrainingCancellation } = require('../models')
 const finishSuspensionJob = require('../jobs/finish-suspension')
 const cron = require('node-schedule')
+const NotFoundError = require('../errors/not-found')
+const ConflictError = require('../errors/conflict')
+const ForbiddenError = require('../errors/forbidden')
+const BadRequestError = require('../errors/bad-request')
 
-exports.defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
+const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
 
-exports.suspend = async (groupId, userId, options) => {
-    if (await models.Suspension.findOne({ where: { userId }})) throw createError(409, 'User is already suspended.')
+exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason }) => {
+    if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
     const rank = await userService.getRank(userId, groupId)
-    if (rank === 2) throw createError(409, 'User is already suspended.')
-    if (rank >= 200 || rank === 99 || rank === 103) throw createError(403, 'User is unsuspendable.')
+    if (rank === 2) throw new ConflictError('User is already suspended.')
+    if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')
     if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
-    const suspension = await models.Suspension.create({
-        rankBack: options.rankBack,
-        duration: options.duration,
-        authorId: options.authorId,
-        reason: options.reason,
+    const suspension = await Suspension.create({
+        rankBack,
+        duration,
+        authorId,
+        reason,
         userId,
         rank
     }, { individualHooks: true })
@@ -39,22 +42,22 @@ exports.getShout = async groupId => {
     return info.shout
 }
 
-exports.getSuspensions = scope => models.Suspension.scope(scope || 'defaultScope').findAll()
+exports.getSuspensions = scope => Suspension.scope(scope || 'defaultScope').findAll()
 
-exports.getTrainings = scope => models.Training.scope(scope || 'defaultScope').findAll()
+exports.getTrainings = scope => Training.scope(scope || 'defaultScope').findAll()
 
-exports.postTraining = options => {
-    return models.Training.create({
-        type: options.type.toLowerCase(),
-        authorId: options.authorId,
-        date: options.date,
-        notes: options.notes
+exports.postTraining = ({ type, authorId, date, notes }) => {
+    return Training.create({
+        type: type.toLowerCase(),
+        authorId,
+        date,
+        notes
     }, { individualHooks: true })
 }
 
 exports.getSuspension = async (userId, scope) => {
-    const suspension = await models.Suspension.scope(scope || 'defaultScope').findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
+    const suspension = await Suspension.scope(scope || 'defaultScope').findOne({ where: { userId }})
+    if (!suspension) throw new NotFoundError('Suspension not found.')
     return suspension
 }
 
@@ -76,16 +79,14 @@ exports.shout = async (groupId, authorId, message) => {
     return shout
 }
 
-exports.putTraining = async (groupId, trainingId, options) => {
-    const training = await models.Training.findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found.')
-    return training.update(options.changes, { editorId: options.editorId, individualHooks: true })
+exports.putTraining = async (groupId, trainingId, { changes, editorId }) => {
+    const training = await exports.getTraining(trainingId)
+    return training.update(changes, { editorId, individualHooks: true })
 }
 
-exports.putSuspension = async (groupId, userId, options) => {
-    const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
-    return suspension.update(options.changes, { editorId: options.editorId, individualHooks: true })
+exports.putSuspension = async (groupId, userId, { changes, editorId }) => {
+    const suspension = await exports.getSuspension(userId)
+    return suspension.update(changes, { editorId, individualHooks: true })
 }
 
 exports.getGroup = groupId => {
@@ -93,12 +94,13 @@ exports.getGroup = groupId => {
     return client.apis.groups.getGroupInfo(groupId)
 }
 
-exports.announceTraining = async (groupId, trainingId, options) => {
-    const medium = options.medium.toLowerCase()
-    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') throw createError(403,
-        'Invalid medium')
+exports.announceTraining = async (groupId, trainingId, { medium, authorId }) => {
+    medium = medium.toLowerCase()
+    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') {
+        throw new ForbiddenError('Invalid medium')
+    }
     const training = await exports.getTraining(trainingId)
-    const authorName = await userService.getUsername(options.authorId)
+    const authorName = await userService.getUsername(authorId)
     await discordMessageJob('log', `**${authorName}** announced training **${trainingId}**${medium !== 
     'both' ? ' on ' + stringHelper.toPascalCase(medium) : ''}`)
     return {
@@ -110,7 +112,7 @@ exports.announceTraining = async (groupId, trainingId, options) => {
 
 exports.announceRoblox = async groupId => {
     const client = robloxManager.getClient(groupId)
-    const shout = await client.apis.groups.updateGroupShout({ groupId, message: exports.defaultTrainingShout })
+    const shout = await client.apis.groups.updateGroupShout({ groupId, message: defaultTrainingShout })
     return shout.body
 }
 
@@ -164,74 +166,72 @@ exports.setRank = async (groupId, userId, rank) => {
     return role
 }
 
-exports.cancelSuspension = async (groupId, userId, options) => {
-    const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
+exports.cancelSuspension = async (groupId, userId, { authorId, reason }) => {
+    const suspension = await exports.getSuspension(userId)
     const rank = await userService.getRank(suspension.userId, groupId)
     if (rank !== 0) await exports.setRank(groupId, suspension.userId, suspension.rank)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
-    return models.SuspensionCancellation.create({
-        authorId: options.authorId,
-        reason: options.reason,
-        suspensionId: suspension.id
+    return SuspensionCancellation.create({
+        suspensionId: suspension.id,
+        authorId,
+        reason
     }, { individualHooks: true })
 }
 
-exports.cancelTraining = async (groupId, trainingId, options) => {
-    const training = await models.Training.findByPk(trainingId)
-    if (!training) throw createError(404, 'Training not found.')
-    return models.TrainingCancellation.create({
-        authorId: options.authorId,
-        reason: options.reason,
-        trainingId: training.id
+exports.cancelTraining = async (groupId, trainingId, { authorId, reason }) => {
+    const training = await exports.getTraining(trainingId)
+    return TrainingCancellation.create({
+        trainingId: training.id,
+        authorId,
+        reason
     }, { individualHooks: true })
 }
 
-exports.extendSuspension = async (groupId, userId, options) => {
-    const suspension = await models.Suspension.findOne({ where: { userId }})
-    if (!suspension) throw createError(404, 'Suspension not found.')
-    let duration = suspension.duration + options.duration
-    if (!suspension.extensions) suspension.extensions = []
-    for (const extension of suspension.extensions) {
-        duration += extension.duration
+exports.extendSuspension = async (groupId, userId, { authorId, duration, reason }) => {
+    const suspension = await exports.getSuspension(userId)
+    let newDuration = suspension.duration + duration
+    if (suspension.extensions) {
+        for (const extension of suspension.extensions) {
+            newDuration += extension.duration
+        }
     }
-    const days = duration / 86400000
-    if (days < 1) throw createError(403, 'Insufficient amount of days.')
-    if (days > 7) throw createError(403, 'Too many days.')
+    const days = newDuration / 86400000
+    if (days < 1) throw new ForbiddenError('Insufficient amount of days.')
+    if (days > 7) throw new ForbiddenError('Too many days.')
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
     cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
         suspension))
-    return models.SuspensionExtension.create({
-        authorId: options.authorId,
-        duration: options.duration,
-        reason: options.reason,
-        suspensionId: suspension.id
+    return SuspensionExtension.create({
+        suspensionId: suspension.id,
+        authorId,
+        duration,
+        reason
     }, { individualHooks: true })
 }
 
-exports.changeRank = async (groupId, userId, options) => {
-    const rank = await userService.getRank(userId, groupId)
-    if (rank === 0) throw createError(403, 'Can\'t change rank of non members.')
-    if (rank === 1 && options.authorId) throw createError(403, 'Can\'t change rank of customers.')
-    if (rank === 2) throw createError(403, 'Can\'t change rank of suspended members.')
-    if (rank === 99) throw createError(403, 'Can\'t change rank of partners.')
-    if (rank >= 200) throw createError(403, 'Can\'t change rank of HRs.')
-    if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
-        throw createError(400, 'Invalid rank.')
+exports.changeRank = async (groupId, userId, { rank, authorId }) => {
+    const oldRank = await userService.getRank(userId, groupId)
+    if (oldRank === 0) throw new ForbiddenError('Can\'t change rank of non members.')
+    if (oldRank === 1 && authorId) throw new ForbiddenError('Can\'t change rank of customers.')
+    if (oldRank === 2) throw new ForbiddenError('Can\'t change rank of suspended members.')
+    if (oldRank === 99) throw new ForbiddenError('Can\'t change rank of partners.')
+    if (oldRank >= 200) throw new ForbiddenError('Can\'t change rank of HRs.')
+    if (!(rank === 1 || rank >= 3 && rank <= 5 || rank >= 100 && rank <= 102)) {
+        throw new BadRequestError('Invalid rank.')
     }
-    const newRole = await exports.setRank(groupId, userId, options.rank)
+    const newRole = await exports.setRank(groupId, userId, rank)
     const roles = await exports.getRoles(groupId)
-    const oldRole = roles.roles.find(role => role.rank === rank)
+    const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await userService.getUsername(userId)
-    if (options.authorId) {
-        const authorName = await userService.getUsername(options.authorId)
-        await discordMessageJob('log', `**${authorName}** ${options.rank > rank ? 'promoted' : 
+    if (authorId) {
+        const authorName = await userService.getUsername(authorId)
+        await discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
             'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-        await discordMessageJob('log', `${options.rank > rank ? 'Promoted' : 'demoted'} **${username}` +
-            `** from **${oldRole.name}** to **${newRole.name}**`)
+        await discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
+            `from **${oldRole.name}** to **${newRole.name}**`)
     }
     return { oldRole, newRole }
 }
