@@ -90,7 +90,7 @@ module.exports = async groupId => {
         // await client.apis.groups.payoutUser({ groupId, payoutRequest })
 
         // Add new payout row.
-        await models.Payout.create({ until: new Date(trainTransactions[0].created) })
+        await Payout.create({ until: new Date(trainTransactions[0].created) })
     }
 
     // Broadcast information about the payouts over the WebSocket.
