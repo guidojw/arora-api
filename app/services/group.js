@@ -172,20 +172,12 @@ exports.cancelSuspension = async (groupId, userId, { authorId, reason }) => {
     if (rank !== 0) await exports.setRank(groupId, suspension.userId, suspension.rank)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
-    return SuspensionCancellation.create({
-        suspensionId: suspension.id,
-        authorId,
-        reason
-    }, { individualHooks: true })
+    return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason }, { individualHooks: true })
 }
 
 exports.cancelTraining = async (groupId, trainingId, { authorId, reason }) => {
     const training = await exports.getTraining(trainingId)
-    return TrainingCancellation.create({
-        trainingId: training.id,
-        authorId,
-        reason
-    }, { individualHooks: true })
+    return TrainingCancellation.create({ trainingId: training.id, authorId, reason }, { individualHooks: true })
 }
 
 exports.extendSuspension = async (groupId, userId, { authorId, duration, reason }) => {
