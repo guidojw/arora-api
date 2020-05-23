@@ -18,13 +18,7 @@ const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted s
     'Scheduler in the Group Center for more info!'
 
 async function suspend (groupId, userId, { rankBack, duration, authorId, reason }) {
-    let suspended = true
-    try {
-        await getSuspension(userId)
-    } catch {
-        suspended = false
-    }
-    if (suspended) throw new ConflictError('User is already suspended.')
+    if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
     const rank = await userService.getRank(userId, groupId)
     if (rank === 2) throw new ConflictError('User is already suspended.')
     if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')

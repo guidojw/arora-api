@@ -12,13 +12,7 @@ function getBans (scope) {
 }
 
 async function ban (groupId, userId, { authorId, reason }) {
-    let banned = true
-    try {
-        await getBan(userId)
-    } catch {
-        banned = false
-    }
-    if (banned) throw new ConflictError('User is already banned.')
+    if (await Ban.findOne({ where: { userId }})) throw new ConflictError('User is already banned.')
     const rank = await userService.getRank(userId, groupId)
     if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unbannable.')
     return Ban.create({
