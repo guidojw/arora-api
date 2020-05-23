@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(extension.authorId)])
                 const extensionDays = extension.duration / 86400000
-                discordMessageJob('log', `**${authorName}** extended **${username}**'s suspension ` +
+                discordMessageJob.run('log', `**${authorName}** extended **${username}**'s suspension ` +
                     `with **${extensionDays}** ${pluralize('day', extensionDays)}`)
             }
         },

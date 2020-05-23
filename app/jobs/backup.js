@@ -24,7 +24,7 @@ function run () {
         [backupScript, backupFile, databaseConfig.password],
         error => {
             if (error) throw error
-            discordMessageJob('backupNotification', {
+            discordMessageJob.run('backupNotification', {
                 embeds: [{
                     title: `${databaseConfig.database}-backup successful`,
                     description: `${databaseConfig.database}-backup has been executed successfully!`,
@@ -47,4 +47,6 @@ function run () {
     })
 }
 
-module.exports = run
+module.exports = {
+    run
+}

@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
             async afterCreate (ban) {
                 const [username, authorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(ban.authorId)])
-                discordMessageJob('log', `**${authorName}** banned **${username}** with reason  "*${
+                discordMessageJob.run('log', `**${authorName}** banned **${username}** with reason  "*${
                     ban.reason}*"`)
             },
 
@@ -43,13 +43,13 @@ module.exports = (sequelize, DataTypes) => {
                 const [username, editorName] = await Promise.all([userService.getUsername(ban.userId),
                     userService.getUsername(options.editorId)])
                 if (ban.changed('reason')) {
-                    discordMessageJob('log', `**${editorName}** changed the reason of **${username}**` +
-                        `'s ban to *"${ban.reason}"*`)
+                    discordMessageJob.run('log', `**${editorName}** changed the reason of **${
+                        username}**'s ban to *"${ban.reason}"*`)
                 }
                 if (ban.changed('authorId')) {
                     const authorName = await userService.getUsername(ban.authorId)
-                    discordMessageJob('log', `**${editorName}** changed the author of **${username}**` +
-                        `'s ban to **${authorName}**`)
+                    discordMessageJob.run('log', `**${editorName}** changed the author of **${
+                        username}**'s ban to **${authorName}**`)
                 }
             }
         },

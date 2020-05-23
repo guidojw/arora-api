@@ -8,13 +8,15 @@ async function run () {
     for (const suspension of suspensions) {
         const endDate = await suspension.endDate
         if (endDate <= Date.now()) {
-            finishSuspensionJob(suspension)
+            finishSuspensionJob.run(suspension)
         } else {
             const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-            if (!job) cron.scheduleJob(`suspension_${suspension.id}`, endDate, finishSuspensionJob.bind(null,
+            if (!job) cron.scheduleJob(`suspension_${suspension.id}`, endDate, finishSuspensionJob.run.bind(null,
                 suspension))
         }
     }
 }
 
-module.exports = run
+module.exports = {
+    run
+}

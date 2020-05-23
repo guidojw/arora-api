@@ -47,4 +47,6 @@ async function sendBackupNotification (body) {
     })
 }
 
-module.exports = run
+module.exports = {
+    run
+}

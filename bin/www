@@ -28,9 +28,9 @@ wss.on('connection', webSocketManager.addConnection)
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
         const [...args] = job.args
-        cron.scheduleJob(job.expression, () => job.job.bind(null, ...args))
+        cron.scheduleJob(job.expression, () => job.job.run.bind(null, ...args))
     } else {
-        cron.scheduleJob(job.expression, job.job)
+        cron.scheduleJob(job.expression, job.job.run)
     }
 }
 

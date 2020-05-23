@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
                 const suspension = await sequelize.models.Suspension.unscoped().findByPk(cancellation.suspensionId)
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(cancellation.authorId)])
-                discordMessageJob('log', `**${authorName}** cancelled **${username}**'s suspension` +
+                discordMessageJob.run('log', `**${authorName}** cancelled **${username}**'s suspension` +
                     ` with reason "*${cancellation.reason}*"`)
             }
         },

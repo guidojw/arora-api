@@ -31,7 +31,7 @@ async function suspend (groupId, userId, { rankBack, duration, authorId, reason 
         userId,
         rank
     }, { individualHooks: true })
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
         suspension))
     return suspension
 }
@@ -76,9 +76,9 @@ async function shout (groupId, authorId, message) {
     const shout = await client.apis.groups.updateGroupShout({ groupId, message })
     const authorName = await userService.getUsername(authorId)
     if (shout.body === '') {
-        await discordMessageJob('log', `**${authorName}** cleared the shout`)
+        await discordMessageJob.run('log', `**${authorName}** cleared the shout`)
     } else {
-        await discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+        await discordMessageJob.run('log', `**${authorName}** shouted "*${shout.body}*"`)
     }
     return shout
 }
@@ -105,7 +105,7 @@ async function announceTraining (groupId, trainingId, { medium, authorId }) {
     }
     const training = await getTraining(trainingId)
     const authorName = await userService.getUsername(authorId)
-    await discordMessageJob('log', `**${authorName}** announced training **${trainingId}**${
+    await discordMessageJob.run('log', `**${authorName}** announced training **${trainingId}**${
         medium !== 'both' ? ' on ' + stringHelper.toPascalCase(medium) : ''}`)
     return {
         shout: medium === 'both' || medium === 'roblox' ? await announceRoblox(groupId) : undefined,
@@ -121,7 +121,7 @@ async function announceRoblox (groupId) {
 
 async function announceDiscord (groupId, training) {
     const announcement = await getTrainingAnnouncement(training)
-    await discordMessageJob('training', announcement)
+    await discordMessageJob.run('training', announcement)
     return announcement
 }
 
@@ -196,7 +196,7 @@ async function extendSuspension (groupId, userId, { authorId, duration, reason }
     if (days > 7) throw new ForbiddenError('Too many days.')
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
         suspension))
     return SuspensionExtension.create({
         suspensionId: suspension.id,
@@ -222,11 +222,11 @@ async function changeRank (groupId, userId, { rank, authorId }) {
     const username = await userService.getUsername(userId)
     if (authorId) {
         const authorName = await userService.getUsername(authorId)
-        await discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **${
-            username}** from **${oldRole.name}** to **${newRole.name}**`)
+        await discordMessageJob.run('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
+            'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-        await discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
-            `from **${oldRole.name}** to **${newRole.name}**`)
+        await discordMessageJob.run('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${
+            username}** from **${oldRole.name}** to **${newRole.name}**`)
     }
     return { oldRole, newRole }
 }
