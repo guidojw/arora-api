@@ -1,23 +1,15 @@
 'use strict'
-function getReadableDate(opts) {
-    return `${opts.day}-${opts.month}-${opts.year}`
-}
-
-function getReadableTime(opts) {
-    return `${opts.hours}:${'0'.repeat(2 - String(opts.minutes).length)}${opts.minutes}`
-}
-
 exports.getDate = date => {
     const day = date.getDate()
-    const month = date.getMonth() + 1
+    const month = date.getMonth()
     const year = date.getFullYear()
-    return getReadableDate({ day, month, year })
+    return `${day}-${month + 1}-${year}`
 }
 
 exports.getTime = date => {
     const hours = date.getHours()
     const minutes = date.getMinutes()
-    return getReadableTime({ hours, minutes })
+    return `${hours}:${'0'.repeat(2 - String(minutes).length)}${minutes}`
 }
 
 exports.isDst = date => {
