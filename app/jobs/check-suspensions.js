@@ -11,8 +11,9 @@ async function run () {
             finishSuspensionJob.run(suspension)
         } else {
             const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-            if (!job) cron.scheduleJob(`suspension_${suspension.id}`, endDate, finishSuspensionJob.run.bind(null,
-                suspension))
+            if (!job) {
+                cron.scheduleJob(`suspension_${suspension.id}`, endDate, finishSuspensionJob.run.bind(null, suspension))
+            }
         }
     }
 }

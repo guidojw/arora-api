@@ -1,7 +1,7 @@
 'use strict'
 const { param, body, header, query } = require('express-validator')
 const banService = require('../../services/ban')
-const { decodeQuery }  = require('../../helpers/request')
+const { decodeQuery } = require('../../helpers/request')
 
 function validate (method) {
     switch (method) {
