@@ -17,17 +17,23 @@ const BadRequestError = require('../errors/bad-request')
 const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
     'Scheduler in the Group Center for more info!'
 
-async function suspend (groupId, userId, options) {
-    if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
+async function suspend (groupId, userId, { rankBack, duration, authorId, reason }) {
+    let suspended = true
+    try {
+        await getSuspension(userId)
+    } catch {
+        suspended = false
+    }
+    if (suspended) throw new ConflictError('User is already suspended.')
     const rank = await userService.getRank(userId, groupId)
     if (rank === 2) throw new ConflictError('User is already suspended.')
     if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')
     if (rank > 0 && rank !== 2) await setRank(groupId, userId, 2)
     const suspension = await Suspension.create({
-        rankBack: options.rankBack,
-        duration: options.duration,
-        authorId: options.authorId,
-        reason: options.reason,
+        rankBack,
+        duration,
+        authorId,
+        reason,
         userId,
         rank
     }, { individualHooks: true })
@@ -50,21 +56,25 @@ function getTrainings (scope) {
     return Training.scope(scope || 'defaultScope').findAll()
 }
 
-function postTraining (options) {
+function postTraining ({ type, authorId, date, notes }) {
     return Training.create({
-        type: options.type.toLowerCase(),
-        authorId: options.authorId,
-        date: options.date,
-        notes: options.notes
+        type: type.toLowerCase(),
+        authorId,
+        date,
+        notes
     }, { individualHooks: true })
 }
 
-function getSuspension (userId, scope) {
+async function getSuspension (userId, scope) {
+    const suspension = await Suspension.scope(scope || 'defaultScope').findOne({ where: { userId }})
+    if (!suspension) throw new NotFoundError('Suspension not found.')
     return Suspension.scope(scope || 'defaultScope').findOne({ where: { userId }})
 }
 
-function getTraining (trainingId, scope) {
-    return Training.scope(scope || 'defaultScope').findByPk(trainingId)
+async function getTraining (trainingId, scope) {
+    const training = await Training.scope(scope || 'defaultScope').findByPk(trainingId)
+    if (!training) throw new NotFoundError('Training not found.')
+    return training
 }
 
 async function shout (groupId, authorId, message) {
@@ -79,14 +89,14 @@ async function shout (groupId, authorId, message) {
     return shout
 }
 
-async function putTraining (groupId, trainingId, options) {
+async function putTraining (groupId, trainingId, { changes, editorId }) {
     const training = await getTraining(trainingId)
-    return training.update(options.changes, { editorId: options.editorId, individualHooks: true })
+    return training.update(changes, { editorId, individualHooks: true })
 }
 
-async function putSuspension (groupId, userId, options) {
+async function putSuspension (groupId, userId, { changes, editorId }) {
     const suspension = await getSuspension(userId)
-    return suspension.update(options.changes, { editorId: options.editorId, individualHooks: true })
+    return suspension.update(changes, { editorId, individualHooks: true })
 }
 
 function getGroup (groupId) {
@@ -94,8 +104,8 @@ function getGroup (groupId) {
     return client.apis.groups.getGroupInfo(groupId)
 }
 
-async function announceTraining (groupId, trainingId, options) {
-    const medium = options.medium.toLowerCase()
+async function announceTraining (groupId, trainingId, { medium }) {
+    medium = medium.toLowerCase()
     if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') {
         throw new ForbiddenError('Invalid medium')
     }
@@ -165,39 +175,29 @@ async function setRank (groupId, userId, rank) {
     return role
 }
 
-async function cancelSuspension (groupId, userId, options) {
-    const suspension = await Suspension.findOne({ where: { userId }})
-    if (!suspension) throw new NotFoundError('Suspension not found.')
+async function cancelSuspension (groupId, userId, { authorId, reason }) {
+    const suspension = await getSuspension(userId)
     const rank = await userService.getRank(suspension.userId, groupId)
     if (rank !== 0) await setRank(groupId, suspension.userId, suspension.rank)
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) job.cancel()
-    return SuspensionCancellation.create({
-        authorId: options.authorId,
-        reason: options.reason,
-        suspensionId: suspension.id
-    }, { individualHooks: true })
+    return SuspensionCancellation.create({ authorId, reason, suspensionId: suspension.id }, { individualHooks: true })
 }
 
-async function cancelTraining (groupId, trainingId, options) {
-    const training = await Training.findByPk(trainingId)
-    if (!training) throw new NotFoundError('Training not found.')
-    return TrainingCancellation.create({
-        authorId: options.authorId,
-        reason: options.reason,
-        trainingId: training.id
-    }, { individualHooks: true })
+async function cancelTraining (groupId, trainingId, { authorId, reason }) {
+    const training = await getTraining(trainingId)
+    return TrainingCancellation.create({ authorId, reason, trainingId: training.id }, { individualHooks: true })
 }
 
-async function extendSuspension (groupId, userId, options) {
-    const suspension = await Suspension.findOne({ where: { userId }})
-    if (!suspension) throw new NotFoundError('Suspension not found.')
-    let duration = suspension.duration + options.duration
-    if (!suspension.extensions) suspension.extensions = []
-    for (const extension of suspension.extensions) {
-        duration += extension.duration
+async function extendSuspension (groupId, userId, { authorId, duration, reason }) {
+    const suspension = await getSuspension(userId)
+    let newDuration = suspension.duration + duration
+    if (suspension.extensions) {
+        for (const extension of suspension.extensions) {
+            newDuration += extension.duration
+        }
     }
-    const days = duration / 86400000
+    const days = newDuration / 86400000
     if (days < 1) throw new ForbiddenError('Insufficient amount of days.')
     if (days > 7) throw new ForbiddenError('Too many days.')
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
@@ -205,33 +205,33 @@ async function extendSuspension (groupId, userId, options) {
     cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
         suspension))
     return SuspensionExtension.create({
-        authorId: options.authorId,
-        duration: options.duration,
-        reason: options.reason,
-        suspensionId: suspension.id
+        suspensionId: suspension.id,
+        authorId,
+        duration,
+        reason
     }, { individualHooks: true })
 }
 
-async function changeRank (groupId, userId, options) {
-    const rank = await userService.getRank(userId, groupId)
-    if (rank === 0) throw new ForbiddenError('Can\'t change rank of non members.')
-    if (rank === 1 && options.authorId) throw new ForbiddenError('Can\'t change rank of customers.')
-    if (rank === 2) throw new ForbiddenError('Can\'t change rank of suspended members.')
-    if (rank === 99) throw new ForbiddenError('Can\'t change rank of partners.')
-    if (rank >= 200) throw new ForbiddenError('Can\'t change rank of HRs.')
-    if (!(options.rank === 1 || options.rank >= 3 && options.rank <= 5 || options.rank >= 100 && options.rank <= 102)) {
+async function changeRank (groupId, userId, { rank, authorId }) {
+    const oldRank = await userService.getRank(userId, groupId)
+    if (oldRank === 0) throw new ForbiddenError('Can\'t change rank of non members.')
+    if (oldRank === 1 && authorId) throw new ForbiddenError('Can\'t change rank of customers.')
+    if (oldRank === 2) throw new ForbiddenError('Can\'t change rank of suspended members.')
+    if (oldRank === 99) throw new ForbiddenError('Can\'t change rank of partners.')
+    if (oldRank >= 200) throw new ForbiddenError('Can\'t change rank of HRs.')
+    if (!(rank === 1 || rank >= 3 && rank <= 5 || rank >= 100 && rank <= 102)) {
         throw new BadRequestError('Invalid rank.')
     }
-    const newRole = await setRank(groupId, userId, options.rank)
+    const newRole = await setRank(groupId, userId, rank)
     const roles = await getRoles(groupId)
-    const oldRole = roles.roles.find(role => role.rank === rank)
+    const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await userService.getUsername(userId)
-    if (options.authorId) {
-        const authorName = await userService.getUsername(options.authorId)
-        await discordMessageJob.run('log', `**${authorName}** ${options.rank > rank ? 'promoted' : 
+    if (authorId) {
+        const authorName = await userService.getUsername(authorId)
+        await discordMessageJob.run('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
             'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-        await discordMessageJob.run('log', `${options.rank > rank ? 'Promoted' : 'demoted'} **${
+        await discordMessageJob.run('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${
             username}** from **${oldRole.name}** to **${newRole.name}**`)
     }
     return { oldRole, newRole }
