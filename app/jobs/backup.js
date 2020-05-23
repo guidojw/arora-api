@@ -1,7 +1,7 @@
 'use strict'
 const { execFile } = require('child_process')
 const path = require('path')
-const discordMessageJob = require('../jobs/discord-message')
+const discordMessageJob = require('./discord-message')
 const fs = require('fs')
 const fileHelper = require('../helpers/file')
 

@@ -1,7 +1,7 @@
 'use strict'
 const robloxManager = require('../managers/roblox')
 const webSocketManager = require('../managers/web-socket')
-const models = require('../models')
+const { Payout } = require('../models')
 
 const products = [
     { id: 1371397, developerIds: [32851718] }, // Supersnel11
@@ -20,7 +20,7 @@ const PAY_RATE = 0.5
 
 module.exports = async groupId => {
     // Get last payout and its last transaction.
-    const lastPayout = await models.Payout.getLast()
+    const lastPayout = await Payout.getLast()
     if (!lastPayout) throw new Error('Could not get last transaction!')
     const lastTransactionDate = lastPayout.until
 
@@ -90,7 +90,7 @@ module.exports = async groupId => {
         // await client.apis.groups.payoutUser({ groupId, payoutRequest })
 
         // Add new payout row.
-        await models.Payout.create({ until: new Date(trainTransactions[0].created) })
+        await Payout.create({ until: new Date(trainTransactions[0].created) })
     }
 
     // Broadcast information about the payouts over the WebSocket.

@@ -1,6 +1,6 @@
 'use strict'
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('Exile', {
+    const Exile = sequelize.define('Exile', {
         userId: {
             type: DataTypes.STRING,
             field: 'user_id'
@@ -8,4 +8,6 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'exiles'
     })
+
+    return Exile
 }
