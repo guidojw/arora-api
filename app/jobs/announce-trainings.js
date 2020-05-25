@@ -23,7 +23,8 @@ module.exports = async groupId => {
         if (shout.length > 255) shout = `${shout.substring(0, 255 - 3)}...`
     }
 
-    await groupService.shout(groupId, shout)
+    const oldShout = await groupService.getShout(groupId)
+    if (shout !== oldShout) await groupService.shout(groupId, shout)
 }
 
 function getTrainingsInfo (trainings, authors) {
