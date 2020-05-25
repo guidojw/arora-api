@@ -63,11 +63,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         hooks: {
             afterCreate: async suspension => {
+                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+                    suspension))
                 const days = suspension.duration / 86400000
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(suspension.authorId)])
-                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-                    suspension))
                 discordMessageJob('log', `**${authorName}** suspended **${username}** for **${days}** ` +
                     `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
             },
