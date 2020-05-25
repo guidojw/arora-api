@@ -4,6 +4,7 @@ const userService = require('../services/user')
 const discordMessageJob = require('../jobs/discord-message')
 const { Op } = require('sequelize')
 const announceTrainingsJob = require('../jobs/announce-trainings')
+
 const robloxConfig = require('../../config/roblox')
 
 module.exports = (sequelize, DataTypes) => {
