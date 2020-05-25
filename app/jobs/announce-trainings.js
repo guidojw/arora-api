@@ -5,19 +5,23 @@ const timeHelper = require('../helpers/time')
 
 module.exports = async groupId => {
     const trainings = await groupService.getTrainings()
-    const today = new Date().getDate()
-    const trainingsToday = trainings.filter(training => training.date.getDate() === today)
-    const trainingsTomorrow = trainings.filter(training => training.date.getDate() === today + 1)
-    const authorIds = [...new Set([...trainingsToday.map(training => training.authorId), ...trainingsTomorrow
-        .map(training => training.authorId)])]
-    const authors = await userService.getUsers(authorIds)
+    let shout = ''
 
-    let shout = 'Trainings today - '
-    shout += getTrainingsInfo(trainingsToday, authors)
-    shout += '. Trainings tomorrow - '
-    shout += getTrainingsInfo(trainingsTomorrow, authors)
-    shout += '.'
-    if (shout.length > 255) shout = `${shout.substring(0, 255 - 3)}...`
+    if (trainings.length > 0) {
+        const today = new Date().getDate()
+        const trainingsToday = trainings.filter(training => training.date.getDate() === today)
+        const trainingsTomorrow = trainings.filter(training => training.date.getDate() === today + 1)
+        const authorIds = [...new Set([...trainingsToday.map(training => training.authorId), ...trainingsTomorrow
+            .map(training => training.authorId)])]
+        const authors = await userService.getUsers(authorIds)
+
+        shout += 'Trainings today - '
+        shout += getTrainingsInfo(trainingsToday, authors)
+        shout += '. Trainings tomorrow - '
+        shout += getTrainingsInfo(trainingsTomorrow, authors)
+        shout += '.'
+        if (shout.length > 255) shout = `${shout.substring(0, 255 - 3)}...`
+    }
 
     await groupService.shout(groupId, shout)
 }
