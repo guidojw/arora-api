@@ -4,6 +4,7 @@ const acceptMtJoinRequestsJob = require('../app/jobs/accept-mt-join-requests')
 const backupJob = require('../app/jobs/backup')
 const checkSuspensionsJob = require('../app/jobs/check-suspensions')
 const payoutTrainDevelopersJob = require('../app/jobs/payout-train-developers')
+const announceTrainingsJob = require('../app/jobs/announce-trainings')
 
 module.exports = {
     acceptJoinRequestsJob: {
@@ -27,6 +28,11 @@ module.exports = {
     payoutTrainDevelopersJob: {
         expression: '0 12 * * 6', // https://crontab.guru/#0_12_*_*_6
         job: payoutTrainDevelopersJob,
+        args: [1018818]
+    },
+    announceTrainingsJob: {
+        expression: '0 0 */1 * *', // https://crontab.guru/#0_0_*/1_*_*
+        job: announceTrainingsJob,
         args: [1018818]
     }
 }

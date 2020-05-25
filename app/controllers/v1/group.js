@@ -170,7 +170,7 @@ exports.getTraining = async (req, res) => {
 }
 
 exports.shout = async (req, res) => {
-    res.json(await groupService.shout(req.params.groupId, req.body.authorId, req.body.message))
+    res.json(await groupService.shout(req.params.groupId, req.body.message, req.body.authorId))
 }
 
 exports.putTraining = async (req, res) => {

@@ -67,14 +67,16 @@ exports.getTraining = async (trainingId, scope) => {
     return training
 }
 
-exports.shout = async (groupId, authorId, message) => {
+exports.shout = async (groupId, message, authorId) => {
     const client = robloxManager.getClient(groupId)
     const shout = await client.apis.groups.updateGroupShout({ groupId, message })
-    const authorName = await userService.getUsername(authorId)
-    if (shout.body === '') {
-        await discordMessageJob('log', `**${authorName}** cleared the shout`)
-    } else {
-        await discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+    if (authorId) {
+        const authorName = await userService.getUsername(authorId)
+        if (shout.body === '') {
+            await discordMessageJob('log', `**${authorName}** cleared the shout`)
+        } else {
+            await discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+        }
     }
     return shout
 }
@@ -111,8 +113,7 @@ exports.announceTraining = async (groupId, trainingId, { medium, authorId }) => 
 }
 
 exports.announceRoblox = async groupId => {
-    const client = robloxManager.getClient(groupId)
-    const shout = await client.apis.groups.updateGroupShout({ groupId, message: defaultTrainingShout })
+    const shout = await exports.shout(groupId, defaultTrainingShout)
     return shout.body
 }
 
