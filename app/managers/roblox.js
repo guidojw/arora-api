@@ -3,6 +3,10 @@ require('dotenv').config()
 
 const { Client } = require('bloxy')
 const checkSuspensionsJob = require('../jobs/check-suspensions')
+const announceTrainingsJob = require('../jobs/announce-trainings')
+
+const robloxConfig = require('../../config/roblox')
+
 
 const clients = { authenticated: {} }
 
@@ -26,6 +30,7 @@ exports.init = async () => {
     clients.unauthenticated = new Client({ setup: { throwHttpErrors: true }})
 
     checkSuspensionsJob()
+    announceTrainingsJob(robloxConfig.defaultGroup)
 }
 
 exports.getClient = groupId => {

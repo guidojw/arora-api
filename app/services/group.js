@@ -4,18 +4,12 @@ const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
 const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
-const stringHelper = require('../helpers/string')
 const webSocketManager = require('../managers/web-socket')
 const { Suspension, SuspensionExtension, SuspensionCancellation, Training, TrainingCancellation } = require('../models')
-const finishSuspensionJob = require('../jobs/finish-suspension')
-const cron = require('node-schedule')
 const NotFoundError = require('../errors/not-found')
 const ConflictError = require('../errors/conflict')
 const ForbiddenError = require('../errors/forbidden')
 const BadRequestError = require('../errors/bad-request')
-
-const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
-    'Scheduler in the Group Center for more info!'
 
 exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason }) => {
     if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
@@ -23,7 +17,7 @@ exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason
     if (rank === 2) throw new ConflictError('User is already suspended.')
     if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')
     if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
-    const suspension = await Suspension.create({
+    return Suspension.create({
         rankBack,
         duration,
         authorId,
@@ -31,9 +25,6 @@ exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason
         userId,
         rank
     }, { individualHooks: true })
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-        suspension))
-    return suspension
 }
 
 exports.getShout = async groupId => {
@@ -67,14 +58,16 @@ exports.getTraining = async (trainingId, scope) => {
     return training
 }
 
-exports.shout = async (groupId, authorId, message) => {
+exports.shout = async (groupId, message, authorId) => {
     const client = robloxManager.getClient(groupId)
     const shout = await client.apis.groups.updateGroupShout({ groupId, message })
-    const authorName = await userService.getUsername(authorId)
-    if (shout.body === '') {
-        await discordMessageJob('log', `**${authorName}** cleared the shout`)
-    } else {
-        await discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+    if (authorId) {
+        const authorName = await userService.getUsername(authorId)
+        if (shout.body === '') {
+            discordMessageJob('log', `**${authorName}** cleared the shout`)
+        } else {
+            discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+        }
     }
     return shout
 }
@@ -94,26 +87,11 @@ exports.getGroup = groupId => {
     return client.apis.groups.getGroupInfo(groupId)
 }
 
-exports.announceTraining = async (groupId, trainingId, { medium, authorId }) => {
-    medium = medium.toLowerCase()
-    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') {
-        throw new ForbiddenError('Invalid medium')
-    }
+exports.announceTraining = async (groupId, trainingId, authorId) => {
     const training = await exports.getTraining(trainingId)
     const authorName = await userService.getUsername(authorId)
-    await discordMessageJob('log', `**${authorName}** announced training **${trainingId}**${medium !== 
-    'both' ? ' on ' + stringHelper.toPascalCase(medium) : ''}`)
-    return {
-        shout: medium === 'both' || medium === 'roblox' ? await exports.announceRoblox(groupId) : undefined,
-        announcement: medium === 'both' || medium === 'discord' ? await exports.announceDiscord(groupId, training) :
-            undefined
-    }
-}
-
-exports.announceRoblox = async groupId => {
-    const client = robloxManager.getClient(groupId)
-    const shout = await client.apis.groups.updateGroupShout({ groupId, message: defaultTrainingShout })
-    return shout.body
+    discordMessageJob('log', `**${authorName}** announced training **${trainingId}**`)
+    return exports.announceDiscord(groupId, training)
 }
 
 exports.announceDiscord = async (groupId, training) => {
@@ -170,8 +148,6 @@ exports.cancelSuspension = async (groupId, userId, { authorId, reason }) => {
     const suspension = await exports.getSuspension(userId)
     const rank = await userService.getRank(suspension.userId, groupId)
     if (rank !== 0) await exports.setRank(groupId, suspension.userId, suspension.rank)
-    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-    if (job) job.cancel()
     return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason }, { individualHooks: true })
 }
 
@@ -191,10 +167,6 @@ exports.extendSuspension = async (groupId, userId, { authorId, duration, reason 
     const days = newDuration / 86400000
     if (days < 1) throw new ForbiddenError('Insufficient amount of days.')
     if (days > 7) throw new ForbiddenError('Too many days.')
-    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-    if (job) job.cancel()
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-        suspension))
     return SuspensionExtension.create({
         suspensionId: suspension.id,
         authorId,
@@ -219,10 +191,10 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
     const username = await userService.getUsername(userId)
     if (authorId) {
         const authorName = await userService.getUsername(authorId)
-        await discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
+        discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
             'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-        await discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
+        discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
             `from **${oldRole.name}** to **${newRole.name}**`)
     }
     return { oldRole, newRole }

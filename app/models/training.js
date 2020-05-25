@@ -3,6 +3,10 @@ const timeHelper = require('../helpers/time')
 const userService = require('../services/user')
 const discordMessageJob = require('../jobs/discord-message')
 const { Op } = require('sequelize')
+const announceTrainingsJob = require('../jobs/announce-trainings')
+const cron = require('node-schedule')
+
+const robloxConfig = require('../../config/roblox')
 
 module.exports = (sequelize, DataTypes) => {
     const Training = sequelize.define('Training', {
@@ -26,6 +30,9 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         hooks: {
             afterCreate: async training => {
+                announceTrainingsJob(robloxConfig.defaultGroup)
+                cron.scheduleJob(`training_${training.id}`, new Date(training.date.getTime() + 30 * 60 * 1000),
+                    announceTrainingsJob.bind(null, robloxConfig.defaultGroup))
                 const dateString = timeHelper.getDate(training.date)
                 const timeString = timeHelper.getTime(training.date)
                 const authorName = await userService.getUsername(training.authorId)
@@ -54,7 +61,13 @@ module.exports = (sequelize, DataTypes) => {
                     const timeString = timeHelper.getTime(training.date)
                     discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
                         `date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
-
+                }
+                if (!training.changed('notes')) {
+                    announceTrainingsJob(robloxConfig.defaultGroup)
+                    const job = cron.scheduledJobs[`training_${training.id}`]
+                    if (job) job.cancel()
+                    cron.scheduleJob(`training_${training.id}`, training.date, announceTrainingsJob.bind(null,
+                        robloxConfig.defaultGroup))
                 }
             }
         },

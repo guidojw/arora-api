@@ -1,10 +1,10 @@
 'use strict'
 const finishSuspensionJob = require('../jobs/finish-suspension')
-const { Suspension }= require('../models')
+const groupService = require('../services/group')
 const cron = require('node-schedule')
 
 module.exports = async () => {
-    const suspensions = await Suspension.findAll()
+    const suspensions = await groupService.getSuspensions()
     for (const suspension of suspensions) {
         const endDate = await suspension.endDate
         if (endDate <= Date.now()) {
