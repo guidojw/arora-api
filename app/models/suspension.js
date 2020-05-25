@@ -2,6 +2,8 @@
 const userService = require('../services/user')
 const discordMessageJob = require('../jobs/discord-message')
 const pluralize = require('pluralize')
+const cron = require('node-schedule')
+const finishSuspensionJob = require('../jobs/finish-suspension')
 
 module.exports = (sequelize, DataTypes) => {
     const Suspension = sequelize.define('Suspension', {
@@ -64,6 +66,8 @@ module.exports = (sequelize, DataTypes) => {
                 const days = suspension.duration / 86400000
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(suspension.authorId)])
+                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
+                    suspension))
                 discordMessageJob('log', `**${authorName}** suspended **${username}** for **${days}** ` +
                     `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
             },

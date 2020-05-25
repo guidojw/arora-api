@@ -7,15 +7,10 @@ const userService = require('../services/user')
 const stringHelper = require('../helpers/string')
 const webSocketManager = require('../managers/web-socket')
 const { Suspension, SuspensionExtension, SuspensionCancellation, Training, TrainingCancellation } = require('../models')
-const finishSuspensionJob = require('../jobs/finish-suspension')
-const cron = require('node-schedule')
 const NotFoundError = require('../errors/not-found')
 const ConflictError = require('../errors/conflict')
 const ForbiddenError = require('../errors/forbidden')
 const BadRequestError = require('../errors/bad-request')
-
-const defaultTrainingShout = '[TRAININGS] There are new trainings being hosted soon, check out the Training ' +
-    'Scheduler in the Group Center for more info!'
 
 exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason }) => {
     if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
@@ -23,7 +18,7 @@ exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason
     if (rank === 2) throw new ConflictError('User is already suspended.')
     if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')
     if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
-    const suspension = await Suspension.create({
+    return Suspension.create({
         rankBack,
         duration,
         authorId,
@@ -31,9 +26,6 @@ exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason
         userId,
         rank
     }, { individualHooks: true })
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-        suspension))
-    return suspension
 }
 
 exports.getShout = async groupId => {
@@ -171,8 +163,6 @@ exports.cancelSuspension = async (groupId, userId, { authorId, reason }) => {
     const suspension = await exports.getSuspension(userId)
     const rank = await userService.getRank(suspension.userId, groupId)
     if (rank !== 0) await exports.setRank(groupId, suspension.userId, suspension.rank)
-    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-    if (job) job.cancel()
     return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason }, { individualHooks: true })
 }
 
@@ -192,10 +182,6 @@ exports.extendSuspension = async (groupId, userId, { authorId, duration, reason 
     const days = newDuration / 86400000
     if (days < 1) throw new ForbiddenError('Insufficient amount of days.')
     if (days > 7) throw new ForbiddenError('Too many days.')
-    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
-    if (job) job.cancel()
-    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-        suspension))
     return SuspensionExtension.create({
         suspensionId: suspension.id,
         authorId,
