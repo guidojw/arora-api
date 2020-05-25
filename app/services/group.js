@@ -4,7 +4,6 @@ const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
 const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
-const stringHelper = require('../helpers/string')
 const webSocketManager = require('../managers/web-socket')
 const { Suspension, SuspensionExtension, SuspensionCancellation, Training, TrainingCancellation } = require('../models')
 const NotFoundError = require('../errors/not-found')
@@ -65,9 +64,9 @@ exports.shout = async (groupId, message, authorId) => {
     if (authorId) {
         const authorName = await userService.getUsername(authorId)
         if (shout.body === '') {
-            await discordMessageJob('log', `**${authorName}** cleared the shout`)
+            discordMessageJob('log', `**${authorName}** cleared the shout`)
         } else {
-            await discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+            discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
         }
     }
     return shout
@@ -88,25 +87,11 @@ exports.getGroup = groupId => {
     return client.apis.groups.getGroupInfo(groupId)
 }
 
-exports.announceTraining = async (groupId, trainingId, { medium, authorId }) => {
-    medium = medium.toLowerCase()
-    if (medium !== undefined && medium !== 'both' && medium !== 'roblox' && medium !== 'discord') {
-        throw new ForbiddenError('Invalid medium')
-    }
+exports.announceTraining = async (groupId, trainingId, authorId) => {
     const training = await exports.getTraining(trainingId)
     const authorName = await userService.getUsername(authorId)
-    await discordMessageJob('log', `**${authorName}** announced training **${trainingId}**${medium !== 
-    'both' ? ' on ' + stringHelper.toPascalCase(medium) : ''}`)
-    return {
-        shout: medium === 'both' || medium === 'roblox' ? await exports.announceRoblox(groupId) : undefined,
-        announcement: medium === 'both' || medium === 'discord' ? await exports.announceDiscord(groupId, training) :
-            undefined
-    }
-}
-
-exports.announceRoblox = async groupId => {
-    const shout = await exports.shout(groupId, defaultTrainingShout)
-    return shout.body
+    discordMessageJob('log', `**${authorName}** announced training **${trainingId}**`)
+    return exports.announceDiscord(groupId, training)
 }
 
 exports.announceDiscord = async (groupId, training) => {
@@ -206,10 +191,10 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
     const username = await userService.getUsername(userId)
     if (authorId) {
         const authorName = await userService.getUsername(authorId)
-        await discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
+        discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
             'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-        await discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
+        discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
             `from **${oldRole.name}** to **${newRole.name}**`)
     }
     return { oldRole, newRole }

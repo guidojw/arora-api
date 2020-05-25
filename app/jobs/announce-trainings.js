@@ -51,7 +51,7 @@ function getTrainingsInfo (trainings, authors) {
 function groupTrainingsByType (trainings) {
     const result = {}
     for (const training of trainings) {
-        if (!result.hasOwnProperty(training.type)) result[training.type] = []
+        if (!result[training.type]) result[training.type] = []
         result[training.type].push(training)
     }
     return result

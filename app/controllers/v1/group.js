@@ -99,7 +99,6 @@ exports.validate = method => {
                 param('groupId').isInt().toInt(),
                 param('trainingId').isInt().toInt(),
                 body('authorId').exists().isInt().toInt(),
-                body('medium').optional().isString()
             ]
         case 'cancelSuspension':
             return [
@@ -186,7 +185,7 @@ exports.getGroup = async (req, res) => {
 }
 
 exports.announceTraining = async (req, res) => {
-    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body))
+    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.authorId))
 }
 
 exports.cancelSuspension = async (req, res) => {
