@@ -2,9 +2,18 @@
 const groupService = require('../services/group')
 const userService = require('../services/user')
 const timeHelper = require('../helpers/time')
+const cron = require('node-schedule')
 
 module.exports = async groupId => {
     const trainings = await groupService.getTrainings()
+    for (const training of trainings) {
+        const job = cron.scheduledJobs[`training_${training.id}`]
+        if (!job) {
+            cron.scheduleJob(`training_${training.id}`, new Date(training.date.getTime() + 30 * 60 * 1000),
+                module.exports.bind(null, groupId))
+        }
+    }
+
     const today = new Date().getDate()
     const trainingsToday = trainings.filter(training => training.date.getDate() === today)
     const trainingsTomorrow = trainings.filter(training => training.date.getDate() === today + 1)
