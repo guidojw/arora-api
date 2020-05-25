@@ -3,6 +3,8 @@ const timeHelper = require('../helpers/time')
 const userService = require('../services/user')
 const discordMessageJob = require('../jobs/discord-message')
 const { Op } = require('sequelize')
+const announceTrainingsJob = require('../jobs/announce-trainings')
+const robloxConfig = require('../../config/roblox')
 
 module.exports = (sequelize, DataTypes) => {
     const Training = sequelize.define('Training', {
@@ -32,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
                 discordMessageJob('log', `**${authorName}** scheduled a **${training.type
                     .toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 
                     'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
+                announceTrainingsJob(robloxConfig.defaultGroup)
             },
 
             afterUpdate: async (training, options) => {
@@ -54,8 +57,8 @@ module.exports = (sequelize, DataTypes) => {
                     const timeString = timeHelper.getTime(training.date)
                     discordMessageJob('log', `**${editorName}** changed training **${training.id}**'s ` +
                         `date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
-
                 }
+                if (!training.changed('notes')) announceTrainingsJob(robloxConfig.defaultGroup)
             }
         },
         tableName: 'trainings'
