@@ -1,14 +1,15 @@
 'use strict'
 const { param, body, header, query } = require('express-validator')
 const banService = require('../../services/ban')
-const { decodeQuery } = require('../../helpers/request')
+const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers/request')
 
 exports.validate = method => {
     switch (method) {
         case 'getBans':
             return [
                 header('authorization').exists().isString(),
-                query('scope').customSanitizer(decodeQuery)
+                query('scope').customSanitizer(decodeScopeQueryParam),
+                query('sort').customSanitizer(decodeSortQueryParam)
             ]
         case 'ban':
             return [
@@ -30,7 +31,7 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('userId').exists().isInt().toInt(),
-                query('scope').customSanitizer(decodeQuery)
+                query('scope').customSanitizer(decodeScopeQueryParam)
             ]
         case 'cancelBan':
             return [
@@ -43,7 +44,7 @@ exports.validate = method => {
 }
 
 exports.getBans = async (req, res) => {
-    res.json((await banService.getBans(req.query.scope)).map(ban => ban.get({ raw: true })))
+    res.json((await banService.getBans(req.query.scope, req.query.sort)).map(ban => ban.get({ raw: true })))
 }
 
 exports.ban = async (req, res) => {

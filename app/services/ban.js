@@ -7,8 +7,8 @@ const NotFoundError = require('../errors/not-found')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getBans = scope => {
-    return Ban.scope(scope || 'defaultScope').findAll()
+exports.getBans = (scope, sort) => {
+    return Ban.scope(scope || 'defaultScope').findAll({ order: sort })
 }
 
 exports.ban = async (groupId, userId, { authorId, reason }) => {

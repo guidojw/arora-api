@@ -1,7 +1,7 @@
 'use strict'
 const { param, body, header, query } = require('express-validator')
 const groupService = require('../../services/group')
-const { decodeQuery } = require('../../helpers/request')
+const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers/request')
 
 exports.validate = method => {
     switch (method) {
@@ -24,13 +24,15 @@ exports.validate = method => {
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isInt().toInt(),
-                query('scope').customSanitizer(decodeQuery)
+                query('scope').customSanitizer(decodeScopeQueryParam),
+                query('sort').customSanitizer(decodeSortQueryParam)
             ]
         case 'getTrainings':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isInt().toInt(),
-                query('scope').customSanitizer(decodeQuery)
+                query('scope').customSanitizer(decodeScopeQueryParam),
+                query('sort').customSanitizer(decodeSortQueryParam)
             ]
         case 'postTraining':
             return [
@@ -51,14 +53,14 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isInt().toInt(),
                 param('userId').isInt().toInt(),
-                query('scope').customSanitizer(decodeQuery)
+                query('scope').customSanitizer(decodeScopeQueryParam)
             ]
         case 'getTraining':
             return [
                 header('authorization').exists().isString(),
                 param('groupId').isInt().toInt(),
                 param('trainingId').isInt().toInt(),
-                query('scope').customSanitizer(decodeQuery)
+                query('scope').customSanitizer(decodeScopeQueryParam)
             ]
         case 'shout':
             return [
@@ -145,11 +147,13 @@ exports.getShout = async (req, res) => {
 }
 
 exports.getSuspensions = async (req, res) => {
-    res.json((await groupService.getSuspensions(req.query.scope)).map(suspension => suspension.get({ raw: true })))
+    res.json((await groupService.getSuspensions(req.query.scope, req.query.sort)).map(suspension => suspension.get({
+        raw: true })))
 }
 
 exports.getTrainings = async (req, res) => {
-    res.json((await groupService.getTrainings(req.query.scope)).map(training => training.get({ raw: true })))
+    res.json((await groupService.getTrainings(req.query.scope, req.query.sort)).map(training => training.get({
+        raw: true })))
 }
 
 exports.postTraining = async (req, res) => {
