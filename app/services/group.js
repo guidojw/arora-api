@@ -33,9 +33,9 @@ exports.getShout = async groupId => {
     return info.shout
 }
 
-exports.getSuspensions = scope => Suspension.scope(scope || 'defaultScope').findAll()
+exports.getSuspensions = (scope, sort) => Suspension.scope(scope || 'defaultScope').findAll({ order: sort })
 
-exports.getTrainings = scope => Training.scope(scope || 'defaultScope').findAll()
+exports.getTrainings = (scope, sort) => Training.scope(scope || 'defaultScope').findAll({ order: sort })
 
 exports.postTraining = ({ type, authorId, date, notes }) => {
     return Training.create({
