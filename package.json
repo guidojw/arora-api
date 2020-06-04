@@ -13,7 +13,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^5.15.5",
+    "@sentry/node": "^5.16.1",
     "axios": "^0.19.2",
     "bloxy": "github:Visualizememe/bloxy#dev",
     "debug": "^4.1.1",
@@ -30,7 +30,7 @@
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "pluralize": "^8.0.0",
-    "sequelize": "^5.21.10",
+    "sequelize": "^5.21.11",
     "ws": "^7.3.0"
   },
   "devDependencies": {
