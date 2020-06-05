@@ -95,13 +95,6 @@ exports.validate = method => {
                 header('authorization').exists().isString(),
                 param('groupId').isInt().toInt()
             ]
-        case 'announceTraining':
-            return [
-                header('authorization').exists().isString(),
-                param('groupId').isInt().toInt(),
-                param('trainingId').isInt().toInt(),
-                body('authorId').exists().isInt().toInt(),
-            ]
         case 'cancelSuspension':
             return [
                 header('authorization').exists().isString(),
@@ -186,10 +179,6 @@ exports.putSuspension = async (req, res) => {
 
 exports.getGroup = async (req, res) => {
     res.json(await groupService.getGroup(req.params.groupId))
-}
-
-exports.announceTraining = async (req, res) => {
-    res.json(await groupService.announceTraining(req.params.groupId, req.params.trainingId, req.body.authorId))
 }
 
 exports.cancelSuspension = async (req, res) => {

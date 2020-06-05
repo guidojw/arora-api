@@ -41,9 +41,6 @@ router.put('/:groupId/suspensions/:userId', groupController.validate('putSuspens
 router.get('/:groupId', groupController.validate('getGroup'), handleValidationResult, authenticate,
     groupController.getGroup)
 
-router.post('/:groupId/trainings/:trainingId/announce', groupController.validate('announceTraining'),
-    handleValidationResult, authenticate, groupController.announceTraining)
-
 router.post('/:groupId/suspensions/:userId/cancel', groupController.validate('cancelSuspension'),
     handleValidationResult, authenticate, groupController.cancelSuspension)
 
