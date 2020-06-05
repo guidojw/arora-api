@@ -1,6 +1,5 @@
 'use strict'
 const axios = require('axios')
-const timeHelper = require('../helpers/time')
 const discordMessageJob = require('../jobs/discord-message')
 const robloxManager = require('../managers/roblox')
 const userService = require('../services/user')
@@ -85,47 +84,6 @@ exports.putSuspension = async (groupId, userId, { changes, editorId }) => {
 exports.getGroup = groupId => {
     const client = robloxManager.getClient(groupId)
     return client.apis.groups.getGroupInfo(groupId)
-}
-
-exports.announceTraining = async (groupId, trainingId, authorId) => {
-    const training = await exports.getTraining(trainingId)
-    const authorName = await userService.getUsername(authorId)
-    discordMessageJob('log', `**${authorName}** announced training **${trainingId}**`)
-    return exports.announceDiscord(groupId, training)
-}
-
-exports.announceDiscord = async (groupId, training) => {
-    const announcement = await exports.getTrainingAnnouncement(training)
-    await discordMessageJob('training', announcement)
-    return announcement
-}
-
-exports.getTrainingAnnouncement = async training => {
-    const role = exports.getRoleByAbbreviation(training.type.toUpperCase())
-    const dateString = timeHelper.getDate(training.date)
-    const timeString = timeHelper.getTime(training.date)
-    const authorName = await userService.getUsername(training.authorId)
-    const notes = training.notes
-    return `<:ns:248922413599817728> **TRAINING**\nThere will be a *${role}* training on **` +
-        `${dateString}**.\nTime: **${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**.\n${notes ? notes 
-            + '\n' : ''}Hosted by **${authorName}**.\n<@&${training.type === 'cd' ? '673950073716998177' : 
-            '673950095250554920'}>`
-}
-
-exports.getRoleByAbbreviation = str => {
-    /* eslint-disable indent */
-    return str === 'G' ? 'Guest' : str === 'C' ? 'Customer' : str === 'S' ? 'Suspended' : str === 'TD' ? 'Train Driver'
-        : str === 'CD' ? 'Conductor' : str === 'CSR' ? 'Customer Service Representative' : str === 'CS' ?
-        'Customer Service' : str === 'J' ? 'Janitor' : str === 'Se' ? 'Security' : str === 'LC' ? 'Line Controller' :
-        str === 'PR' ? 'Partner Representative' : str === 'R' ? 'Representative' : str === 'MC' ?
-        'Management Coordinator' : str === 'OC' ? 'Operations Coordinator' : str === 'GA' ? 'Group Admin' : str ===
-        'BoM' ? 'Board of Managers' : str === 'BoD' ? 'Board of Directors' : str === 'CF' ? 'Co-Founder' : str === 'AA'
-        ? 'Alt. Accounts' : str === 'PD' ? 'President-Director' : str === 'UT' ? 'Update Tester' : str === 'P' ?
-        'Pending' : str === 'PH' ? 'Pending HR' : str === 'HoCR' ? 'Head of Customer Relations' : str === 'HoSe' ?
-        'Head of Security' : str === 'HoSt' ? 'Manager of Stations' : str === 'HoE' ? 'Head of Events' : str === 'HoC' ?
-        'Head of Conductors' : str === 'HoRM' ? 'Head of Rail Management' : str === 'SD' ? 'Staff Director' : str ===
-        'OD' ? 'Operations Director' : null
-    /* eslint-enable indent */
 }
 
 exports.getRoles = async groupId => {
