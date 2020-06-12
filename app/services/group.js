@@ -10,12 +10,19 @@ const ConflictError = require('../errors/conflict')
 const ForbiddenError = require('../errors/forbidden')
 const BadRequestError = require('../errors/bad-request')
 
+const robloxConfig = require('../../config/roblox')
+
 exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason }) => {
     if (await Suspension.findOne({ where: { userId }})) throw new ConflictError('User is already suspended.')
     const rank = await userService.getRank(userId, groupId)
     if (rank === 2) throw new ConflictError('User is already suspended.')
     if (rank >= 200 || rank === 99 || rank === 103) throw new ForbiddenError('User is unsuspendable.')
     if (rank > 0 && rank !== 2) await exports.setRank(groupId, userId, 2)
+    const mtRank = await userService.getRank(userId, robloxConfig.mtGroup)
+    if (mtRank > 0) {
+        const client = robloxManager.getClient(robloxConfig.mtGroup)
+        await client.apis.groups.removeMemberFromGroup({ userId, groupId: robloxConfig.mtGroup })
+    }
     return Suspension.create({
         rankBack,
         duration,
@@ -144,6 +151,17 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
         throw new BadRequestError('Invalid rank.')
     }
     const newRole = await exports.setRank(groupId, userId, rank)
+
+    const mtRank = await userService.getRank(userId, robloxConfig.mtGroup)
+    if (mtRank > 0) {
+        if (rank < 100) {
+            const client = robloxManager.getClient(robloxConfig.mtGroup)
+            await client.apis.groups.removeMemberFromGroup({ userId, groupId: robloxConfig.mtGroup })
+        } else {
+            await exports(robloxConfig.mtGroup, userId, rank)
+        }
+    }
+
     const roles = await exports.getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await userService.getUsername(userId)
