@@ -94,18 +94,18 @@ module.exports = async groupId => {
     // Only continue with payout logic if there are train transactions.
     if (trainTransactions.length > 0) {
         // Build a PayoutRequest from the developer sales information.
-        // const recipients = []
-        // for (const [id, developerSales] of Object.entries(developersSales)) {
-        //     recipients.push({
-        //         recipientId: parseInt(id),
-        //         recipientType: 'User',
-        //         amount: Math.ceil(developerSales.total.robux)
-        //     })
-        // }
-        // const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
+        const recipients = []
+        for (const [id, developerSales] of Object.entries(developersSales)) {
+            recipients.push({
+                recipientId: parseInt(id),
+                recipientType: 'User',
+                amount: Math.ceil(developerSales.total.robux)
+            })
+        }
+        const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
 
         // Make the payouts.
-        // await client.apis.groups.payoutUser({ groupId, data: payoutRequest })
+        await client.apis.groups.payoutUser({ groupId, data: payoutRequest })
 
         // Add new payout row.
         await Payout.create({ until: new Date(trainTransactions[0].created) })
