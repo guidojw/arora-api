@@ -13,7 +13,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^5.16.1",
+    "@sentry/node": "^5.17.0",
     "axios": "^0.19.2",
     "bloxy": "github:Visualizememe/bloxy#dev",
     "debug": "^4.1.1",
@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "express-validator": "^6.5.0",
-    "helmet": "^3.22.0",
+    "helmet": "^3.23.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
@@ -30,7 +30,7 @@
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "pluralize": "^8.0.0",
-    "sequelize": "^5.21.12",
+    "sequelize": "^5.21.13",
     "ws": "^7.3.0"
   },
   "devDependencies": {
