@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "express-validator": "^6.5.0",
-    "helmet": "^3.23.0",
+    "helmet": "^3.23.1",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.3.0",
     "nodemon": "^2.0.4",
     "sequelize-cli": "^5.5.1"
   }
