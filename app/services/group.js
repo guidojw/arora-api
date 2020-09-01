@@ -158,7 +158,7 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
             const client = robloxManager.getClient(robloxConfig.mtGroup)
             await client.apis.groups.removeMemberFromGroup({ userId, groupId: robloxConfig.mtGroup })
         } else {
-            await exports(robloxConfig.mtGroup, userId, rank)
+            await exports.changeRank(robloxConfig.mtGroup, userId, { rank })
         }
     }
 
