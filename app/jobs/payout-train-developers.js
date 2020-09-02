@@ -64,6 +64,7 @@ module.exports = async groupId => {
     const developersSales = {}
     for (const product of products) {
         for (const developer of product.developers) {
+
             if (!developersSales[developer.robloxId]) {
                 developersSales[developer.robloxId] = {
                     total: { amount: 0, robux: 0 },
@@ -71,10 +72,12 @@ module.exports = async groupId => {
                     discordId: developer.discordId
                 }
             }
+
             developersSales[developer.robloxId].sales[product.id] = {
                 amount: 0,
                 robux: 0,
-                name: (await client.apis.api.getProductInfo(product.id)).Name }
+                name: (await client.apis.api.getGamePassInfo(product.id)).Name
+            }
         }
     }
 
