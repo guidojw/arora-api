@@ -14,7 +14,8 @@ module.exports = async groupId => {
         }
     }
 
-    const today = new Date().getDate()
+    const now = new Date()
+    const today = now.getDate()
     const trainingsToday = trainings.filter(training => training.date.getDate() === today)
     const trainingsTomorrow = trainings.filter(training => training.date.getDate() === today + 1)
     const authorIds = [...new Set([...trainingsToday.map(training => training.authorId), ...trainingsTomorrow
@@ -26,31 +27,55 @@ module.exports = async groupId => {
     shout += '. Trainings tomorrow - '
     shout += getTrainingsInfo(trainingsTomorrow, authors)
     shout += '.'
-    if (shout.length > 255) shout = `${shout.substring(0, 255 - 3)}...`
 
+    const addition = ` (Timezone: ${timeHelper.isDst(now) ? 'CEST' : 'CET'})`
+
+    // Cut excessive characters of shout
+    if (shout.length > 255 - addition.length) {
+        shout = `${shout.substring(0, 255 - addition.length - 3)}...`
+    }
+
+    shout += addition
+
+    // Compare current shout with new shout and update if they differ
     const oldShout = await groupService.getShout(groupId)
-    if (shout !== oldShout.body) await groupService.shout(groupId, shout)
+    if (shout !== oldShout.body) {
+        await groupService.shout(groupId, shout)
+    }
 }
 
 function getTrainingsInfo (trainings, authors) {
     const groupedTrainings = groupTrainingsByType(trainings)
     const types = Object.keys(groupedTrainings)
     let result = ''
+
     if (types.length > 0) {
+
         for (let i = 0; i < types.length; i++) {
             const type = types[i]
             const typeTrainings = groupedTrainings[type]
+
             result += `${type.toUpperCase()}:`
+
             for (let j = 0; j < typeTrainings.length; j++) {
                 const training = typeTrainings[j]
                 const timeString = timeHelper.getTime(training.date)
                 const author = authors.find(author => author.id === training.authorId)
+
                 result += ` ${timeString} (host: ${author.name})`
-                if (j < typeTrainings.length - 2) result += ','
-                if (j === typeTrainings.length - 2) result += ' and'
+                if (j < typeTrainings.length - 2) {
+                    result += ','
+                }
+                if (j === typeTrainings.length - 2) {
+                    result += ' and'
+                }
             }
-            if (i <= types.length - 2) result += ' | '
+
+            if (i <= types.length - 2) {
+                result += ' | '
+            }
         }
+
     } else {
         result += 'none'
     }
@@ -59,8 +84,12 @@ function getTrainingsInfo (trainings, authors) {
 
 function groupTrainingsByType (trainings) {
     const result = {}
+
     for (const training of trainings) {
-        if (!result[training.type]) result[training.type] = []
+        if (!result[training.type]) {
+            result[training.type] = []
+        }
+
         result[training.type].push(training)
     }
     return result
