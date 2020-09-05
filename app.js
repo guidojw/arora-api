@@ -16,6 +16,7 @@ const usersRouter = require('./app/routes/users')
 const bansRouter = require('./app/routes/bans')
 const trelloRouter = require('./app/routes/trello')
 const catalogRouter = require('./app/routes/catalog')
+const statusRouter = require('./app/routes/status')
 
 const app = express()
 
@@ -35,6 +36,7 @@ app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/bans', bansRouter)
 app.use('/api/v1/catalog', catalogRouter)
 app.use('/api/v1/trello', trelloRouter)
+app.use('/api/v1/status', statusRouter)
 
 app.use(() => {
     throw new NotFoundError()
