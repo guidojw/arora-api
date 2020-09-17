@@ -7,7 +7,7 @@ const cron = require('node-schedule')
 const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
-const { authenticateWebSocket } = require('../app/middlewares/auth')
+const { authenticateWebSocketConnection } = require('../app/middlewares/auth')
 
 const cronConfig = require('../config/cron')
 
@@ -27,7 +27,7 @@ server.on('listening', onListening)
 
 server.on('upgrade', function upgrade (req, socket, head) {
     try {
-        authenticateWebSocket(req)
+        authenticateWebSocketConnection(req)
     } catch (err) {
         socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
         socket.destroy()

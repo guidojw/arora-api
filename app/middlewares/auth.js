@@ -14,7 +14,7 @@ exports.authenticate = (req, _res, next) => {
     next()
 }
 
-exports.authenticateWebSocket = req => {
+exports.authenticateWebSocketConnection = req => {
     // Check for existence of the authorization header as these
     // requests are not checked by express-validator
     const token = req.headers.authorization !== undefined
