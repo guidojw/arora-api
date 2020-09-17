@@ -7,6 +7,7 @@ const cron = require('node-schedule')
 const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
+const { authenticateWebSocket } = require('../app/middlewares/auth')
 
 const cronConfig = require('../config/cron')
 
@@ -14,16 +15,32 @@ const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
 const server = http.createServer(app)
-const wss = new WebSocket.Server({ server, path: '/api/v1' })
+const wss = new WebSocket.Server({ noServer: true, path: '/api/v1' })
 
 robloxManager.init()
+webSocketManager.init()
 
-server.listen(port)
+wss.on('connection', webSocketManager.addConnection)
+
 server.on('error', onError)
 server.on('listening', onListening)
 
-webSocketManager.init()
-wss.on('connection', webSocketManager.addConnection)
+server.on('upgrade', function upgrade (req, socket, head) {
+    try {
+        authenticateWebSocket(req)
+    } catch (err) {
+        console.log(err.message)
+        socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
+        socket.destroy()
+        return
+    }
+
+    wss.handleUpgrade(req, socket, head, function done (ws) {
+        wss.emit('connection', ws, req)
+    })
+})
+
+server.listen(port)
 
 for (const job of Object.values(cronConfig)) {
     if (job.hasOwnProperty('args')) {
@@ -34,14 +51,14 @@ for (const job of Object.values(cronConfig)) {
     }
 }
 
-function normalizePort(val) {
+function normalizePort (val) {
     const port = parseInt(val, 10)
     if (isNaN(port)) return val
     if (port >= 0) return port
     return false
 }
 
-function onError(error) {
+function onError (error) {
     if (error.syscall !== 'listen') throw error
     const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port
     switch (error.code) {
@@ -58,7 +75,7 @@ function onError(error) {
     }
 }
 
-function onListening() {
+function onListening () {
     const addr = server.address()
     const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
     debug('Listening on ' + bind)
