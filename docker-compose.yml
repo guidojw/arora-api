@@ -1,27 +1,32 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:11.2
+  app:
+    build: .
+    image: nsadmin-api
+    container_name: nsadmin-api
+    restart: always
     env_file: .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: nsadmin
+      NODE_ENV: production
+      POSTGRES_HOST: db
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/opt/app
+      - node_modules:/opt/app/node_modules
+    networks:
+      - nsadmin_production_default
+    command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
+
+  db:
+    image: postgres:11.2
+    container_name: postgresdb
+    restart: always
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  nsadmin-api:
-    build: .
-    env_file: .env
-    environment:
-      DB_HOST: db
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/home/nodejs
     networks:
       - nsadmin_production_default
 
@@ -30,4 +35,5 @@ networks:
     external: true
 
 volumes:
+  node_modules:
   postgres_data:

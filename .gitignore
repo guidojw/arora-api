@@ -1,6 +1,5 @@
 /.idea/*
 /node_modules
 .env
-config/database.json
 ecosystem.config.js
 *.key
