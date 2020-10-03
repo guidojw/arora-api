@@ -20,7 +20,7 @@ module.exports = {
         username: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
         host: process.env.POSTGRES_HOST,
-        database: `nsadmin_production`,
+        database: 'nsadmin_production',
 
         dialect: 'postgres',
         operatorsAliases: '0',

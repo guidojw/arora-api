@@ -17,12 +17,17 @@ services:
       - node_modules:/opt/app/node_modules
     networks:
       - nsadmin_production_default
-    command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
+    command: /bin/bash ./bin/wait-for-it.sh db:5432 -- npm start
 
   db:
     image: postgres:11.2
-    container_name: postgresdb
+    container_name: postgres-db
     restart: always
+    env_file: .env
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: nsadmin_production
     ports:
       - "5432:5432"
     volumes:
