@@ -4,7 +4,6 @@
 
 # Docker configuration
 Dockerfile
-Makefile
 docker-compose.yml
 
 # NPM dependencies
