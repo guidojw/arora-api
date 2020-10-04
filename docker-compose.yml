@@ -17,7 +17,7 @@ services:
       - node_modules:/opt/app/node_modules
     networks:
       - nsadmin_production_default
-    command: /bin/bash ./bin/wait-for-it.sh db:5432 -- npm start
+    command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
 
   db:
     image: postgres:11.2
