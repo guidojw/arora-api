@@ -8,3 +8,4 @@ docker-compose.yml
 
 # NPM dependencies
 node_modules
+npm-debug.log
