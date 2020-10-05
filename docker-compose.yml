@@ -1,10 +1,9 @@
 version: '3'
 
 services:
-  app:
+  web:
     build: .
     image: nsadmin-api
-    container_name: nsadmin-api
     restart: always
     env_file: .env
     environment:
@@ -21,7 +20,6 @@ services:
 
   db:
     image: postgres:11.2
-    container_name: postgres-db
     restart: always
     env_file: .env
     environment:
