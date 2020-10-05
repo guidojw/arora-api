@@ -14,8 +14,6 @@ services:
     volumes:
       - .:/opt/app
       - node_modules:/opt/app/node_modules
-    networks:
-      - nsadmin_production_default
     command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
 
   db:
@@ -30,12 +28,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - nsadmin_production_default
-
-networks:
-  nsadmin_production_default:
-    external: true
 
 volumes:
   node_modules:
