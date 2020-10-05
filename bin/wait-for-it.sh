@@ -13,9 +13,9 @@
 #
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
+# --------------------------------------------------------------------
 
 # Use this script to test if a given TCP host/port are available
-# --------------------------------------------------------------------
 
 WAITFORIT_cmdname=${0##*/}
 
