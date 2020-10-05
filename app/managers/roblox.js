@@ -7,7 +7,6 @@ const announceTrainingsJob = require('../jobs/announce-trainings')
 
 const robloxConfig = require('../../config/roblox')
 
-
 const clients = { authenticated: {} }
 
 let initiated = false
@@ -15,19 +14,34 @@ let initiated = false
 exports.init = async () => {
     if (initiated) return
     initiated = true
+
     try {
-        const client = new Client({ setup: { throwHttpErrors: true }})
-        await client.login({ cookie: process.env.ROBLOX_COOKIE })
+        const client = new Client({
+            setup: {
+                throwHttpErrors: true
+            }, credentials: {
+                cookie: process.env.ROBLOX_COOKIE
+            }
+        })
+
+        await client.login()
         console.log('Roblox account logged in!')
+
         const groups = await client.user.getGroups()
-        const groupIds = groups.map(group => group.id)
+        const groupIds = groups.data.map(group => group.id)
         for (const groupId of groupIds) {
             clients.authenticated[groupId] = client
         }
+
     } catch (err) {
         console.error(err.message)
     }
-    clients.unauthenticated = new Client({ setup: { throwHttpErrors: true }})
+
+    clients.unauthenticated = new Client({
+        setup: {
+            throwHttpErrors: true
+        }
+    })
 
     checkSuspensionsJob()
     announceTrainingsJob(robloxConfig.defaultGroup)
