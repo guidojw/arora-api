@@ -4,6 +4,7 @@ require('dotenv').config()
 const { Client } = require('bloxy')
 const checkSuspensionsJob = require('../jobs/check-suspensions')
 const announceTrainingsJob = require('../jobs/announce-trainings')
+const axios = require('axios')
 
 const robloxConfig = require('../../config/roblox')
 
@@ -17,9 +18,12 @@ exports.init = async () => {
 
     try {
         const client = new Client({
-            setup: {
-                throwHttpErrors: true
-            }, credentials: {
+            rest: {
+                // Bloxy's default requester (got) doesn't throw HTTP errors,
+                // so this custom requester is used which does.
+                requester
+            },
+            credentials: {
                 cookie: process.env.ROBLOX_COOKIE
             }
         })
@@ -28,7 +32,7 @@ exports.init = async () => {
         console.log('Roblox account logged in!')
 
         const groups = await client.user.getGroups()
-        const groupIds = groups.data.map(group => group.id)
+        const groupIds = groups.data.map(group => group.group.id)
         for (const groupId of groupIds) {
             clients.authenticated[groupId] = client
         }
@@ -49,4 +53,15 @@ exports.init = async () => {
 
 exports.getClient = groupId => {
     return groupId ? clients.authenticated[groupId] : clients.unauthenticated
+}
+
+// Custom requester for Bloxy using Axios.
+async function requester(options) {
+    const result = await axios.request(options)
+
+    // Bloxy expects (the very odd) got's format for response data,
+    // so map two variables to keep Bloxy responseHandlers from breaking.
+    result.statusCode = result.status
+    result.body = result.data
+    return result
 }
