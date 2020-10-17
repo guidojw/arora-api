@@ -99,8 +99,8 @@ module.exports = async groupId => {
     if (trainTransactions.length > 0) {
         // Build a PayoutRequest from the developer sales information.
         const recipients = []
-        for (const [id, developerSales] of Object.entries(developersSales)) {
-            const id = parseInt(id)
+        for (let [id, developerSales] of Object.entries(developersSales)) {
+            id = parseInt(id)
 
             // Check if user is in the group.
             if (await userService.getRank(id, groupId) !== 0) {
