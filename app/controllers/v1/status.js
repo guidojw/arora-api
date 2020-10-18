@@ -13,5 +13,5 @@ exports.validate = method => {
 }
 
 exports.getStatus = async (req, res) => {
-    res.json(statusService.getStatus(req.params.groupId))
+    res.json(await statusService.getStatus(req.params.groupId))
 }
