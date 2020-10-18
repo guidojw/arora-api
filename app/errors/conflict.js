@@ -4,7 +4,7 @@ class ConflictError extends Error {
         super(message || 'Conflict')
 
         this.name = this.constructor.name
-        this.status = 409
+        this.statusCode = 409
     }
 }
 

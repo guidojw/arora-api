@@ -41,11 +41,7 @@ exports.init = async () => {
         console.error(err.message)
     }
 
-    clients.unauthenticated = new Client({
-        setup: {
-            throwHttpErrors: true
-        }
-    })
+    clients.unauthenticated = new Client({ rest: { requester }})
 
     checkSuspensionsJob()
     announceTrainingsJob(robloxConfig.defaultGroup)
@@ -57,11 +53,23 @@ exports.getClient = groupId => {
 
 // Custom requester for Bloxy using Axios.
 async function requester(options) {
-    const result = await axios.request(options)
+    let result
+    try {
+        result = await axios.request(options)
+
+    } catch (err) {
+        // Map status and statusText to corresponding
+        // statusCode and message in thrown error.
+        err.statusCode = err.response.status
+        err.message = err.response.statusText
+
+        throw err
+    }
 
     // Bloxy expects (the very odd) got's format for response data,
     // so map two variables to keep Bloxy responseHandlers from breaking.
     result.statusCode = result.status
     result.body = result.data
+
     return result
 }

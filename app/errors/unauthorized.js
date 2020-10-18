@@ -5,7 +5,7 @@ class UnauthorizedError extends Error {
         super(message || 'Unauthorized')
 
         this.name = this.constructor.name
-        this.status = 401
+        this.statusCode = 401
     }
 }
 
