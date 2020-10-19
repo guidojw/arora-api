@@ -12,7 +12,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/opt/app
       - node_modules:/opt/app/node_modules
     command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
 
@@ -30,5 +29,4 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  node_modules:
   postgres_data:
