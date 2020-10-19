@@ -202,7 +202,7 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
             const group = await client.getGroup(robloxConfig.mtGroup)
             await group.kickMember(userId)
         } else {
-            await exports.changeRank(robloxConfig.mtGroup, userId, { rank })
+            await exports.setRank(robloxConfig.mtGroup, userId, rank)
         }
     }
 
