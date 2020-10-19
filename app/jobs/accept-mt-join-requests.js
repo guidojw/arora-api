@@ -6,26 +6,21 @@ const groupService = require('../services/group')
 
 module.exports = async (groupId, mtGroupId) => {
     const client = robloxManager.getClient(mtGroupId)
-    const mtGroup = await client.getGroup(mtGroupId)
     let cursor = null
     do {
-        const requests = await mtGroup.getJoinRequests({ cursor })
-
+        const requests = await client.apis.groups.getJoinRequests({ groupId: mtGroupId, cursor })
         for (const request of requests.data) {
             const userId = request.requester.userId
             const rank = await userService.getRank(userId, groupId)
-
             if (rank >= 100) {
-                await mtGroup.acceptJoinRequest(userId)
+                await client.apis.groups.acceptJoinRequest({ groupId: mtGroupId, userId })
                 await groupService.setRank(mtGroupId, userId, rank)
                 discordMessageJob('log', `Accepted **${request.requester.username}**'s MT join request`)
-
             } else {
-                await mtGroup.declineJoinRequest(userId)
+                await client.apis.groups.declineJoinRequest({ groupId: mtGroupId, userId })
                 discordMessageJob('log', `Declined **${request.requester.username}**'s MT join request`)
             }
         }
-
         cursor = requests.nextPageCursor
     } while (cursor)
 }

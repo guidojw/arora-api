@@ -10,16 +10,16 @@ exports.getUserId = username => {
 
 exports.hasBadge = async (userId, badgeId) => {
     const client = robloxManager.getClient(robloxConfig.defaultGroup)
-    return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
+    return (await client.apis.inventory.getUserOwnedItems({
         userId,
         itemType: 'Badge',
-        itemTargetId: badgeId
+        targetId: badgeId
     })).data.length === 1
 }
 
 exports.getUsers = async userIds => {
     const client = robloxManager.getClient()
-    return (await client.apis.usersAPI.getUsersByIds(userIds)).data
+    return (await client.apis.users.getUsersByIds(userIds)).data
 }
 
 exports.getRank = async (userId, groupId) => {
@@ -45,5 +45,5 @@ exports.getUsername = userId => {
 
 exports.getUser = userId => {
     const client = robloxManager.getClient()
-    return client.apis.usersAPI.getUserById(userId)
+    return client.apis.users.getUserInfo(userId)
 }

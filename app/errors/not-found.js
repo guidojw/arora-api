@@ -4,7 +4,7 @@ class NotFoundError extends Error {
         super(message || 'Not Found')
 
         this.name = this.constructor.name
-        this.statusCode = 404
+        this.status = 404
     }
 }
 

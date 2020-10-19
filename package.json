@@ -15,7 +15,7 @@
   "dependencies": {
     "@sentry/node": "^5.26.0",
     "axios": "^0.20.0",
-    "bloxy": "^5.0.2",
+    "bloxy": "github:Visualizememe/bloxy#dev",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
