@@ -38,19 +38,20 @@ module.exports = async groupId => {
     const transactions = []
     let cursor = null
     do {
-        const transactionHistory = await client.apis.economy.getGroupTransactions({
+        const transactionHistory = await client.apis.economyAPI.getGroupTransactions({
             transactionType: 'Sale',
             limit: 100,
             groupId,
             cursor
         })
 
-        const lastTransaction = transactionHistory.data.find(transaction => new Date(transaction.created).getTime() <=
-            lastTransactionDate.getTime())
+        const lastTransaction = transactionHistory.data.find(transaction => new Date(transaction.created)
+                .getTime() <= lastTransactionDate.getTime())
         if (!lastTransaction) {
             transactions.push(...transactionHistory.data)
         } else {
-            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(lastTransaction)))
+            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(
+                lastTransaction)))
             break
         }
 
