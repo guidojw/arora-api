@@ -47,7 +47,7 @@ if (process.env.SENTRY_DSN) {
 }
 
 app.use((err, req, res, _next) => {
-    sendError(res, err.status || 500, err.message)
+    sendError(res, err.statusCode || 500, err.message)
 })
 
 module.exports = app

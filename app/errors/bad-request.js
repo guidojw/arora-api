@@ -4,7 +4,7 @@ class BadRequestError extends Error {
         super(message || 'Bad Request')
 
         this.name = this.constructor.name
-        this.status = 400
+        this.statusCode = 400
     }
 }
 
