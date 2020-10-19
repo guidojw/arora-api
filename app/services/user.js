@@ -3,9 +3,9 @@ const robloxManager = require('../managers/roblox')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getUserId = username => {
+exports.getUserIdFromUsername = username => {
     const client = robloxManager.getClient()
-    return client.getUserId(username)
+    return client.getUserIdFromUsername(username)
 }
 
 exports.hasBadge = async (userId, badgeId) => {

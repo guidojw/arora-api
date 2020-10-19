@@ -5,8 +5,8 @@ const userController = require('../controllers/v1/user')
 const { handleValidationResult } = require('../middlewares/error')
 const { authenticate } = require('../middlewares/auth')
 
-router.get('/:username/user-id', userController.validate('getUserId'), handleValidationResult, authenticate,
-    userController.getUserId)
+router.get('/:username/user-id', userController.validate('getUserIdFromUsername'), handleValidationResult,
+    authenticate, userController.getUserIdFromUsername)
 
 router.get('/:userId/has-badge/:badgeId', userController.validate('hasBadge'), handleValidationResult,
     authenticate, userController.hasBadge)
