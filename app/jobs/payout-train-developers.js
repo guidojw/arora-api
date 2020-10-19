@@ -1,6 +1,7 @@
 'use strict'
 const robloxManager = require('../managers/roblox')
 const webSocketManager = require('../managers/web-socket')
+const userService = require('../services/user')
 const { Payout } = require('../models')
 
 const developers = {
@@ -98,12 +99,17 @@ module.exports = async groupId => {
     if (trainTransactions.length > 0) {
         // Build a PayoutRequest from the developer sales information.
         const recipients = []
-        for (const [id, developerSales] of Object.entries(developersSales)) {
-            recipients.push({
-                recipientId: parseInt(id),
-                recipientType: 'User',
-                amount: Math.ceil(developerSales.total.robux)
-            })
+        for (let [id, developerSales] of Object.entries(developersSales)) {
+            id = parseInt(id)
+
+            // Check if user is in the group.
+            if (await userService.getRank(id, groupId) !== 0) {
+                recipients.push({
+                    recipientId: id,
+                    recipientType: 'User',
+                    amount: Math.ceil(developerSales.total.robux)
+                })
+            }
         }
         const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
 
