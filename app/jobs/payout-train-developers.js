@@ -39,7 +39,7 @@ module.exports = async groupId => {
     const transactions = []
     let cursor = null
     do {
-        const transactionHistory = await client.apis.economy.getGroupTransactions({
+        const transactionHistory = await client.apis.economyAPI.getGroupTransactions({
             transactionType: 'Sale',
             limit: 100,
             groupId,
