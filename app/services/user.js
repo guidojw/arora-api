@@ -8,6 +8,7 @@ exports.getUserIdFromUsername = async username => {
     const client = robloxManager.getClient()
     const user = await client.getUserIdFromUsername(username)
 
+    // This Roblox endpoint doesn't throw HTTP 404 if a user doesn't exist -.-
     if (user.id === undefined) {
         throw new NotFoundError('User not found')
     }
@@ -30,27 +31,27 @@ exports.getUsers = async userIds => {
 }
 
 exports.getRank = async (userId, groupId) => {
-    const client = robloxManager.getClient()
+    const client = robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
-    const group = groups.find(group => group.id === groupId)
+    const group = groups.data.find(group => group.group.id === groupId)
     return group ? group.role.rank : 0
 }
 
 exports.getRole = async (userId, groupId) => {
-    const client = robloxManager.getClient()
+    const client = robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
-    const group = groups.find(group => group.id === groupId)
+    const group = groups.data.find(group => group.group.id === groupId)
     return group ? group.role.name : 'Guest'
 }
 
-exports.getUsername = userId => {
+exports.getUsername = async userId => {
     const client = robloxManager.getClient()
-    return client.getUsername(userId)
+    return (await client.apis.generalApi.getUserById({ userId })).name
 }
 
 exports.getUser = userId => {
     const client = robloxManager.getClient()
-    return client.apis.usersAPI.getUserById(userId)
+    return client.apis.usersAPI.getUserById({ userId })
 }
