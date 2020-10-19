@@ -1,11 +1,18 @@
 'use strict'
 const robloxManager = require('../managers/roblox')
+const NotFoundError = require('../errors/not-found')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getUserIdFromUsername = username => {
+exports.getUserIdFromUsername = async username => {
     const client = robloxManager.getClient()
-    return client.getUserIdFromUsername(username)
+    const user = await client.getUserIdFromUsername(username)
+
+    if (user.id === undefined) {
+        throw new NotFoundError('User not found')
+    }
+
+    return user.id
 }
 
 exports.hasBadge = async (userId, badgeId) => {
