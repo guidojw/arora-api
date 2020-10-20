@@ -23,6 +23,8 @@ exports.init = async () => {
             }
         })
         // Set the client's requester to the custom requester.
+        // Needs to be done after instantiation as we need to
+        // know what the original requester was.
         client.rest.requester = requester.bind(client.rest.requester)
 
         await client.login()
@@ -40,6 +42,7 @@ exports.init = async () => {
 
     // Unauthenticated client
     const client = new Client()
+    // Set custom requester again, like with the authenticated clients.
     client.rest.requester = requester.bind(client.rest.requester)
     clients.unauthenticated = client
 
@@ -52,8 +55,10 @@ exports.getClient = groupId => {
 }
 
 // Custom requester that uses Bloxy's default requester but
-// enables its throwHttpErrors as the project relies on that.
-async function requester(options) {
+// enables its throwHttpErrors option as the project relies on that.
+function requester(options) {
+    // HTTP 403 is thrown on fetching a new X-CSRF token, Bloxy however
+    // relies on this so don't throw HTTP errors then.
     if (options.xcsrf !== false && options.url !== 'https://auth.roblox.com/v2/login') {
         options.throwHttpErrors = true
     }
