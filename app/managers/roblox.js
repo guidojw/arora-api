@@ -4,7 +4,6 @@ require('dotenv').config()
 const { Client } = require('bloxy')
 const checkSuspensionsJob = require('../jobs/check-suspensions')
 const announceTrainingsJob = require('../jobs/announce-trainings')
-const axios = require('axios')
 
 const robloxConfig = require('../../config/roblox')
 
@@ -16,17 +15,15 @@ exports.init = async () => {
     if (initiated) return
     initiated = true
 
+    // Authenticated client(s)
     try {
         const client = new Client({
-            rest: {
-                // Bloxy's default requester (got) doesn't throw HTTP errors,
-                // so this custom requester is used which does.
-                requester
-            },
             credentials: {
                 cookie: process.env.ROBLOX_COOKIE
             }
         })
+        // Set the client's requester to the custom requester.
+        client.rest.requester = requester.bind(client.rest.requester)
 
         await client.login()
         console.log('Roblox account logged in!')
@@ -41,7 +38,10 @@ exports.init = async () => {
         console.error(err.message)
     }
 
-    clients.unauthenticated = new Client({ rest: { requester }})
+    // Unauthenticated client
+    const client = new Client()
+    client.rest.requester = requester.bind(client.rest.requester)
+    clients.unauthenticated = client
 
     checkSuspensionsJob()
     announceTrainingsJob(robloxConfig.defaultGroup)
@@ -51,25 +51,13 @@ exports.getClient = groupId => {
     return groupId ? clients.authenticated[groupId] : clients.unauthenticated
 }
 
-// Custom requester for Bloxy using Axios.
+// Custom requester that uses Bloxy's default requester but
+// enables its throwHttpErrors as the project relies on that.
 async function requester(options) {
-    let result
-    try {
-        result = await axios.request(options)
-
-    } catch (err) {
-        // Map status and statusText to corresponding
-        // statusCode and message in thrown error.
-        err.statusCode = err.response.status
-        err.message = err.response.statusText
-
-        throw err
+    if (options.xcsrf !== false && options.url !== 'https://auth.roblox.com/v2/login') {
+        options.throwHttpErrors = true
     }
 
-    // Bloxy expects (the very odd) got's format for response data,
-    // so map two variables to keep Bloxy responseHandlers from breaking.
-    result.statusCode = result.status
-    result.body = result.data
-
-    return result
+    // this refers to Bloxy's original requester.
+    return this(options)
 }
