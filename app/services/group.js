@@ -113,7 +113,7 @@ exports.getGroup = groupId => {
     return client.apis.groupsAPI.getGroup({ groupId })
 }
 
-exports.getRoles = async groupId => {
+exports.getRoles = groupId => {
     const client = robloxManager.getClient(groupId)
     return client.apis.groupsAPI.getGroupRoles({ groupId })
 }
