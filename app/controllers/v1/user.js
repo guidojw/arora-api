@@ -4,7 +4,7 @@ const userService = require('../../services/user')
 
 exports.validate = method => {
     switch (method) {
-        case 'getUserId':
+        case 'getUserIdFromUsername':
             return [
                 header('authorization').exists().isString(),
                 param('username').isString()
@@ -41,8 +41,8 @@ exports.validate = method => {
     }
 }
 
-exports.getUserId = async (req, res) => {
-    res.json(await userService.getUserId(req.params.username))
+exports.getUserIdFromUsername = async (req, res) => {
+    res.json(await userService.getUserIdFromUsername(req.params.username))
 }
 
 exports.hasBadge = async (req, res) => {

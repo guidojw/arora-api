@@ -4,7 +4,7 @@ class ForbiddenError extends Error {
         super(message || 'Forbidden')
 
         this.name = this.constructor.name
-        this.status = 403
+        this.statusCode = 403
     }
 }
 
