@@ -27,7 +27,7 @@ exports.hasBadge = async (userId, badgeId) => {
 
 exports.getUsers = async userIds => {
     const client = robloxManager.getClient()
-    return (await client.apis.usersAPI.getUsersByIds(userIds)).data
+    return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
 }
 
 exports.getRank = async (userId, groupId) => {
