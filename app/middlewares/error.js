@@ -1,16 +1,23 @@
 'use strict'
 const { validationResult } = require('express-validator')
 
-exports.handleValidationResult = async (req, res, next) => {
+async function handleValidationResult(req, res, next) {
     const errors = await validationResult(req)
-    if (errors.isEmpty()) return next()
-    exports.sendErrors(res, 422, errors.array())
+    if (errors.isEmpty()) {
+        return next()
+    }
+    sendErrors(res, 422, errors.array())
 }
 
-exports.sendError = (res, statusCode, message) => {
-    exports.sendErrors(res, statusCode, [{ message }])
+function sendError(res, statusCode, message) {
+    sendErrors(res, statusCode, [{ message }])
 }
 
-exports.sendErrors = (res, statusCode, errors) => {
+function sendErrors(res, statusCode, errors) {
     res.status(statusCode).send({ errors })
+}
+
+module.exports = {
+    handleValidationResult,
+    sendError
 }

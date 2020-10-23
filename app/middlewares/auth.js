@@ -3,7 +3,7 @@ const crypto = require('crypto')
 const authService = require('../services/auth')
 const UnauthorizedError = require('../errors/unauthorized')
 
-exports.authenticate = (req, _res, next) => {
+function authenticate(req, _res, next) {
     const token = req.header('authorization').replace('Bearer ', '')
 
     if (!authService.authenticate(token)) {
@@ -12,7 +12,7 @@ exports.authenticate = (req, _res, next) => {
     next()
 }
 
-exports.verifyTrelloWebhookRequest = (req, _res, next) => {
+function verifyTrelloWebhookRequest(req, _res, next) {
     const base64Digest = content => {
         return crypto.createHmac('sha1', process.env.TRELLO_SECRET).update(content).digest('base64')
     }
@@ -24,4 +24,9 @@ exports.verifyTrelloWebhookRequest = (req, _res, next) => {
         throw new UnauthorizedError('Invalid signature.')
     }
     next()
+}
+
+module.exports = {
+    authenticate,
+    verifyTrelloWebhookRequest
 }
