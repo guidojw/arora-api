@@ -3,7 +3,7 @@ const { param, body, header, query } = require('express-validator')
 const banService = require('../../services/ban')
 const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers/request')
 
-exports.validate = method => {
+function validate(method) {
     switch (method) {
         case 'getBans':
             return [
@@ -43,22 +43,31 @@ exports.validate = method => {
     }
 }
 
-exports.getBans = async (req, res) => {
+async function getBans(req, res) {
     res.json((await banService.getBans(req.query.scope, req.query.sort)).map(ban => ban.get({ raw: true })))
 }
 
-exports.ban = async (req, res) => {
+async function ban(req, res) {
     res.json((await banService.ban(req.body.groupId, req.body.userId, req.body)).get({ raw: true }))
 }
 
-exports.putBan = async (req, res) => {
+async function putBan(req, res) {
     res.json((await banService.putBan(req.params.userId, req.body)).get({ raw: true }))
 }
 
-exports.getBan = async (req, res) => {
+async function getBan(req, res) {
     res.json((await banService.getBan(req.params.userId, req.query.scope)).get({ raw: true }))
 }
 
-exports.cancelBan = async (req, res) => {
+async function cancelBan(req, res) {
     res.json((await banService.cancelBan(req.params.userId, req.body.authorId, req.body.reason)).get({ raw: true }))
+}
+
+module.exports = {
+    validate,
+    getBans,
+    ban,
+    putBan,
+    getBan,
+    cancelBan
 }

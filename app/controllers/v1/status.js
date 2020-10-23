@@ -2,7 +2,7 @@
 const { header, param } = require('express-validator')
 const statusService = require('../../services/status')
 
-exports.validate = method => {
+function validate(method) {
     switch (method) {
         case 'getStatus':
             return [
@@ -12,6 +12,11 @@ exports.validate = method => {
     }
 }
 
-exports.getStatus = async (req, res) => {
+async function getStatus(req, res) {
     res.json(await statusService.getStatus(req.params.groupId))
+}
+
+module.exports = {
+    validate,
+    getStatus
 }
