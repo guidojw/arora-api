@@ -8,6 +8,7 @@ const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
 const { authenticateWebSocketConnection } = require('../app/services/auth')
+const checkSuspensionsJob = require('../app/jobs/check-suspensions')
 
 const cronConfig = require('../config/cron')
 
@@ -49,6 +50,8 @@ for (const job of Object.values(cronConfig)) {
         cron.scheduleJob(job.expression, job.job.run)
     }
 }
+
+checkSuspensionsJob.run()
 
 function normalizePort (val) {
     const port = parseInt(val, 10)
