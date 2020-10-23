@@ -1,10 +1,10 @@
 'use strict'
-exports.decodeScopeQueryParam = (param = '') => {
+function decodeScopeQueryParam(param = '') {
     const result = param.split(',').filter(value => value !== '').map(value => parseInt(value) || value)
     return result.length > 0 ? result : undefined
 }
 
-exports.decodeSortQueryParam = (param = '') => {
+function decodeSortQueryParam(param = '') {
     let result = param.split(',').filter(value => value !== '').map(value => parseInt(value) || value)
     result = result.map(sort => {
         if (sort.charAt(0) === '-') {
@@ -14,4 +14,9 @@ exports.decodeSortQueryParam = (param = '') => {
         }
     })
     return result.length > 0 ? result : undefined
+}
+
+module.exports = {
+    decodeScopeQueryParam,
+    decodeSortQueryParam
 }
