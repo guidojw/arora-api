@@ -23,7 +23,10 @@ function run() {
         path.resolve(__dirname, '../../bin/backup.sh'),
         [backupScript, backupFile, databaseConfig.password],
         error => {
-            if (error) throw error
+            if (error) {
+                throw error
+            }
+
             discordMessageJob.run('backupNotification', {
                 embeds: [{
                     title: `${databaseConfig.database}-backup successful`,
@@ -38,9 +41,12 @@ function run() {
         if (err) throw err
         for (const file of files) {
             const date = fileHelper.getBackupDate(file)
+
             if (date.getTime() < Date.now() - KEEP) {
                 fs.unlink(path.resolve(home, 'storage/backups', file), err => {
-                    if (err) throw err
+                    if (err) {
+                        throw err
+                    }
                 })
             }
         }
