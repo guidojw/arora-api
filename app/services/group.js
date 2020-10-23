@@ -11,7 +11,7 @@ const BadRequestError = require('../errors/bad-request')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason }) => {
+async function suspend(groupId, userId, { rankBack, duration, authorId, reason }) {
     if (await Suspension.findOne({ where: { userId }})) {
         throw new ConflictError('User is already suspended.')
     }
@@ -44,20 +44,20 @@ exports.suspend = async (groupId, userId, { rankBack, duration, authorId, reason
     }, { individualHooks: true })
 }
 
-exports.getShout = async groupId => {
+async function getShout(groupId) {
     const group = await exports.getGroup(groupId)
     return group.shout
 }
 
-exports.getSuspensions = (scope, sort) => {
+function getSuspensions(scope, sort) {
     return Suspension.scope(scope || 'defaultScope').findAll({ order: sort })
 }
 
-exports.getTrainings = (scope, sort) => {
+function getTrainings(scope, sort) {
     return Training.scope(scope || 'defaultScope').findAll({ order: sort })
 }
 
-exports.postTraining = ({ type, authorId, date, notes }) => {
+function postTraining({ type, authorId, date, notes }) {
     return Training.create({
         type: type.toLowerCase(),
         authorId,
@@ -66,7 +66,7 @@ exports.postTraining = ({ type, authorId, date, notes }) => {
     }, { individualHooks: true })
 }
 
-exports.getSuspension = async (userId, scope) => {
+async function getSuspension(userId, scope) {
     const suspension = await Suspension.scope(scope || 'defaultScope').findOne({ where: { userId }})
     if (!suspension) {
         throw new NotFoundError('Suspension not found.')
@@ -74,7 +74,7 @@ exports.getSuspension = async (userId, scope) => {
     return suspension
 }
 
-exports.getTraining = async (trainingId, scope) => {
+async function getTraining(trainingId, scope) {
     const training = await Training.scope(scope || 'defaultScope').findByPk(trainingId)
     if (!training) {
         throw new NotFoundError('Training not found.')
@@ -82,7 +82,7 @@ exports.getTraining = async (trainingId, scope) => {
     return training
 }
 
-exports.shout = async (groupId, message, authorId) => {
+async function shout(groupId, message, authorId) {
     const client = robloxManager.getClient(groupId)
     const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message })
 
@@ -98,27 +98,27 @@ exports.shout = async (groupId, message, authorId) => {
     return shout
 }
 
-exports.putTraining = async (groupId, trainingId, { changes, editorId }) => {
+async function putTraining(groupId, trainingId, { changes, editorId }) {
     const training = await exports.getTraining(trainingId)
     return training.update(changes, { editorId, individualHooks: true })
 }
 
-exports.putSuspension = async (groupId, userId, { changes, editorId }) => {
+async function putSuspension(groupId, userId, { changes, editorId }) {
     const suspension = await exports.getSuspension(userId)
     return suspension.update(changes, { editorId, individualHooks: true })
 }
 
-exports.getGroup = groupId => {
+function getGroup(groupId) {
     const client = robloxManager.getClient(groupId)
     return client.apis.groupsAPI.getGroup({ groupId })
 }
 
-exports.getRoles = groupId => {
+function getRoles(groupId) {
     const client = robloxManager.getClient(groupId)
     return client.apis.groupsAPI.getGroupRoles({ groupId })
 }
 
-exports.setRank = async (groupId, userId, rank) => {
+async function setRank(groupId, userId, rank) {
     const roles = await exports.getRoles(groupId)
     const role = roles.roles.find(role => role.rank === rank)
     const client = robloxManager.getClient(groupId)
@@ -130,7 +130,7 @@ exports.setRank = async (groupId, userId, rank) => {
     return role
 }
 
-exports.cancelSuspension = async (groupId, userId, { authorId, reason }) => {
+async function cancelSuspension(groupId, userId, { authorId, reason }) {
     const suspension = await exports.getSuspension(userId)
     const rank = await userService.getRank(suspension.userId, groupId)
 
@@ -141,12 +141,12 @@ exports.cancelSuspension = async (groupId, userId, { authorId, reason }) => {
     return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason }, { individualHooks: true })
 }
 
-exports.cancelTraining = async (groupId, trainingId, { authorId, reason }) => {
+async function cancelTraining(groupId, trainingId, { authorId, reason }) {
     const training = await exports.getTraining(trainingId)
     return TrainingCancellation.create({ trainingId: training.id, authorId, reason }, { individualHooks: true })
 }
 
-exports.extendSuspension = async (groupId, userId, { authorId, duration, reason }) => {
+async function extendSuspension(groupId, userId, { authorId, duration, reason }) {
     const suspension = await exports.getSuspension(userId)
     let newDuration = suspension.duration + duration
     if (suspension.extensions) {
@@ -171,7 +171,7 @@ exports.extendSuspension = async (groupId, userId, { authorId, duration, reason 
     }, { individualHooks: true })
 }
 
-exports.changeRank = async (groupId, userId, { rank, authorId }) => {
+async function changeRank(groupId, userId, { rank, authorId }) {
     const oldRank = await userService.getRank(userId, groupId)
     if (oldRank === 0) {
         throw new ForbiddenError('Can\'t change rank of non members.')
@@ -218,4 +218,24 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
     }
 
     return { oldRole, newRole }
+}
+
+module.exports = {
+    suspend,
+    getShout,
+    getSuspensions,
+    getTrainings,
+    postTraining,
+    getSuspension,
+    getTraining,
+    shout,
+    putTraining,
+    putSuspension,
+    getGroup,
+    getRoles,
+    setRank,
+    cancelSuspension,
+    cancelTraining,
+    extendSuspension,
+    changeRank
 }

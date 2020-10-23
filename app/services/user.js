@@ -4,7 +4,7 @@ const NotFoundError = require('../errors/not-found')
 
 const robloxConfig = require('../../config/roblox')
 
-exports.getUserIdFromUsername = async username => {
+async function getUserIdFromUsername(username) {
     const client = robloxManager.getClient()
     const user = await client.getUserIdFromUsername(username)
 
@@ -16,7 +16,7 @@ exports.getUserIdFromUsername = async username => {
     return user.id
 }
 
-exports.hasBadge = async (userId, badgeId) => {
+async function hasBadge(userId, badgeId) {
     const client = robloxManager.getClient(robloxConfig.defaultGroup)
     return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
         userId,
@@ -25,12 +25,12 @@ exports.hasBadge = async (userId, badgeId) => {
     })).data.length === 1
 }
 
-exports.getUsers = async userIds => {
+async function getUsers(userIds) {
     const client = robloxManager.getClient()
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
 }
 
-exports.getRank = async (userId, groupId) => {
+async function getRank(userId, groupId) {
     const client = robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
@@ -38,7 +38,7 @@ exports.getRank = async (userId, groupId) => {
     return group ? group.role.rank : 0
 }
 
-exports.getRole = async (userId, groupId) => {
+async function getRole(userId, groupId) {
     const client = robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
@@ -46,11 +46,21 @@ exports.getRole = async (userId, groupId) => {
     return group ? group.role.name : 'Guest'
 }
 
-exports.getUsername = async userId => {
+async function getUsername(userId) {
     return (await this.getUser(userId)).name
 }
 
-exports.getUser = userId => {
+function getUser(userId) {
     const client = robloxManager.getClient()
     return client.apis.usersAPI.getUserById({ userId })
+}
+
+module.exports = {
+    getUserIdFromUsername,
+    hasBadge,
+    getUsers,
+    getRank,
+    getRole,
+    getUsername,
+    getUser
 }
