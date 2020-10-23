@@ -11,7 +11,7 @@ async function run(type, message) {
     }
 }
 
-const sendLog = async message => {
+async function sendLog(message) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_LOGS_WEBHOOK_URL,
@@ -19,7 +19,7 @@ const sendLog = async message => {
     })
 }
 
-const sendTrello = async body => {
+async function sendTrello(body) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_TRELLO_WEBHOOK_URL,
@@ -27,7 +27,7 @@ const sendTrello = async body => {
     })
 }
 
-const sendBackupNotification = async body => {
+async function sendBackupNotification(body) {
     await axios({
         method: 'post',
         url: process.env.DISCORD_BACKUP_NOTIFICATION_WEBHOOK_URL,
