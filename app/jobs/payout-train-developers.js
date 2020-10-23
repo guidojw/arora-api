@@ -51,8 +51,8 @@ async function run(groupId) {
         if (!lastTransaction) {
             transactions.push(...transactionHistory.data)
         } else {
-            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data.indexOf(
-                lastTransaction)))
+            transactions.push(...transactionHistory.data.splice(0, transactionHistory.data
+                .indexOf(lastTransaction)))
             break
         }
 
