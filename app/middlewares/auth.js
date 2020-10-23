@@ -14,18 +14,6 @@ exports.authenticate = (req, _res, next) => {
     next()
 }
 
-exports.authenticateWebSocketConnection = req => {
-    // Check for existence of the authorization header as these
-    // requests are not checked by express-validator
-    const token = req.headers.authorization !== undefined
-        ? req.headers.authorization.replace('Bearer ', '')
-        : undefined
-
-    if (!authService.authenticate(token)) {
-        throw new UnauthorizedError('Invalid authentication key.')
-    }
-}
-
 exports.verifyTrelloWebhookRequest = (req, _res, next) => {
     const base64Digest = content => {
         return crypto.createHmac('sha1', process.env.TRELLO_SECRET).update(content).digest('base64')

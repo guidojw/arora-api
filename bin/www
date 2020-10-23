@@ -7,7 +7,7 @@ const cron = require('node-schedule')
 const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
-const { authenticateWebSocketConnection } = require('../app/middlewares/auth')
+const { authenticateWebSocketConnection } = require('../app/services/auth')
 
 const cronConfig = require('../config/cron')
 
