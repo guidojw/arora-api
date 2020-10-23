@@ -25,8 +25,8 @@ module.exports = (sequelize, DataTypes) => {
                     userService.getUsername(cancellation.authorId)])
                 const job = cron.scheduledJobs[`suspension_${suspension.id}`]
                 if (job) job.cancel()
-                discordMessageJob('log', `**${authorName}** cancelled **${username}**'s suspension with `
-                    + `reason "*${cancellation.reason}*"`)
+                discordMessageJob.run('log', `**${authorName}** cancelled **${username}**'s suspension` +
+                    ` with reason "*${cancellation.reason}*"`)
             }
         },
         tableName: 'suspension_cancellations'

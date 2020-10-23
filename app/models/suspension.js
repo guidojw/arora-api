@@ -63,13 +63,13 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         hooks: {
             afterCreate: async suspension => {
-                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-                    suspension))
+                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run
+                    .bind(null, suspension))
                 const days = suspension.duration / 86400000
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(suspension.authorId)])
-                discordMessageJob('log', `**${authorName}** suspended **${username}** for **${days}** ` +
-                    `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
+                discordMessageJob.run('log', `**${authorName}** suspended **${username}** for **` +
+                    `${days}** ${pluralize('day', days)} with reason "*${suspension.reason}*"`)
             },
 
             afterUpdate: async (suspension, options) => {
@@ -77,16 +77,16 @@ module.exports = (sequelize, DataTypes) => {
                     userService.getUsername(options.editorId)])
                 if (suspension.changed('authorId')) {
                     const authorName = await userService.getUsername(suspension.authorId)
-                    discordMessageJob('log', `**${editorName}** changed the author of **${username}*` +
-                        `*'s suspension to **${authorName}**`)
+                    discordMessageJob.run('log', `**${editorName}** changed the author of **` +
+                        `${username}**'s suspension to **${authorName}**`)
                 }
                 if (suspension.changed('reason')) {
-                    discordMessageJob('log', `**${editorName}** changed the reason of **${username}*` +
-                        `*'s suspension to *"${suspension.reason}"*`)
+                    discordMessageJob.run('log', `**${editorName}** changed the reason of **` +
+                        `${username}**'s suspension to *"${suspension.reason}"*`)
                 }
                 if (suspension.changed('rankBack')) {
-                    discordMessageJob('log', `**${editorName}** changed the rankBack option of **${
-                        username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
+                    discordMessageJob.run('log', `**${editorName}** changed the rankBack option of **` +
+                        `${username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
                 }
             }
         },

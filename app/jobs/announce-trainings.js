@@ -4,13 +4,13 @@ const userService = require('../services/user')
 const timeHelper = require('../helpers/time')
 const cron = require('node-schedule')
 
-module.exports = async groupId => {
+async function run(groupId) {
     const trainings = await groupService.getTrainings()
     for (const training of trainings) {
         const job = cron.scheduledJobs[`training_${training.id}`]
         if (!job) {
             cron.scheduleJob(`training_${training.id}`, new Date(training.date.getTime() + 30 * 60 * 1000),
-                module.exports.bind(null, groupId))
+                module.exports.run.bind(null, groupId))
         }
     }
 
@@ -93,4 +93,8 @@ function groupTrainingsByType (trainings) {
         result[training.type].push(training)
     }
     return result
+}
+
+module.exports = {
+    run
 }

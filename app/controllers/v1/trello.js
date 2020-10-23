@@ -19,6 +19,6 @@ exports.head = (req, res) => {
 
 exports.postWebhook = async (req, res) => {
     const embed = await trelloService.getActionEmbed(req.body.action)
-    if (embed) await discordMessageJob('trello', { embeds: [embed] })
+    if (embed) await discordMessageJob.run('trello', { embeds: [embed] })
     res.sendStatus(200)
 }

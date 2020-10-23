@@ -44,8 +44,8 @@ exports.init = async () => {
     client.rest.requester = requester.bind(client.rest.requester)
     clients.unauthenticated = client
 
-    checkSuspensionsJob()
-    announceTrainingsJob(robloxConfig.defaultGroup)
+    checkSuspensionsJob.run()
+    announceTrainingsJob.run(robloxConfig.defaultGroup)
 }
 
 exports.getClient = groupId => {

@@ -1,7 +1,7 @@
 'use strict'
 const axios = require('axios')
 
-module.exports = async (type, message) => {
+async function run(type, message) {
     if (type === 'log') {
         await sendLog(message)
     } else if (type === 'trello') {
@@ -33,4 +33,8 @@ const sendBackupNotification = async body => {
         url: process.env.DISCORD_BACKUP_NOTIFICATION_WEBHOOK_URL,
         data: body
     })
+}
+
+module.exports = {
+    run
 }

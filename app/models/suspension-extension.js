@@ -29,13 +29,13 @@ module.exports = (sequelize, DataTypes) => {
                 const suspension = await sequelize.models.Suspension.findByPk(extension.suspensionId)
                 const job = cron.scheduledJobs[`suspension_${suspension.id}`]
                 if (job) job.cancel()
-                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.bind(null,
-                    suspension))
+                cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run
+                    .bind(null, suspension))
                 const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
                     userService.getUsername(extension.authorId)])
                 const extensionDays = extension.duration / 86400000
-                discordMessageJob('log', `**${authorName}** extended **${username}**'s suspension with` +
-                    ` **${extensionDays}** ${pluralize('day', extensionDays)}`)
+                discordMessageJob.run('log', `**${authorName}** extended **${username}**'s suspension ` +
+                    `with **${extensionDays}** ${pluralize('day', extensionDays)}`)
             }
         },
         tableName: 'suspension_extensions'

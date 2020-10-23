@@ -89,9 +89,9 @@ exports.shout = async (groupId, message, authorId) => {
     if (authorId) {
         const authorName = await userService.getUsername(authorId)
         if (shout.body === '') {
-            discordMessageJob('log', `**${authorName}** cleared the shout`)
+            discordMessageJob.run('log', `**${authorName}** cleared the shout`)
         } else {
-            discordMessageJob('log', `**${authorName}** shouted "*${shout.body}*"`)
+            discordMessageJob.run('log', `**${authorName}** shouted "*${shout.body}*"`)
         }
     }
 
@@ -210,11 +210,11 @@ exports.changeRank = async (groupId, userId, { rank, authorId }) => {
     const username = await userService.getUsername(userId)
     if (authorId) {
         const authorName = await userService.getUsername(authorId)
-        discordMessageJob('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 
-            'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+        discordMessageJob.run('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **` +
+            `${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-        discordMessageJob('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** ` +
-            `from **${oldRole.name}** to **${newRole.name}**`)
+        discordMessageJob.run('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** from ` +
+            `**${oldRole.name}** to **${newRole.name}**`)
     }
 
     return { oldRole, newRole }

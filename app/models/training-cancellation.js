@@ -23,11 +23,11 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         hooks: {
             afterCreate: async cancellation => {
-                announceTrainingsJob(robloxConfig.defaultGroup)
+                announceTrainingsJob.run(robloxConfig.defaultGroup)
                 const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]
                 if (job) job.cancel()
                 const authorName = await userService.getUsername(cancellation.authorId)
-                discordMessageJob('log', `**${authorName}** cancelled training **${cancellation
+                discordMessageJob.run('log', `**${authorName}** cancelled training **${cancellation
                     .trainingId}** with reason "*${cancellation.reason}*"`)
             }
         },

@@ -11,7 +11,7 @@ const home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
 
 const KEEP = 7 * 60 * 60 * 24 * 1000 // keep backups 7 days
 
-module.exports = () => {
+function run() {
     const date = new Date()
     const backupName = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}-${date
         .getMinutes()}`
@@ -24,7 +24,7 @@ module.exports = () => {
         [backupScript, backupFile, databaseConfig.password],
         error => {
             if (error) throw error
-            discordMessageJob('backupNotification', {
+            discordMessageJob.run('backupNotification', {
                 embeds: [{
                     title: `${databaseConfig.database}-backup successful`,
                     description: `${databaseConfig.database}-backup has been executed successfully!`,
@@ -45,4 +45,8 @@ module.exports = () => {
             }
         }
     })
+}
+
+module.exports = {
+    run
 }
