@@ -1,15 +1,11 @@
 'use strict'
 const { Client } = require('bloxy')
-const checkSuspensionsJob = require('../jobs/check-suspensions')
-const announceTrainingsJob = require('../jobs/announce-trainings')
-
-const robloxConfig = require('../../config/roblox')
 
 const clients = { authenticated: {} }
 
 let initiated = false
 
-exports.init = async () => {
+async function init() {
     if (initiated) return
     initiated = true
 
@@ -43,12 +39,9 @@ exports.init = async () => {
     // Set custom requester again, like with the authenticated clients.
     client.rest.requester = requester.bind(client.rest.requester)
     clients.unauthenticated = client
-
-    checkSuspensionsJob.run()
-    announceTrainingsJob.run(robloxConfig.defaultGroup)
 }
 
-exports.getClient = groupId => {
+function getClient(groupId) {
     return groupId ? clients.authenticated[groupId] : clients.unauthenticated
 }
 
@@ -63,4 +56,9 @@ function requester(options) {
 
     // this refers to Bloxy's original requester.
     return this(options)
+}
+
+module.exports = {
+    init,
+    getClient
 }
