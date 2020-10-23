@@ -1,6 +1,4 @@
 'use strict'
-require('dotenv').config()
-
 const Trello = require('node-trello')
 
 const trello = new Trello(process.env.TRELLO_KEY, process.env.TRELLO_TOKEN)

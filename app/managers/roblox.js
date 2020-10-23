@@ -1,6 +1,4 @@
 'use strict'
-require('dotenv').config()
-
 const { Client } = require('bloxy')
 const checkSuspensionsJob = require('../jobs/check-suspensions')
 const announceTrainingsJob = require('../jobs/announce-trainings')

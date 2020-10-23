@@ -1,6 +1,4 @@
 'use strict'
-require('dotenv').config()
-
 const crypto = require('crypto')
 const authService = require('../services/auth')
 const UnauthorizedError = require('../errors/unauthorized')

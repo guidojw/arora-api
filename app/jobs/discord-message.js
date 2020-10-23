@@ -1,6 +1,4 @@
 'use strict'
-require('dotenv').config()
-
 const axios = require('axios')
 
 module.exports = async (type, message) => {
