@@ -36,13 +36,13 @@ module.exports = async groupId => {
 
     // Get train transactions.
     const client = robloxManager.getClient(groupId)
+    const group = await client.getGroup(groupId)
     const transactions = []
     let cursor = null
     do {
-        const transactionHistory = await client.apis.economyAPI.getGroupTransactions({
+        const transactionHistory = await group.getTransactions({
             transactionType: 'Sale',
             limit: 100,
-            groupId,
             cursor
         })
 
@@ -77,7 +77,7 @@ module.exports = async groupId => {
             developersSales[developer.robloxId].sales[product.id] = {
                 amount: 0,
                 robux: 0,
-                name: (await client.apis.api.getGamePassInfo(product.id)).Name
+                name: (await client.apis.generalApi.getGamePassProductInfo({ gamePassId: product.id })).Name
             }
         }
     }
@@ -105,16 +105,15 @@ module.exports = async groupId => {
             // Check if user is in the group.
             if (await userService.getRank(id, groupId) !== 0) {
                 recipients.push({
-                    recipientId: id,
-                    recipientType: 'User',
+                    userId: id,
                     amount: Math.ceil(developerSales.total.robux)
                 })
             }
         }
-        const payoutRequest = { PayoutType: 'FixedAmount', Recipients: recipients }
+        const payoutRequest = { type: 'FixedAmount', users: recipients }
 
         // Make the payouts.
-        await client.apis.groups.payoutUser({ groupId, data: payoutRequest })
+        await group.payoutMembers(payoutRequest)
 
         // Add new payout row.
         await Payout.create({ until: new Date(trainTransactions[0].created) })
