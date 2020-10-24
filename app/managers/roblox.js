@@ -20,6 +20,9 @@ exports.init = async () => {
         const client = new Client({
             credentials: {
                 cookie: process.env.ROBLOX_COOKIE
+            },
+            rest: {
+                xcsrfRefreshInterval: 0
             }
         })
         // Set the client's requester to the custom requester.
