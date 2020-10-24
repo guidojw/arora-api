@@ -44,7 +44,7 @@ async function run(groupId) {
     }
 }
 
-function getTrainingsInfo (trainings, authors) {
+function getTrainingsInfo(trainings, authors) {
     const groupedTrainings = groupTrainingsByType(trainings)
     const types = Object.keys(groupedTrainings)
     let result = ''
@@ -82,7 +82,7 @@ function getTrainingsInfo (trainings, authors) {
     return result
 }
 
-function groupTrainingsByType (trainings) {
+function groupTrainingsByType(trainings) {
     const result = {}
 
     for (const training of trainings) {
