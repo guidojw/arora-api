@@ -1,7 +1,14 @@
 'use strict'
 const { param, body, header, query } = require('express-validator')
-const groupService = require('../../services/group')
 const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers/request')
+const timeHelper = require('../../helpers/time')
+const groupService = require('../../services/group')
+const userService = require('../../services/user')
+const announceTrainingsJob = require('../../jobs/announce-trainings')
+const discordMessageJob = require('../../jobs/discord-message')
+const cron = require('node-schedule')
+
+const robloxConfig = require('../../../config/roblox')
 
 function validate(method) {
     switch (method) {
@@ -140,17 +147,32 @@ async function getShout(req, res) {
 }
 
 async function getSuspensions(req, res) {
-    res.json((await groupService.getSuspensions(req.query.scope, req.query.sort)).map(suspension => suspension.get({
-        raw: true })))
+    res.json((await groupService.getSuspensions(req.query.scope, req.query.sort)).map(suspension => {
+        return suspension.get({ raw: true })
+    }))
 }
 
 async function getTrainings(req, res) {
-    res.json((await groupService.getTrainings(req.query.scope, req.query.sort)).map(training => training.get({
-        raw: true })))
+    res.json((await groupService.getTrainings(req.query.scope, req.query.sort)).map(training => {
+        return training.get({ raw: true })
+    }))
 }
 
 async function postTraining(req, res) {
-    res.json((await groupService.postTraining(req.body)).get({ raw: true }))
+    const training = await groupService.postTraining(req.body)
+
+    announceTrainingsJob.run(robloxConfig.defaultGroup)
+    cron.scheduleJob(`training_${training.id}`, new Date(training.date.getTime() + 30 * 60 * 1000),
+        announceTrainingsJob.run.bind(null, robloxConfig.defaultGroup))
+
+    const dateString = timeHelper.getDate(training.date)
+    const timeString = timeHelper.getTime(training.date)
+    const authorName = await userService.getUsername(training.authorId)
+    discordMessageJob.run('log', `**${authorName}** scheduled a **${training.type.toUpperCase()}** ` +
+        `training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**` +
+        `${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
+
+    res.json(training.get({ raw: true }))
 }
 
 async function getExiles(req, res) {
@@ -170,7 +192,38 @@ async function shout(req, res) {
 }
 
 async function putTraining(req, res) {
-    res.json((await groupService.putTraining(req.params.groupId, req.params.trainingId, req.body)).get({ raw: true }))
+    const training = await groupService.putTraining(req.params.groupId, req.params.trainingId, req.body.changes)
+
+    const editorName = await userService.getUsername(req.body.editorId)
+    if (req.body.authorId) {
+        const authorName = await userService.getUsername(training.authorId)
+        discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s host to ` +
+            `**${authorName}**`)
+    }
+    if (req.body.notes) {
+        discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s notes to` +
+            ` "*${training.notes}*"`)
+    }
+    if (req.body.type) {
+        discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s type to ` +
+            `**${training.type.toUpperCase()}**`)
+    }
+    if (req.body.date) {
+        const dateString = timeHelper.getDate(training.date)
+        const timeString = timeHelper.getTime(training.date)
+        discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s date to ` +
+            `**${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
+    }
+
+    if (!req.body.notes) {
+        announceTrainingsJob.run(robloxConfig.defaultGroup)
+        const job = cron.scheduledJobs[`training_${training.id}`]
+        if (job) job.cancel()
+        cron.scheduleJob(`training_${training.id}`, training.date, announceTrainingsJob.run.bind(null,
+            robloxConfig.defaultGroup))
+    }
+
+    res.json(training.get({ raw: true }))
 }
 
 async function putSuspension(req, res) {
@@ -186,8 +239,17 @@ async function cancelSuspension(req, res) {
 }
 
 async function cancelTraining(req, res) {
-    res.json((await groupService.cancelTraining(req.params.groupId, req.params.trainingId, req.body)).get({
-        raw: true }))
+    const cancellation = await groupService.cancelTraining(req.params.groupId, req.params.trainingId, req.body)
+
+    announceTrainingsJob.run(robloxConfig.defaultGroup)
+    const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]
+    if (job) job.cancel()
+
+    const authorName = await userService.getUsername(cancellation.authorId)
+    discordMessageJob.run('log', `**${authorName}** cancelled training **${cancellation.trainingId}** ` +
+        `with reason "*${cancellation.reason}*"`)
+
+    res.json(cancellation.get({ raw: true }))
 }
 
 async function extendSuspension(req, res) {

@@ -24,7 +24,7 @@ async function suspend(groupId, userId, { rankBack, duration, authorId, reason }
         throw new ForbiddenError('User is unsuspendable.')
     }
     if (rank > 0 && rank !== 2) {
-        await exports.setRank(groupId, userId, 2)
+        await setRank(groupId, userId, 2)
     }
 
     const mtRank = await userService.getRank(userId, robloxConfig.mtGroup)
@@ -45,7 +45,7 @@ async function suspend(groupId, userId, { rankBack, duration, authorId, reason }
 }
 
 async function getShout(groupId) {
-    const group = await exports.getGroup(groupId)
+    const group = await getGroup(groupId)
     return group.shout
 }
 
@@ -63,7 +63,7 @@ function postTraining({ type, authorId, date, notes }) {
         authorId,
         date,
         notes
-    }, { individualHooks: true })
+    })
 }
 
 async function getSuspension(userId, scope) {
@@ -98,13 +98,13 @@ async function shout(groupId, message, authorId) {
     return shout
 }
 
-async function putTraining(groupId, trainingId, { changes, editorId }) {
-    const training = await exports.getTraining(trainingId)
-    return training.update(changes, { editorId, individualHooks: true })
+async function putTraining(groupId, trainingId, changes) {
+    const training = await getTraining(trainingId)
+    return training.update(changes)
 }
 
 async function putSuspension(groupId, userId, { changes, editorId }) {
-    const suspension = await exports.getSuspension(userId)
+    const suspension = await getSuspension(userId)
     return suspension.update(changes, { editorId, individualHooks: true })
 }
 
@@ -119,7 +119,7 @@ function getRoles(groupId) {
 }
 
 async function setRank(groupId, userId, rank) {
-    const roles = await exports.getRoles(groupId)
+    const roles = await getRoles(groupId)
     const role = roles.roles.find(role => role.rank === rank)
     const client = robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
@@ -131,23 +131,23 @@ async function setRank(groupId, userId, rank) {
 }
 
 async function cancelSuspension(groupId, userId, { authorId, reason }) {
-    const suspension = await exports.getSuspension(userId)
+    const suspension = await getSuspension(userId)
     const rank = await userService.getRank(suspension.userId, groupId)
 
     if (rank !== 0) {
-        await exports.setRank(groupId, suspension.userId, suspension.rank)
+        await setRank(groupId, suspension.userId, suspension.rank)
     }
 
     return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason }, { individualHooks: true })
 }
 
 async function cancelTraining(groupId, trainingId, { authorId, reason }) {
-    const training = await exports.getTraining(trainingId)
-    return TrainingCancellation.create({ trainingId: training.id, authorId, reason }, { individualHooks: true })
+    const training = await getTraining(trainingId)
+    return TrainingCancellation.create({ trainingId: training.id, authorId, reason })
 }
 
 async function extendSuspension(groupId, userId, { authorId, duration, reason }) {
-    const suspension = await exports.getSuspension(userId)
+    const suspension = await getSuspension(userId)
     let newDuration = suspension.duration + duration
     if (suspension.extensions) {
         for (const extension of suspension.extensions) {
@@ -192,7 +192,7 @@ async function changeRank(groupId, userId, { rank, authorId }) {
         throw new BadRequestError('Invalid rank.')
     }
 
-    const newRole = await exports.setRank(groupId, userId, rank)
+    const newRole = await setRank(groupId, userId, rank)
 
     const mtRank = await userService.getRank(userId, robloxConfig.mtGroup)
     if (mtRank > 0) {
@@ -201,11 +201,11 @@ async function changeRank(groupId, userId, { rank, authorId }) {
             const group = await client.getGroup(robloxConfig.mtGroup)
             await group.kickMember(userId)
         } else {
-            await exports.setRank(robloxConfig.mtGroup, userId, { rank })
+            await setRank(robloxConfig.mtGroup, userId, { rank })
         }
     }
 
-    const roles = await exports.getRoles(groupId)
+    const roles = await getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await userService.getUsername(userId)
     if (authorId) {
