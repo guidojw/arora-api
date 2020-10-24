@@ -9,8 +9,10 @@ const WebSocket = require('ws')
 const webSocketManager = require('../app/managers/web-socket')
 const { authenticateWebSocketConnection } = require('../app/services/auth')
 const checkSuspensionsJob = require('../app/jobs/check-suspensions')
+const announceTrainingsJob = require('../app/jobs/announce-trainings')
 
 const cronConfig = require('../config/cron')
+const robloxConfig = require('../config/roblox')
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
@@ -52,11 +54,16 @@ for (const job of Object.values(cronConfig)) {
 }
 
 checkSuspensionsJob.run()
+announceTrainingsJob.run(robloxConfig.defaultGroup)
 
 function normalizePort (val) {
     const port = parseInt(val, 10)
-    if (isNaN(port)) return val
-    if (port >= 0) return port
+    if (isNaN(port)) {
+        return val
+    }
+    if (port >= 0) {
+        return port
+    }
     return false
 }
 
