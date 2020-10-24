@@ -6,6 +6,7 @@ const groupService = require('../../services/group')
 const userService = require('../../services/user')
 const announceTrainingsJob = require('../../jobs/announce-trainings')
 const discordMessageJob = require('../../jobs/discord-message')
+const finishSuspensionJob = require('../../jobs/finish-suspension')
 const cron = require('node-schedule')
 
 const robloxConfig = require('../../../config/roblox')
@@ -139,7 +140,18 @@ function validate(method) {
 }
 
 async function suspend(req, res) {
-    res.json((await groupService.suspend(req.params.groupId, req.body.userId, req.body)).get({ raw: true }))
+    const suspension = await groupService.suspend(req.params.groupId, req.body.userId, req.body)
+
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
+        suspension))
+
+    const days = suspension.duration / 86400000
+    const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId), userService
+        .getUsername(suspension.authorId)])
+    discordMessageJob.run('log', `**${authorName}** suspended **${username}** for **${days}** ` +
+        `${pluralize('day', days)} with reason "*${suspension.reason}*"`)
+
+    res.json(suspension.get({ raw: true }))
 }
 
 async function getShout(req, res) {
@@ -147,15 +159,13 @@ async function getShout(req, res) {
 }
 
 async function getSuspensions(req, res) {
-    res.json((await groupService.getSuspensions(req.query.scope, req.query.sort)).map(suspension => {
-        return suspension.get({ raw: true })
-    }))
+    const suspensions = await groupService.getSuspensions(req.query.scope, req.query.sort)
+    res.json(suspensions.map(suspension => suspension.get({ raw: true })))
 }
 
 async function getTrainings(req, res) {
-    res.json((await groupService.getTrainings(req.query.scope, req.query.sort)).map(training => {
-        return training.get({ raw: true })
-    }))
+    const trainings = await groupService.getTrainings(req.query.scope, req.query.sort)
+    res.json(trainings.map(training => training.get({ raw: true })))
 }
 
 async function postTraining(req, res) {
@@ -219,15 +229,33 @@ async function putTraining(req, res) {
         announceTrainingsJob.run(robloxConfig.defaultGroup)
         const job = cron.scheduledJobs[`training_${training.id}`]
         if (job) job.cancel()
-        cron.scheduleJob(`training_${training.id}`, training.date, announceTrainingsJob.run.bind(null,
-            robloxConfig.defaultGroup))
+        cron.scheduleJob(`training_${training.id}`, training.date, announceTrainingsJob.run.bind(null, robloxConfig
+            .defaultGroup))
     }
 
     res.json(training.get({ raw: true }))
 }
 
 async function putSuspension(req, res) {
-    res.json((await groupService.putSuspension(req.params.groupId, req.params.userId, req.body)).get({ raw: true }))
+    const suspension = (await groupService.putSuspension(req.params.groupId, req.params.userId, req.body.changes))
+
+    const [username, editorName] = await Promise.all([userService.getUsername(suspension.userId), userService
+        .getUsername(req.body.editorId)])
+    if (req.body.authorId) {
+        const authorName = await userService.getUsername(suspension.authorId)
+        discordMessageJob.run('log', `**${editorName}** changed the author of **${username}**'s ` +
+            `suspension to **${authorName}**`)
+    }
+    if (req.body.reason) {
+        discordMessageJob.run('log', `**${editorName}** changed the reason of **${username}**'s ` +
+            `suspension to *"${suspension.reason}"*`)
+    }
+    if (req.body.rankBack) {
+        discordMessageJob.run('log', `**${editorName}** changed the rankBack option of **${username}**` +
+            `'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
+    }
+
+    res.json(suspension.get({ raw: true }))
 }
 
 async function getGroup(req, res) {
@@ -235,7 +263,18 @@ async function getGroup(req, res) {
 }
 
 async function cancelSuspension(req, res) {
-    res.json((await groupService.cancelSuspension(req.params.groupId, req.params.userId, req.body)).get({ raw: true }))
+    const cancellation = await groupService.cancelSuspension(req.params.groupId, req.params.userId, req.body)
+
+    // TODO: fetch suspension
+    const suspension = await sequelize.models.Suspension.unscoped().findByPk(cancellation.suspensionId)
+    const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
+        userService.getUsername(cancellation.authorId)])
+    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
+    if (job) job.cancel()
+    discordMessageJob.run('log', `**${authorName}** cancelled **${username}**'s suspension` +
+        ` with reason "*${cancellation.reason}*"`)
+
+    res.json(cancellation.get({ raw: true }))
 }
 
 async function cancelTraining(req, res) {
@@ -253,7 +292,22 @@ async function cancelTraining(req, res) {
 }
 
 async function extendSuspension(req, res) {
-    res.json((await groupService.extendSuspension(req.params.groupId, req.params.userId, req.body)).get({ raw: true }))
+    const extension = await groupService.extendSuspension(req.params.groupId, req.params.userId, req.body)
+
+    // TODO: fetch suspension
+    const suspension = await sequelize.models.Suspension.findByPk(extension.suspensionId)
+    const job = cron.scheduledJobs[`suspension_${suspension.id}`]
+    if (job) job.cancel()
+    cron.scheduleJob(`suspension_${suspension.id}`, await suspension.endDate, finishSuspensionJob.run.bind(null,
+        suspension))
+
+    const [username, authorName] = await Promise.all([userService.getUsername(suspension.userId),
+        userService.getUsername(extension.authorId)])
+    const extensionDays = extension.duration / 86400000
+    discordMessageJob.run('log', `**${authorName}** extended **${username}**'s suspension with **` +
+        `${extensionDays}** ${pluralize('day', extensionDays)}`)
+
+    res.json(extension.get({ raw: true }))
 }
 
 async function putUser(req, res) {

@@ -41,7 +41,7 @@ async function suspend(groupId, userId, { rankBack, duration, authorId, reason }
         reason,
         userId,
         rank
-    }, { individualHooks: true })
+    })
 }
 
 async function getShout(groupId) {
@@ -103,9 +103,9 @@ async function putTraining(groupId, trainingId, changes) {
     return training.update(changes)
 }
 
-async function putSuspension(groupId, userId, { changes, editorId }) {
+async function putSuspension(groupId, userId, changes) {
     const suspension = await getSuspension(userId)
-    return suspension.update(changes, { editorId, individualHooks: true })
+    return suspension.update(changes)
 }
 
 function getGroup(groupId) {
@@ -138,7 +138,7 @@ async function cancelSuspension(groupId, userId, { authorId, reason }) {
         await setRank(groupId, suspension.userId, suspension.rank)
     }
 
-    return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason }, { individualHooks: true })
+    return SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason })
 }
 
 async function cancelTraining(groupId, trainingId, { authorId, reason }) {
@@ -168,7 +168,7 @@ async function extendSuspension(groupId, userId, { authorId, duration, reason })
         authorId,
         duration,
         reason
-    }, { individualHooks: true })
+    })
 }
 
 async function changeRank(groupId, userId, { rank, authorId }) {
