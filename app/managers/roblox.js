@@ -6,7 +6,9 @@ const clients = { authenticated: {} }
 let initiated = false
 
 async function init() {
-    if (initiated) return
+    if (initiated) {
+        return
+    }
     initiated = true
 
     // Authenticated client(s)

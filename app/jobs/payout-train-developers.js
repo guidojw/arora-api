@@ -31,7 +31,9 @@ const PAY_RATE = 0.5
 async function run(groupId) {
     // Get last payout and its last transaction.
     const lastPayout = await Payout.getLast()
-    if (!lastPayout) throw new Error('Could not get last transaction!')
+    if (!lastPayout) {
+        throw new Error('Could not get last transaction!')
+    }
     const lastTransactionDate = lastPayout.until
 
     // Get train transactions.

@@ -38,10 +38,12 @@ function run() {
     )
 
     fs.readdir(path.resolve(home, 'storage/backups'), (err, files) => {
-        if (err) throw err
+        if (err) {
+            throw err
+        }
+
         for (const file of files) {
             const date = fileHelper.getBackupDate(file)
-
             if (date.getTime() < Date.now() - KEEP) {
                 fs.unlink(path.resolve(home, 'storage/backups', file), err => {
                     if (err) {
