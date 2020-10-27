@@ -9,8 +9,6 @@ services:
     environment:
       NODE_ENV: production
       POSTGRES_HOST: db
-    ports:
-      - "3000:3000"
     volumes:
       - node_modules:/opt/app/node_modules
     command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
@@ -19,12 +17,6 @@ services:
     image: postgres:11.2
     restart: unless-stopped
     env_file: .env
-    environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      POSTGRES_DB: nsadmin_production
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
