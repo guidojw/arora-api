@@ -11,6 +11,10 @@ services:
       POSTGRES_HOST: db
     volumes:
       - node_modules:/opt/app/node_modules
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nsadmin-api-production.rule=Host(`$HOST`)
+      - traefik.http.routers.nsadmin-api-production.tls.certresolver=default
     command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
 
   db:
