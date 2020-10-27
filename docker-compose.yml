@@ -13,6 +13,7 @@ services:
       - "3000:3000"
     volumes:
       - node_modules:/opt/app/node_modules
+      - /storage/backups:/storage/backups
     command: /bin/bash ./bin/wait-for-it.sh db:5432 -- node ./bin/www
 
   db:
