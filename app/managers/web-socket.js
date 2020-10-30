@@ -1,46 +1,45 @@
 'use strict'
-const connections = []
+class WebSocketManager {
+    constructor() {
+        this.connections = []
+    }
 
-function init() {
-    setInterval(() => {
-        for (const connection of connections) {
-            if (!connection.isAlive) {
-                return connection.terminate()
+    init() {
+        setInterval(() => {
+            for (const connection of this.connections) {
+                if (!connection.isAlive) {
+                    return connection.terminate()
+                }
+                connection.isAlive = false
+
+                connection.ping()
             }
-            connection.isAlive = false
+        }, 30000)
+    }
 
-            connection.ping()
+    addConnection(connection) {
+        console.log('New connection!')
+        connection.isAlive = true
+
+        connection.on('error', console.error)
+        connection.on('close', () => {
+            console.log('Connection closed!')
+            this.removeConnection(connection)
+        })
+        connection.on('pong', () => connection.isAlive = true)
+
+        this.connections.push(connection)
+    }
+
+    removeConnection(connection) {
+        this.connections.splice(this.connections.indexOf(connection), 1)
+    }
+
+    broadcast(event, data) {
+        for (const connection of this.connections) {
+            connection.send(JSON.stringify({ event, data }))
         }
-    }, 30000)
-}
-
-function addConnection(connection) {
-    console.log('New connection!')
-    connection.isAlive = true
-
-    connection.on('error', console.error)
-    connection.on('close', () => {
-        console.log('Connection closed!')
-        exports.removeConnection(connection)
-    })
-    connection.on('pong', () => connection.isAlive = true)
-
-    connections.push(connection)
-}
-
-function removeConnection(connection) {
-    connections.splice(connections.indexOf(connection), 1)
-}
-
-function broadcast(event, data) {
-    for (const connection of connections) {
-        connection.send(JSON.stringify({ event, data }))
     }
 }
 
-module.exports = {
-    init,
-    addConnection,
-    removeConnection,
-    broadcast
-}
+module.exports = WebSocketManager

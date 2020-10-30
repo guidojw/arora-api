@@ -13,6 +13,7 @@ function decodeSortQueryParam(param = '') {
             return [sort, 'ASC']
         }
     })
+
     return result.length > 0 ? result : undefined
 }
 

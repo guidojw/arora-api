@@ -1,11 +1,14 @@
 'use strict'
 const express = require('express')
-const router = express.Router()
-const catalogController = require('../controllers/v1/catalog')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
 
-router.get('/', catalogController.validate('getItems'), handleValidationResult, authenticate, catalogController
-    .getItems)
+export default class CatalogRouter {
+    constructor(catalogController, { handleValidationResult }, { authenticate }) {
+        const router = express.Router()
 
-module.exports = router
+        router.get('/', catalogController.validate('getItems'), handleValidationResult, authenticate, catalogController
+            .getItems)
+
+        return router
+    }
+}
+

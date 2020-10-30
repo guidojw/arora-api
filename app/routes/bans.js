@@ -1,21 +1,21 @@
 'use strict'
 const express = require('express')
-const router = express.Router()
-const banController = require('../controllers/v1/ban')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
 
-router.get('/', banController.validate('getBans'), handleValidationResult, authenticate, banController.getBans)
+export default class BansRouter {
+    constructor(banController, { handleValidationResult }, { authenticate }) {
+        const router = express.Router()
 
-router.post('/', banController.validate('ban'), handleValidationResult, authenticate, banController.ban)
+        router.get('/', banController.validate('getBans'), handleValidationResult, authenticate, banController.getBans)
+        router.get('/:userId', banController.validate('getBan'), handleValidationResult, authenticate, banController
+            .getBan)
 
-router.put('/:userId', banController.validate('putBan'), handleValidationResult, authenticate, banController
-    .putBan)
+        router.post('/', banController.validate('ban'), handleValidationResult, authenticate, banController.ban)
+        router.post('/:userId/cancel', banController.validate('cancelBan'), handleValidationResult, authenticate,
+            banController.cancelBan)
 
-router.get('/:userId', banController.validate('getBan'), handleValidationResult, authenticate, banController
-    .getBan)
+        router.put('/:userId', banController.validate('putBan'), handleValidationResult, authenticate, banController
+            .putBan)
 
-router.post('/:userId/cancel', banController.validate('cancelBan'), handleValidationResult, authenticate,
-    banController.cancelBan)
-
-module.exports = router
+        return router
+    }
+}

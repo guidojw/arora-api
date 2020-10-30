@@ -15,38 +15,37 @@ const ACTION_TYPES = {
     deleteCard: 'card deleted'
 }
 
-function getMember(memberId, options) {
-    return new Promise((resolve, reject) => {
-        trello.get(`/1/members/${memberId}`, { fields: options }, (err, member) => {
-            if (err) {
-                reject(err)
-            }
-            resolve(member)
+class TrelloService {
+    getMember(memberId, options) {
+        return new Promise((resolve, reject) => {
+            trello.get(`/1/members/${memberId}`, { fields: options }, (err, member) => {
+                if (err) {
+                    reject(err)
+                }
+                resolve(member)
+            })
         })
-    })
-}
+    }
 
-async function getActionEmbed(action) {
-    if (ACTION_TYPES[action.type]) {
-        const member = await exports.getMember(action.idMemberCreator, 'username,avatarUrl')
-        const actionUrl = `https://trello.com/c/${action.data.card.shortLink}/${action.data.card.idShort}#action-` +
-            action.id
+    async getActionEmbed(action) {
+        if (ACTION_TYPES[action.type]) {
+            const member = await this.getMember(action.idMemberCreator, 'username,avatarUrl')
+            const actionUrl = `https://trello.com/c/${action.data.card.shortLink}/${action.data.card.idShort}#action-` +
+                action.id
 
-        return {
-            title: `[${action.data.board.name}] 1 ${ACTION_TYPES[action.type]}`,
-            description: `[\`${action.id}\`](${actionUrl}) ${action.data.card.name} - ${member.username}`,
-            author: {
-                name: member.username,
-                icon_url: `${member.avatarUrl}/170.png`,
-                url: `https://trello.com/${member.username}`
-            },
-            url: actionUrl,
-            color: 31424
+            return {
+                title: `[${action.data.board.name}] 1 ${ACTION_TYPES[action.type]}`,
+                description: `[\`${action.id}\`](${actionUrl}) ${action.data.card.name} - ${member.username}`,
+                author: {
+                    name: member.username,
+                    icon_url: `${member.avatarUrl}/170.png`,
+                    url: `https://trello.com/${member.username}`
+                },
+                url: actionUrl,
+                color: 31424
+            }
         }
     }
 }
 
-module.exports = {
-    getMember,
-    getActionEmbed
-}
+module.exports = TrelloService

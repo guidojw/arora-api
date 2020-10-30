@@ -1,7 +1,4 @@
 'use strict'
-const userService = require('../services/user')
-const discordMessageJob = require('../jobs/discord-message')
-
 module.exports = (sequelize, DataTypes) => {
     const BanCancellation = sequelize.define('BanCancellation', {
         authorId: {
@@ -17,23 +14,13 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        hooks: {
-            afterCreate: async cancellation => {
-                const ban = await sequelize.models.Ban.unscoped().findByPk(cancellation.banId)
-                const [username, authorName] = await Promise.all([userService.getUsername(ban.userId),
-                    userService.getUsername(cancellation.authorId)])
-                discordMessageJob.run('log', `**${authorName}** unbanned **${username}** with reason "` +
-                    `*${cancellation.reason}*"`)
-            }
-        },
         tableName: 'ban_cancellations'
     })
 
     BanCancellation.associate = models => {
         BanCancellation.belongsTo(models.Ban, {
             foreignKey: { allowNull: false, name: 'banId' },
-            onDelete: 'cascade',
-            hooks: true
+            onDelete: 'cascade'
         })
     }
 

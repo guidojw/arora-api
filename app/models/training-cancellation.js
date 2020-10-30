@@ -23,8 +23,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 name: 'trainingId'
             },
-            onDelete: 'cascade',
-            hooks: true
+            onDelete: 'cascade'
         })
     }
 

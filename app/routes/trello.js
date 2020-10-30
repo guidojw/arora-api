@@ -1,13 +1,17 @@
 'use strict'
 const express = require('express')
-const router = express.Router()
-const trelloController = require('../controllers/v1/trello')
-const { handleValidationResult } = require('../middlewares/error')
-const { verifyTrelloWebhookRequest } = require('../middlewares/auth')
 
-router.head('/', trelloController.head)
+class TrelloRouter {
+    constructor(trelloController, { handleValidationResult }, { verifyTrelloWebhookRequest }) {
+        const router = express.Router()
 
-router.post('/', trelloController.validate('postWebhook'), handleValidationResult, verifyTrelloWebhookRequest,
-    trelloController.postWebhook)
+        router.head('/', trelloController.head)
 
-module.exports = router
+        router.post('/', trelloController.validate('postWebhook'), handleValidationResult, verifyTrelloWebhookRequest,
+            trelloController.postWebhook)
+
+        return router
+    }
+}
+
+module.exports = TrelloRouter

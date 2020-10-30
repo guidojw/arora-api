@@ -1,50 +1,47 @@
 'use strict'
 const { Client } = require('bloxy')
 
-const clients = { authenticated: {} }
-
-let initiated = false
-
-async function init() {
-    if (initiated) {
-        return
+class RobloxManager {
+    constructor() {
+        this.clients = { authenticated: {} }
     }
-    initiated = true
 
-    // Authenticated client(s)
-    try {
-        const client = new Client({
-            credentials: {
-                cookie: process.env.ROBLOX_COOKIE
+    async init() {
+        // Authenticated client(s)
+        try {
+            const client = new Client({
+                credentials: {
+                    cookie: process.env.ROBLOX_COOKIE
+                }
+            })
+            // Set the client's requester to the custom requester.
+            // Needs to be done after instantiation as we need to
+            // know what the original requester was.
+            client.rest.requester = requester.bind(client.rest.requester)
+
+            await client.login()
+            console.log('Roblox account logged in!')
+
+            const groups = await client.user.getGroups()
+            const groupIds = groups.data.map(group => group.group.id)
+            for (const groupId of groupIds) {
+                this.clients.authenticated[groupId] = client
             }
-        })
-        // Set the client's requester to the custom requester.
-        // Needs to be done after instantiation as we need to
-        // know what the original requester was.
-        client.rest.requester = requester.bind(client.rest.requester)
 
-        await client.login()
-        console.log('Roblox account logged in!')
-
-        const groups = await client.user.getGroups()
-        const groupIds = groups.data.map(group => group.group.id)
-        for (const groupId of groupIds) {
-            clients.authenticated[groupId] = client
+        } catch (err) {
+            console.error(err.message)
         }
 
-    } catch (err) {
-        console.error(err.message)
+        // Unauthenticated client
+        const client = new Client()
+        // Set custom requester again, like with the authenticated clients.
+        client.rest.requester = requester.bind(client.rest.requester)
+        this.clients.unauthenticated = client
     }
 
-    // Unauthenticated client
-    const client = new Client()
-    // Set custom requester again, like with the authenticated clients.
-    client.rest.requester = requester.bind(client.rest.requester)
-    clients.unauthenticated = client
-}
-
-function getClient(groupId) {
-    return groupId ? clients.authenticated[groupId] : clients.unauthenticated
+    getClient(groupId) {
+        return groupId ? this.clients.authenticated[groupId] : this.clients.unauthenticated
+    }
 }
 
 // Custom requester that uses Bloxy's default requester but
@@ -60,7 +57,4 @@ function requester(options) {
     return this(options)
 }
 
-module.exports = {
-    init,
-    getClient
-}
+module.exports = RobloxManager
