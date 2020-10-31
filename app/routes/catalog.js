@@ -1,7 +1,7 @@
 'use strict'
 const express = require('express')
 
-export default class CatalogRouter {
+class CatalogRouter {
     constructor(catalogController, { handleValidationResult }, { authenticate }) {
         const router = express.Router()
 
@@ -12,3 +12,4 @@ export default class CatalogRouter {
     }
 }
 
+module.exports = CatalogRouter

@@ -1,7 +1,7 @@
 'use strict'
 const express = require('express')
 
-export default class BansRouter {
+class BansRouter {
     constructor(banController, { handleValidationResult }, { authenticate }) {
         const router = express.Router()
 
@@ -19,3 +19,5 @@ export default class BansRouter {
         return router
     }
 }
+
+module.exports = BansRouter
