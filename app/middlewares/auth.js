@@ -10,12 +10,23 @@ class AuthMiddleware {
 
     authenticate(req, _res, next) {
         const token = req.header('authorization').replace('Bearer ', '')
-        try {
-            this._authService.verify(token)
-        } catch {
+
+        if (!this._authService.authenticate(token)) {
             throw new UnauthorizedError('Invalid authentication key.')
         }
         next()
+    }
+
+    authenticateWebSocketConnection(req) {
+        // Check for existence of the authorization header as these
+        // requests are not checked by express-validator
+        const token = req.headers.authorization !== undefined
+            ? req.headers.authorization.replace('Bearer ', '')
+            : undefined
+
+        if (!this._authService.authenticate(token)) {
+            throw new UnauthorizedError('Invalid authentication key.')
+        }
     }
 
     verifyTrelloWebhookRequest(req, _res, next) {
