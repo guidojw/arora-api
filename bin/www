@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 'use strict'
 const app = require('../app')
+const container = app.get('container')
+
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
 const cron = require('node-schedule')
-const robloxManager = require('../app/managers/roblox')
 const WebSocket = require('ws')
-const webSocketManager = require('../app/managers/web-socket')
-const { authenticateWebSocketConnection } = require('../app/services/auth')
-const checkSuspensionsJob = require('../app/jobs/check-suspensions')
-const announceTrainingsJob = require('../app/jobs/announce-trainings')
+
+const robloxManager = container.get('RobloxManager')
+const webSocketManager = container.get('WebSocketManager')
+const checkSuspensionsJob = container.get('CheckSuspensionsJob')
+const announceTrainingsJob = container.get('AnnounceTrainingsJob')
+const { authenticateWebSocketConnection } = container.get('AuthMiddleware')
 
 const cronConfig = require('../config/cron')
 const robloxConfig = require('../config/roblox')

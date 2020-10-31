@@ -2,23 +2,23 @@
 require('dotenv').config()
 
 const express = require('express')
+require('express-async-errors')
 const logger = require('morgan')
 const Sentry = require('@sentry/node')
-const { sendError } = require('./app/middlewares/error')
 const helmet = require('helmet')
 const hpp = require('hpp')
-const NotFoundError = require('./app/errors/not-found')
+const { ContainerBuilder, YamlFileLoader } = require('node-dependency-injection')
 
-require('express-async-errors')
+const { NotFoundError } = require('./app/errors')
 
-const groupsRouter = require('./app/routes/groups')
-const usersRouter = require('./app/routes/users')
-const bansRouter = require('./app/routes/bans')
-const trelloRouter = require('./app/routes/trello')
-const catalogRouter = require('./app/routes/catalog')
-const statusRouter = require('./app/routes/status')
+const container = new ContainerBuilder(true, __dirname)
+const loader = new YamlFileLoader(container)
+loader.load('./config/application.yml')
+
+const { sendError } = container.get('ErrorMiddleware')
 
 const app = express()
+app.set('container', container)
 
 if (process.env.SENTRY_DSN) {
     Sentry.init({ dsn: process.env.SENTRY_DSN })
@@ -31,12 +31,12 @@ app.use(express.urlencoded({ extended: false }))
 app.use(helmet())
 app.use(hpp())
 
-app.use('/api/v1/groups', groupsRouter)
-app.use('/api/v1/users', usersRouter)
-app.use('/api/v1/bans', bansRouter)
-app.use('/api/v1/catalog', catalogRouter)
-app.use('/api/v1/trello', trelloRouter)
-app.use('/api/v1/status', statusRouter)
+app.use('/api/v1/groups', container.get('GroupsRouter'))
+app.use('/api/v1/users', container.get('UsersRouter'))
+app.use('/api/v1/bans', container.get('BansRouter'))
+app.use('/api/v1/catalog', container.get('CatalogRouter'))
+app.use('/api/v1/trello', container.get('TrelloRouter'))
+app.use('/api/v1/status', container.get('StatusRouter'))
 
 app.use(() => {
     throw new NotFoundError()

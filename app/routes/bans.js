@@ -9,7 +9,7 @@ class BansRouter {
         router.get('/:userId', banController.validate('getBan'), handleValidationResult, authenticate, banController
             .getBan)
 
-        router.post('/', banController.validate('ban'), handleValidationResult, authenticate, banController.ban)
+        router.post('/', banController.validate('postBan'), handleValidationResult, authenticate, banController.postBan)
         router.post('/:userId/cancel', banController.validate('cancelBan'), handleValidationResult, authenticate,
             banController.cancelBan)
 

@@ -1,131 +1,138 @@
 # Configuration for DI
 services:
   # Controllers
-  app.BanController:
+  BanController:
     class: app/controllers/v1
     main: BanController
-    arguments: [@app.BanService]
-  app.CatalogController:
+    arguments: ['@BanService']
+  CatalogController:
     class: app/controllers/v1
-    arguments: [@app.CatalogService]
+    arguments: ['@CatalogService']
     main: CatalogController
-  app.GroupController:
+  GroupController:
     class: app/controllers/v1
     main: GroupController
-    arguments: [@app.GroupService, @app.SuspensionService, @app.TrainingService]
-  app.StatusController:
+    arguments: ['@GroupService', '@SuspensionService', '@TrainingService']
+  StatusController:
     class: app/controllers/v1
     main: StatusController
-    arguments: [@app.StatusService]
-  app.TrelloController:
+    arguments: ['@StatusService']
+  TrelloController:
     class: app/controllers/v1
     main: TrelloController
-    arguments: [@app.TrelloService, @app.DiscordMessageJob]
-  app.UserController:
-    class: app/controllers/v1/user
+    arguments: ['@TrelloService', '@DiscordMessageJob']
+  UserController:
+    class: app/controllers/v1
     main: UserController
-    arguments: [@app.UserService]
+    arguments: ['@UserService']
 
   # Jobs
-  app.AcceptJoinRequestsJob:
+  AcceptJoinRequestsJob:
     class: app/jobs
     main: AcceptJoinRequestsJob
-    arguments: [@app.RobloxManager, @app.GroupService, @app.DiscordMessageJob]
-  app.AcceptMtJoinRequestsJob:
+    arguments: ['@RobloxManager', '@GroupService', '@DiscordMessageJob']
+  AcceptMtJoinRequestsJob:
     class: app/jobs
     main: AcceptMtJoinRequestsJob
-    arguments: [@app.RobloxManager, @app.UserService, @app.GroupService, @app.DiscordMessageJob]
-  app.AnnounceTrainingsJob:
+    arguments: ['@RobloxManager', '@UserService', '@GroupService', '@DiscordMessageJob']
+  AnnounceTrainingsJob:
     class: app/jobs
     main: AnnounceTrainingsJob
-    arguments: [@app.GroupService, @app.UserService]
-  app.BackupJob:
+    arguments: ['@GroupService', '@UserService']
+  BackupJob:
     class: app/jobs
     main: BackupJob
-    arguments: [@app.DiscordMessageJob]
-  app.CheckSuspensionsJob:
+    arguments: ['@DiscordMessageJob']
+  CheckSuspensionsJob:
     class: app/jobs
     main: CheckSuspensionsJob
-    arguments: [@app.GroupService, @app.FinishSuspensionJob]
-  app.PayoutTrainDevelopersJob:
+    arguments: ['@GroupService', '@FinishSuspensionJob']
+  DiscordMessageJob:
+    class: app/jobs
+    main: DiscordMessageJob
+  FinishSuspensionJob:
+    class: app/jobs
+    main: FinishSuspensionJob
+    arguments: ['@UserService', '@GroupService', '@DiscordMessageJob']
+  PayoutTrainDevelopersJob:
     class: app/jobs
     main: PayoutTrainDevelopersJob
-    arguments: [@app.RobloxManager, @app.UserService, @app.WebSocketManager]
+    arguments: ['@RobloxManager', '@UserService', '@WebSocketManager']
 
   # Managers
-  app.RobloxManager:
+  RobloxManager:
     class: app/managers
     main: RobloxManager
-  app.WebSocketManager:
+  WebSocketManager:
     class: app/managers
     main: WebSocketManager
 
   # Middlewares
-  app.AuthMiddleware:
+  AuthMiddleware:
     class: app/middlewares
     main: AuthMiddleware
-    arguments: [@app.AuthService]
-  app.ErrorMiddleware:
+    arguments: ['@AuthService']
+  ErrorMiddleware:
     class: app/middlewares
     main: ErrorMiddleware
 
   # Routes
-  app.BansRouter:
+  BansRouter:
     class: app/routes
     main: BansRouter
-    arguments: [@app.BanController, @app.ErrorMiddleware, @app.AuthMiddleware]
-  app.CatalogRouter:
+    arguments: ['@BanController', '@ErrorMiddleware', '@AuthMiddleware']
+  CatalogRouter:
     class: app/routes
     main: CatalogRouter
-    arguments: [@app.CatalogController, @app.ErrorMiddleware, @app.AuthMiddleware]
-  app.GroupsRouter:
-    class: app/route
+    arguments: ['@CatalogController', '@ErrorMiddleware', '@AuthMiddleware']
+  GroupsRouter:
+    class: app/routes
     main: GroupsRouter
-    arguments: [@app.GroupController, @app.ErrorMiddleware, @app.AuthMiddleware]
-  app.StatusRouter:
+    arguments: ['@GroupController', '@ErrorMiddleware', '@AuthMiddleware']
+  StatusRouter:
     class: app/routes
     main: StatusRouter
-    arguments: [@app.StatusController, @app.ErrorMiddleware, @app.AuthMiddleware]
-  app.TrelloRouter:
+    arguments: ['@StatusController', '@ErrorMiddleware', '@AuthMiddleware']
+  TrelloRouter:
     class: app/routes
     main: TrelloRouter
-    arguments: [@app.TrelloController, @app.ErrorMiddleware, @app.AuthMiddleware]
-  app.UsersRouter:
+    arguments: ['@TrelloController', '@ErrorMiddleware', '@AuthMiddleware']
+  UsersRouter:
     class: app/routes
     main: UsersRouter
-    arguments: [@app.UserController, @app.ErrorMiddleware, @app.AuthMiddleware]
+    arguments: ['@UserController', '@ErrorMiddleware', '@AuthMiddleware']
 
   # Services
-  app.AuthService:
+  AuthService:
     class: app/services
     main: AuthService
-  app.BanService:
+  BanService:
     class: app/services
     main: BanService
-    arguments: [@app.UserService, @app.DiscordMessageJob]
-  app.CatalogService:
+    arguments: ['@UserService', '@DiscordMessageJob']
+  CatalogService:
     class: app/services
     main: CatalogService
-  app.GroupService:
+  GroupService:
     class: app/services
     main: GroupService
-    arguments: [@app.RobloxManager, @app.UserService, @app.DiscordMessageJob, @app.WebSocketManager]
-  app.StatusService:
+    arguments: ['@RobloxManager', '@UserService', '@DiscordMessageJob', '@WebSocketManager']
+  StatusService:
     class: app/services
     main: StatusService
-    arguments: [@app.RobloxManager]
-  app.SuspensionService:
+    arguments: ['@RobloxManager']
+  SuspensionService:
     class: app/services
     main: SuspensionService
-    arguments: [@app.GroupService, @app.UserService, @app.RobloxManager, @app.FinishSuspensionJob, @app.DiscordMessageJob]
-  app.TrainingService:
+    arguments: ['@GroupService', '@UserService', '@RobloxManager', '@FinishSuspensionJob', '@DiscordMessageJob']
+  TrainingService:
     class: app/services
     main: TrainingService
-    arguments: [@app.AnnounceTrainingsJob, @app.DiscordMessageJob, @app.UserService]
-  app.TrelloService:
+    arguments: ['@AnnounceTrainingsJob', '@DiscordMessageJob', '@UserService']
+  TrelloService:
     class: app/services
     main: TrelloService
-  app.UserService:
+  UserService:
     class: app/services
     main: UserService
-    arguments: [@app.RobloxManager]
+    arguments: ['@RobloxManager']
