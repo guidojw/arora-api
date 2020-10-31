@@ -47,12 +47,13 @@ server.on('upgrade', function upgrade (req, socket, head) {
 
 server.listen(port)
 
-for (const job of Object.values(cronConfig)) {
-    if (job.hasOwnProperty('args')) {
-        const [...args] = job.args
-        cron.scheduleJob(job.expression, job.job.run.bind(null, ...args))
+for (const jobConfig of Object.values(cronConfig)) {
+    const job = container.get(jobConfig.job)
+    if (jobConfig.hasOwnProperty('args')) {
+        const [...args] = jobConfig.args
+        cron.scheduleJob(job.expression, job.run.bind(null, ...args))
     } else {
-        cron.scheduleJob(job.expression, job.job.run)
+        cron.scheduleJob(job.expression, job.run)
     }
 }
 
