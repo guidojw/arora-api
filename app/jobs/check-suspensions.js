@@ -2,13 +2,13 @@
 const cron = require('node-schedule')
 
 class CheckSuspensionsJob {
-    constructor(groupService, finishSuspensionJob) {
-        this._groupService = groupService
+    constructor(suspensionService, finishSuspensionJob) {
+        this._suspensionService = suspensionService
         this._finishSuspensionJob = finishSuspensionJob
     }
 
     async run() {
-        const suspensions = await this._groupService.getSuspensions()
+        const suspensions = await this._suspensionService.getSuspensions()
         for (const suspension of suspensions) {
             const endDate = await suspension.endDate
 

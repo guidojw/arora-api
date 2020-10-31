@@ -4,7 +4,8 @@ const cron = require('node-schedule')
 const { timeHelper } = require('../helpers')
 
 class AnnounceTrainingsJob {
-    constructor(groupService, userService) {
+    constructor(trainingService, groupService, userService) {
+        this._trainingService = trainingService
         this._groupService = groupService
         this._userService = userService
     }

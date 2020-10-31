@@ -76,7 +76,7 @@ class GroupController {
     }
 
     async postTraining(req, res) {
-        res.json((await this._groupService.addTraining(req.body))
+        res.json((await this._trainingService.addTraining(req.body))
             .get({ raw: true }))
     }
 
