@@ -5,7 +5,7 @@ const { Training } = require('../models')
 const { timeHelper } = require('../helpers')
 
 class AnnounceTrainingsJob {
-    constructor(trainingService, groupService, userService) {
+    constructor(groupService, userService) {
         this._groupService = groupService
         this._userService = userService
     }
