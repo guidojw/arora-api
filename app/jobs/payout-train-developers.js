@@ -73,20 +73,21 @@ class PayoutTrainDevelopersJob {
         // Get developer specific sales information from the train transactions.
         const developersSales = {}
         for (const product of products) {
-            for (const developer of product.developers) {
+            const productInfo = await client.apis.generalApi.getGamePassProductInfo({ gamePassId: product.id })
 
+            for (const developer of product.developers) {
                 if (!developersSales[developer.robloxId]) {
                     developersSales[developer.robloxId] = {
+                        discordId: developer.discordId,
                         total: { amount: 0, robux: 0 },
-                        sales: {},
-                        discordId: developer.discordId
+                        sales: {}
                     }
                 }
 
                 developersSales[developer.robloxId].sales[product.id] = {
+                    name: productInfo.Name,
                     amount: 0,
-                    robux: 0,
-                    name: (await client.apis.generalApi.getGamePassProductInfo({ gamePassId: product.id })).Name
+                    robux: 0
                 }
             }
         }
@@ -94,9 +95,11 @@ class PayoutTrainDevelopersJob {
         for (const transaction of trainTransactions) {
             const product = products.find(product => product.id === transaction.details.id)
             const gainings = transaction.currency.amount * 0.7 * PAY_RATE * (1 / product.developers.length)
+
             for (const developer of product.developers) {
                 const developerSales = developersSales[developer.robloxId]
                 const productSales = developerSales.sales[product.id]
+
                 productSales.amount++
                 developerSales.total.amount++
                 productSales.robux += gainings

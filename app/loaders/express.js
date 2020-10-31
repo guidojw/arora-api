@@ -7,7 +7,7 @@ const hpp = require('hpp')
 
 const { NotFoundError } = require('../errors')
 
-module.exports = function(app, container) {
+function init(app, container) {
     const errorMiddleware = container.get('ErrorMiddleware')
 
     if (process.env.SENTRY_DSN) {
@@ -40,3 +40,5 @@ module.exports = function(app, container) {
         errorMiddleware.sendError(res, err.statusCode || 500, err.message)
     })
 }
+
+module.exports = init

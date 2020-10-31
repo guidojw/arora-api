@@ -61,7 +61,7 @@ class TrainingService {
                 job.cancel()
             }
             cron.scheduleJob(
-                `training_${training.id}`,
+                jobName,
                 training.date,
                 this._announceTrainingsJob.run.bind(null, robloxConfig.defaultGroup)
             )

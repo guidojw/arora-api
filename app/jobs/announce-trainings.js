@@ -15,7 +15,6 @@ class AnnounceTrainingsJob {
         for (const training of trainings) {
             const jobName = `training_${training.id}`
             const job = cron.scheduledJobs[jobName]
-
             if (!job) {
                 cron.scheduleJob(
                     jobName,
@@ -64,7 +63,6 @@ function getTrainingsInfo(trainings, authors) {
     let result = ''
 
     if (types.length > 0) {
-
         for (let i = 0; i < types.length; i++) {
             const type = types[i]
             const typeTrainings = groupedTrainings[type]
@@ -79,8 +77,7 @@ function getTrainingsInfo(trainings, authors) {
                 result += ` ${timeString} (host: ${author.name})`
                 if (j < typeTrainings.length - 2) {
                     result += ','
-                }
-                if (j === typeTrainings.length - 2) {
+                } else if (j === typeTrainings.length - 2) {
                     result += ' and'
                 }
             }
@@ -98,12 +95,10 @@ function getTrainingsInfo(trainings, authors) {
 
 function groupTrainingsByType(trainings) {
     const result = {}
-
     for (const training of trainings) {
         if (!result[training.type]) {
             result[training.type] = []
         }
-
         result[training.type].push(training)
     }
     return result
