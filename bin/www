@@ -1,21 +1,13 @@
 #!/usr/bin/env node
 'use strict'
-const app = require('../app')
-const container = app.get('container')
-
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
-const cron = require('node-schedule')
 const WebSocket = require('ws')
 
-const robloxManager = container.get('RobloxManager')
+const app = require('../app')
+const container = app.get('container')
 const webSocketManager = container.get('WebSocketManager')
-const checkSuspensionsJob = container.get('CheckSuspensionsJob')
-const announceTrainingsJob = container.get('AnnounceTrainingsJob')
-const { authenticateWebSocketConnection } = container.get('AuthMiddleware')
-
-const cronConfig = require('../config/cron')
-const robloxConfig = require('../config/roblox')
+const authMiddleware = container.get('AuthMiddleware')
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
@@ -23,17 +15,14 @@ app.set('port', port)
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ noServer: true, path: '/api/v1' })
 
-robloxManager.init()
-webSocketManager.init()
-
-wss.on('connection', webSocketManager.addConnection)
+wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
 
 server.on('error', onError)
 server.on('listening', onListening)
 
 server.on('upgrade', function upgrade (req, socket, head) {
     try {
-        authenticateWebSocketConnection(req)
+        authMiddleware.authenticateWebSocketConnection(req)
     } catch (err) {
         socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
         socket.destroy()
@@ -46,19 +35,6 @@ server.on('upgrade', function upgrade (req, socket, head) {
 })
 
 server.listen(port)
-
-for (const jobConfig of Object.values(cronConfig)) {
-    const job = container.get(jobConfig.job)
-    if (jobConfig.hasOwnProperty('args')) {
-        const [...args] = jobConfig.args
-        cron.scheduleJob(job.expression, job.run.bind(null, ...args))
-    } else {
-        cron.scheduleJob(job.expression, job.run)
-    }
-}
-
-checkSuspensionsJob.run()
-announceTrainingsJob.run(robloxConfig.defaultGroup)
 
 function normalizePort (val) {
     const port = parseInt(val, 10)
