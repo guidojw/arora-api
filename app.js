@@ -2,7 +2,6 @@
 require('dotenv').config()
 
 const express = require('express')
-require('express-async-errors')
 const logger = require('morgan')
 const Sentry = require('@sentry/node')
 const helmet = require('helmet')
@@ -10,6 +9,8 @@ const hpp = require('hpp')
 const { ContainerBuilder, YamlFileLoader } = require('node-dependency-injection')
 
 const { NotFoundError } = require('./app/errors')
+
+require('express-async-errors')
 
 const container = new ContainerBuilder(true, __dirname)
 const loader = new YamlFileLoader(container)

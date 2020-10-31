@@ -1,14 +1,15 @@
 'use strict'
 const cron = require('node-schedule')
 
+const { Suspension } = require('../models')
+
 class CheckSuspensionsJob {
-    constructor(suspensionService, finishSuspensionJob) {
-        this._suspensionService = suspensionService
+    constructor(finishSuspensionJob) {
         this._finishSuspensionJob = finishSuspensionJob
     }
 
     async run() {
-        const suspensions = await this._suspensionService.getSuspensions()
+        const suspensions = await Suspension.findAll()
         for (const suspension of suspensions) {
             const endDate = await suspension.endDate
 

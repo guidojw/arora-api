@@ -38,7 +38,7 @@ services:
   AnnounceTrainingsJob:
     class: app/jobs
     main: AnnounceTrainingsJob
-    arguments: ['@TrainingService', '@GroupService', '@UserService']
+    arguments: ['@GroupService', '@UserService']
   BackupJob:
     class: app/jobs
     main: BackupJob
@@ -46,7 +46,7 @@ services:
   CheckSuspensionsJob:
     class: app/jobs
     main: CheckSuspensionsJob
-    arguments: ['@SuspensionService', '@FinishSuspensionJob']
+    arguments: ['@FinishSuspensionJob']
   DiscordMessageJob:
     class: app/jobs
     main: DiscordMessageJob

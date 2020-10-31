@@ -1,17 +1,17 @@
 'use strict'
 const cron = require('node-schedule')
 
+const { Training } = require('../models')
 const { timeHelper } = require('../helpers')
 
 class AnnounceTrainingsJob {
     constructor(trainingService, groupService, userService) {
-        this._trainingService = trainingService
         this._groupService = groupService
         this._userService = userService
     }
 
     async run(groupId) {
-        const trainings = await this._groupService.getTrainings()
+        const trainings = await Training.findAll()
         for (const training of trainings) {
             const jobName = `training_${training.id}`
             const job = cron.scheduledJobs[jobName]
