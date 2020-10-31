@@ -2,11 +2,18 @@
 const express = require('express')
 
 class StatusRouter {
-    constructor(statusController, { handleValidationResult }, { authenticate }) {
+    constructor(statusController, errorMiddleware, authMiddleware) {
+        const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+        const authenticate = authMiddleware.authenticate.bind(authMiddleware)
         const router = express.Router()
 
-        router.get('/:groupId', statusController.validate('getStatus'), handleValidationResult, authenticate,
-            statusController.getStatus)
+        router.get(
+            '/:groupId',
+            statusController.validate('getStatus'),
+            handleValidationResult,
+            authenticate,
+            statusController.getStatus.bind(statusController)
+        )
 
         return router
     }

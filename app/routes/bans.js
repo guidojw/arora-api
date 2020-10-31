@@ -2,19 +2,46 @@
 const express = require('express')
 
 class BansRouter {
-    constructor(banController, { handleValidationResult }, { authenticate }) {
+    constructor(banController, errorMiddleware, authMiddleware) {
+        const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+        const authenticate = authMiddleware.authenticate.bind(authMiddleware)
         const router = express.Router()
 
-        router.get('/', banController.validate('getBans'), handleValidationResult, authenticate, banController.getBans)
-        router.get('/:userId', banController.validate('getBan'), handleValidationResult, authenticate, banController
-            .getBan)
+        router.route('/')
+            .get(
+                banController.validate('getBans'),
+                handleValidationResult,
+                authenticate,
+                banController.getBans.bind(banController)
+            )
+            .post(
+                banController.validate('postBan'),
+                handleValidationResult,
+                authenticate,
+                banController.postBan.bind(banController)
+            )
 
-        router.post('/', banController.validate('postBan'), handleValidationResult, authenticate, banController.postBan)
-        router.post('/:userId/cancel', banController.validate('cancelBan'), handleValidationResult, authenticate,
-            banController.cancelBan)
+        router.route('/:userId')
+            .get(
+                banController.validate('getBan'),
+                handleValidationResult,
+                authenticate,
+                banController.getBan.bind(banController)
+            )
+            .put(
+                banController.validate('putBan'),
+                handleValidationResult,
+                authenticate,
+                banController.putBan.bind(banController)
+            )
 
-        router.put('/:userId', banController.validate('putBan'), handleValidationResult, authenticate, banController
-            .putBan)
+        router.post(
+            '/:userId/cancel',
+            banController.validate('cancelBan'),
+            handleValidationResult,
+            authenticate,
+            banController.cancelBan.bind(banController)
+        )
 
         return router
     }

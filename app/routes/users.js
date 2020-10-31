@@ -2,22 +2,54 @@
 const express = require('express')
 
 class UsersRouter {
-    constructor(userController, { handleValidationResult }, { authenticate }) {
+    constructor(userController, errorMiddleware, authMiddleware) {
+        const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+        const authenticate = authMiddleware.authenticate.bind(authMiddleware)
         const router = express.Router()
 
-        router.get('/:username/user-id', userController.validate('getUserIdFromUsername'), handleValidationResult,
-            authenticate, userController.getUserIdFromUsername)
-        router.get('/:userId/has-badge/:badgeId', userController.validate('hasBadge'), handleValidationResult,
-            authenticate, userController.hasBadge)
-        router.get('/:userId/rank/:groupId', userController.validate('getRank'), handleValidationResult, authenticate,
-            userController.getRank)
-        router.get('/:userId/role/:groupId', userController.validate('getRole'), handleValidationResult, authenticate,
-            userController.getRole)
-        router.get('/:userId', userController.validate('getUser'), handleValidationResult, authenticate, userController
-            .getUser)
+        router.get(
+            '/:username/user-id',
+            userController.validate('getUserIdFromUsername'),
+            handleValidationResult,
+            authenticate,
+            userController.getUserIdFromUsername.bind(userController)
+        )
+        router.get(
+            '/:userId/has-badge/:badgeId',
+            userController.validate('hasBadge'),
+            handleValidationResult,
+            authenticate,
+            userController.hasBadge.bind(userController)
+        )
+        router.get(
+            '/:userId/rank/:groupId',
+            userController.validate('getRank'),
+            handleValidationResult,
+            authenticate,
+            userController.getRank.bind(userController)
+        )
+        router.get(
+            '/:userId/role/:groupId',
+            userController.validate('getRole'),
+            handleValidationResult,
+            authenticate,
+            userController.getRole.bind(userController)
+        )
+        router.get(
+            '/:userId',
+            userController.validate('getUser'),
+            handleValidationResult,
+            authenticate,
+            userController.getUser.bind(userController)
+        )
 
-        router.post('/', userController.validate('getUsers'), handleValidationResult, authenticate, userController
-            .getUsers)
+        router.post(
+            '/',
+            userController.validate('getUsers'),
+            handleValidationResult,
+            authenticate,
+            userController.getUsers.bind(userController)
+        )
 
         return router
     }
