@@ -1,21 +1,50 @@
 'use strict'
 const express = require('express')
-const router = express.Router()
-const banController = require('../controllers/v1/ban')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
 
-router.get('/', banController.validate('getBans'), handleValidationResult, authenticate, banController.getBans)
+class BansRouter {
+    constructor(banController, errorMiddleware, authMiddleware) {
+        const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+        const authenticate = authMiddleware.authenticate.bind(authMiddleware)
+        const router = express.Router()
 
-router.post('/', banController.validate('ban'), handleValidationResult, authenticate, banController.ban)
+        router.route('/')
+            .get(
+                banController.validate('getBans'),
+                handleValidationResult,
+                authenticate,
+                banController.getBans.bind(banController)
+            )
+            .post(
+                banController.validate('postBan'),
+                handleValidationResult,
+                authenticate,
+                banController.postBan.bind(banController)
+            )
 
-router.put('/:userId', banController.validate('putBan'), handleValidationResult, authenticate, banController
-    .putBan)
+        router.route('/:userId')
+            .get(
+                banController.validate('getBan'),
+                handleValidationResult,
+                authenticate,
+                banController.getBan.bind(banController)
+            )
+            .put(
+                banController.validate('putBan'),
+                handleValidationResult,
+                authenticate,
+                banController.putBan.bind(banController)
+            )
 
-router.get('/:userId', banController.validate('getBan'), handleValidationResult, authenticate, banController
-    .getBan)
+        router.post(
+            '/:userId/cancel',
+            banController.validate('cancelBan'),
+            handleValidationResult,
+            authenticate,
+            banController.cancelBan.bind(banController)
+        )
 
-router.post('/:userId/cancel', banController.validate('cancelBan'), handleValidationResult, authenticate,
-    banController.cancelBan)
+        return router
+    }
+}
 
-module.exports = router
+module.exports = BansRouter

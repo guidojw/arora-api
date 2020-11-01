@@ -1,0 +1,138 @@
+# Configuration for DI
+services:
+  # Controllers
+  BanController:
+    class: app/controllers/v1
+    main: BanController
+    arguments: ['@BanService']
+  CatalogController:
+    class: app/controllers/v1
+    arguments: ['@CatalogService']
+    main: CatalogController
+  GroupController:
+    class: app/controllers/v1
+    main: GroupController
+    arguments: ['@GroupService', '@SuspensionService', '@TrainingService']
+  StatusController:
+    class: app/controllers/v1
+    main: StatusController
+    arguments: ['@StatusService']
+  TrelloController:
+    class: app/controllers/v1
+    main: TrelloController
+    arguments: ['@TrelloService', '@DiscordMessageJob']
+  UserController:
+    class: app/controllers/v1
+    main: UserController
+    arguments: ['@UserService']
+
+  # Jobs
+  AcceptJoinRequestsJob:
+    class: app/jobs
+    main: AcceptJoinRequestsJob
+    arguments: ['@RobloxManager', '@GroupService', '@DiscordMessageJob']
+  AcceptMtJoinRequestsJob:
+    class: app/jobs
+    main: AcceptMtJoinRequestsJob
+    arguments: ['@RobloxManager', '@UserService', '@GroupService', '@DiscordMessageJob']
+  AnnounceTrainingsJob:
+    class: app/jobs
+    main: AnnounceTrainingsJob
+    arguments: ['@GroupService', '@UserService']
+  BackupJob:
+    class: app/jobs
+    main: BackupJob
+    arguments: ['@DiscordMessageJob']
+  CheckSuspensionsJob:
+    class: app/jobs
+    main: CheckSuspensionsJob
+    arguments: ['@FinishSuspensionJob']
+  DiscordMessageJob:
+    class: app/jobs
+    main: DiscordMessageJob
+  FinishSuspensionJob:
+    class: app/jobs
+    main: FinishSuspensionJob
+    arguments: ['@UserService', '@GroupService', '@DiscordMessageJob']
+  PayoutTrainDevelopersJob:
+    class: app/jobs
+    main: PayoutTrainDevelopersJob
+    arguments: ['@RobloxManager', '@UserService', '@WebSocketManager']
+
+  # Managers
+  RobloxManager:
+    class: app/managers
+    main: RobloxManager
+  WebSocketManager:
+    class: app/managers
+    main: WebSocketManager
+
+  # Middlewares
+  AuthMiddleware:
+    class: app/middlewares
+    main: AuthMiddleware
+    arguments: ['@AuthService']
+  ErrorMiddleware:
+    class: app/middlewares
+    main: ErrorMiddleware
+
+  # Routes
+  BansRouter:
+    class: app/routes
+    main: BansRouter
+    arguments: ['@BanController', '@ErrorMiddleware', '@AuthMiddleware']
+  CatalogRouter:
+    class: app/routes
+    main: CatalogRouter
+    arguments: ['@CatalogController', '@ErrorMiddleware', '@AuthMiddleware']
+  GroupsRouter:
+    class: app/routes
+    main: GroupsRouter
+    arguments: ['@GroupController', '@ErrorMiddleware', '@AuthMiddleware']
+  StatusRouter:
+    class: app/routes
+    main: StatusRouter
+    arguments: ['@StatusController', '@ErrorMiddleware', '@AuthMiddleware']
+  TrelloRouter:
+    class: app/routes
+    main: TrelloRouter
+    arguments: ['@TrelloController', '@ErrorMiddleware', '@AuthMiddleware']
+  UsersRouter:
+    class: app/routes
+    main: UsersRouter
+    arguments: ['@UserController', '@ErrorMiddleware', '@AuthMiddleware']
+
+  # Services
+  AuthService:
+    class: app/services
+    main: AuthService
+  BanService:
+    class: app/services
+    main: BanService
+    arguments: ['@UserService', '@DiscordMessageJob']
+  CatalogService:
+    class: app/services
+    main: CatalogService
+  GroupService:
+    class: app/services
+    main: GroupService
+    arguments: ['@RobloxManager', '@UserService', '@DiscordMessageJob', '@WebSocketManager']
+  StatusService:
+    class: app/services
+    main: StatusService
+    arguments: ['@RobloxManager']
+  SuspensionService:
+    class: app/services
+    main: SuspensionService
+    arguments: ['@GroupService', '@UserService', '@RobloxManager', '@FinishSuspensionJob', '@DiscordMessageJob']
+  TrainingService:
+    class: app/services
+    main: TrainingService
+    arguments: ['@AnnounceTrainingsJob', '@DiscordMessageJob', '@UserService']
+  TrelloService:
+    class: app/services
+    main: TrelloService
+  UserService:
+    class: app/services
+    main: UserService
+    arguments: ['@RobloxManager']

@@ -1,11 +1,22 @@
 'use strict'
 const express = require('express')
-const router = express.Router()
-const statusController = require('../controllers/v1/status')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
 
-router.get('/:groupId', statusController.validate('getStatus'), handleValidationResult, authenticate,
-    statusController.getStatus)
+class StatusRouter {
+    constructor(statusController, errorMiddleware, authMiddleware) {
+        const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+        const authenticate = authMiddleware.authenticate.bind(authMiddleware)
+        const router = express.Router()
 
-module.exports = router
+        router.get(
+            '/:groupId',
+            statusController.validate('getStatus'),
+            handleValidationResult,
+            authenticate,
+            statusController.getStatus.bind(statusController)
+        )
+
+        return router
+    }
+}
+
+module.exports = StatusRouter

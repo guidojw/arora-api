@@ -1,56 +1,133 @@
 'use strict'
 const express = require('express')
-const router = express.Router()
-const groupController = require('../controllers/v1/group')
-const { handleValidationResult } = require('../middlewares/error')
-const { authenticate } = require('../middlewares/auth')
 
-router.post('/:groupId/suspensions', groupController.validate('suspend'), handleValidationResult, authenticate,
-    groupController.suspend)
+class GroupsRouter {
+    constructor(groupController, errorMiddleware, authMiddleware) {
+        const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+        const authenticate = authMiddleware.authenticate.bind(authMiddleware)
+        const router = express.Router()
 
-router.get('/:groupId/shout', groupController.validate('getShout'), handleValidationResult, authenticate,
-    groupController.getShout)
+        // GroupService
+        router.route('/:groupId/shout')
+            .get(
+                groupController.validate('getShout'),
+                handleValidationResult,
+                authenticate,
+                groupController.getShout.bind(groupController)
+            )
+            .post(
+                groupController.validate('postShout'),
+                handleValidationResult,
+                authenticate,
+                groupController.postShout.bind(groupController)
+            )
 
-router.get('/:groupId/suspensions', groupController.validate('getSuspensions'), handleValidationResult,
-    authenticate, groupController.getSuspensions)
+        router.get(
+            '/:groupId/exiles',
+            groupController.validate('getExiles'),
+            handleValidationResult,
+            authenticate,
+            groupController.getExiles.bind(groupController)
+        )
+        router.get(
+            '/:groupId',
+            groupController.validate('getGroup'),
+            handleValidationResult,
+            authenticate,
+            groupController.getGroup.bind(groupController)
+        )
 
-router.get('/:groupId/trainings', groupController.validate('getTrainings'), handleValidationResult,
-    authenticate, groupController.getTrainings)
+        router.put(
+            '/:groupId/users/:userId',
+            groupController.validate('putUser'),
+            handleValidationResult,
+            authenticate,
+            groupController.putUser.bind(groupController)
+        )
 
-router.post('/:groupId/trainings', groupController.validate('postTraining'), handleValidationResult,
-    authenticate, groupController.postTraining)
+        // SuspensionService
+        router.route('/:groupId/suspensions')
+            .get(
+                groupController.validate('getSuspensions'),
+                handleValidationResult,
+                authenticate,
+                groupController.getSuspensions.bind(groupController)
+            )
+            .post(
+                groupController.validate('postSuspension'),
+                handleValidationResult,
+                authenticate,
+                groupController.postSuspension.bind(groupController)
+            )
 
-router.get('/:groupId/exiles', groupController.validate('getExiles'), handleValidationResult, authenticate,
-    groupController.getExiles)
+        router.route('/:groupId/suspensions/:userId')
+            .get(
+                groupController.validate('getSuspension'),
+                handleValidationResult,
+                authenticate,
+                groupController.getSuspension.bind(groupController)
+            )
+            .put(
+                groupController.validate('putSuspension'),
+                handleValidationResult,
+                authenticate,
+                groupController.putSuspension.bind(groupController)
+            )
 
-router.get('/:groupId/suspensions/:userId', groupController.validate('getSuspension'), handleValidationResult,
-    authenticate, groupController.getSuspension)
+        router.post(
+            '/:groupId/suspensions/:userId/cancel',
+            groupController.validate('cancelSuspension'),
+            handleValidationResult,
+            authenticate,
+            groupController.cancelSuspension.bind(groupController)
+        )
+        router.post(
+            '/:groupId/suspensions/:userId/extend',
+            groupController.validate('extendSuspension'),
+            handleValidationResult,
+            authenticate,
+            groupController.extendSuspension.bind(groupController)
+        )
 
-router.get('/:groupId/trainings/:trainingId', groupController.validate('getTraining'), handleValidationResult,
-    authenticate, groupController.getTraining)
+        // TrainingService
+        router.route('/:groupId/trainings')
+            .get(
+                groupController.validate('getTrainings'),
+                handleValidationResult,
+                authenticate,
+                groupController.getTrainings.bind(groupController)
+            )
+            .post(
+                groupController.validate('postTraining'),
+                handleValidationResult,
+                authenticate,
+                groupController.postTraining.bind(groupController)
+            )
 
-router.post('/:groupId/shout', groupController.validate('shout'), handleValidationResult, authenticate,
-    groupController.shout)
+        router.route('/:groupId/trainings/:trainingId')
+            .get(
+                groupController.validate('getTraining'),
+                handleValidationResult,
+                authenticate,
+                groupController.getTraining.bind(groupController)
+            )
+            .put(
+                groupController.validate('putTraining'),
+                handleValidationResult,
+                authenticate,
+                groupController.putTraining.bind(groupController)
+            )
 
-router.put('/:groupId/trainings/:trainingId', groupController.validate('putTraining'), handleValidationResult,
-    authenticate, groupController.putTraining)
+        router.post(
+            '/:groupId/trainings/:trainingId/cancel',
+            groupController.validate('cancelTraining'),
+            handleValidationResult,
+            authenticate,
+            groupController.cancelTraining.bind(groupController)
+        )
 
-router.put('/:groupId/suspensions/:userId', groupController.validate('putSuspension'), handleValidationResult,
-    authenticate, groupController.putSuspension)
+        return router
+    }
+}
 
-router.get('/:groupId', groupController.validate('getGroup'), handleValidationResult, authenticate,
-    groupController.getGroup)
-
-router.post('/:groupId/suspensions/:userId/cancel', groupController.validate('cancelSuspension'),
-    handleValidationResult, authenticate, groupController.cancelSuspension)
-
-router.post('/:groupId/trainings/:trainingId/cancel', groupController.validate('cancelTraining'),
-    handleValidationResult, authenticate, groupController.cancelTraining)
-
-router.post('/:groupId/suspensions/:userId/extend', groupController.validate('extendSuspension'),
-    handleValidationResult, authenticate, groupController.extendSuspension)
-
-router.put('/:groupId/users/:userId', groupController.validate('putUser'), handleValidationResult,
-    authenticate, groupController.putUser)
-
-module.exports = router
+module.exports = GroupsRouter

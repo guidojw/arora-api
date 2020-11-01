@@ -1,34 +1,40 @@
 'use strict'
-const discordMessageJob = require('./discord-message')
-const groupService = require('../services/group')
-const robloxManager = require('../managers/roblox')
 const { Exile, Suspension } = require('../models')
 
-module.exports = async groupId => {
-    const client = robloxManager.getClient(groupId)
-    const group = await client.getGroup(groupId)
-    let cursor = null
-    do {
-        const requests = await group.getJoinRequests({ cursor })
+class AcceptJoinRequestsJob {
+    constructor(robloxManager, groupService, discordMessageJob) {
+        this._robloxManager = robloxManager
+        this._groupService = groupService
+        this._discordMessageJob = discordMessageJob
+    }
 
-        for (const request of requests.data) {
-            const userId = request.requester.userId
+    async run (groupId) {
+        const client = this._robloxManager.getClient(groupId)
+        const group = await client.getGroup(groupId)
 
-            if (await Exile.findOne({ where: { userId }})) {
-                await group.declineJoinRequest(userId)
-                discordMessageJob('log', `Declined **${request.requester.username}**'s join request`)
+        let cursor = null
+        do {
+            const requests = await group.getJoinRequests({ cursor })
+            for (const request of requests.data) {
+                const userId = request.requester.userId
 
-            } else {
-                await group.acceptJoinRequest(userId)
-                discordMessageJob('log', `Accepted **${request.requester.username}**'s join request`)
-                if (await Suspension.findOne({ where: { userId }})) {
-                    await groupService.setRank(groupId, userId, 2)
-                    discordMessageJob('log', `Promoted **${request.requester.username}** from **` +
-                        'Customer** to **Suspended**')
+                if (await Exile.findOne({ where: { userId } })) {
+                    await group.declineJoinRequest(userId)
+                    this._discordMessageJob.run('log', `Declined **${request.requester.username}**'s join request`)
+
+                } else {
+                    await group.acceptJoinRequest(userId)
+                    this._discordMessageJob.run('log', `Accepted **${request.requester.username}**'s join request`)
+                    if (await Suspension.findOne({ where: { userId } })) {
+                        await this._groupService.setRank(groupId, userId, 2)
+                        this._discordMessageJob.run('log', `Promoted **${request.requester.username}** from **Customer** to **Suspended**`)
+                    }
                 }
             }
-        }
 
-        cursor = requests.nextPageCursor
-    } while (cursor)
+            cursor = requests.nextPageCursor
+        } while (cursor)
+    }
 }
+
+module.exports = AcceptJoinRequestsJob
