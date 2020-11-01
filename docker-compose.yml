@@ -10,7 +10,7 @@ services:
       NODE_ENV: production
       POSTGRES_HOST: db
     volumes:
-      - node_modules:/opt/app/node_modules
+      - /opt/app/node_modules
       - /storage/backups:/storage/backups
     labels:
       - traefik.enable=true
@@ -26,5 +26,4 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  node_modules:
   postgres_data:
