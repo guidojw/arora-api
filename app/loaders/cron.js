@@ -9,9 +9,9 @@ function init (container) {
 
     if (jobConfig.args) {
       const [...args] = jobConfig.args
-      cron.scheduleJob(jobConfig.expression, job.run.bind(null, ...args))
+      cron.scheduleJob(jobConfig.expression, job.run.bind(job, ...args))
     } else {
-      cron.scheduleJob(jobConfig.expression, job.run)
+      cron.scheduleJob(jobConfig.expression, job.run.bind(job))
     }
   }
 }
