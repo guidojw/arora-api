@@ -1,17 +1,24 @@
 'use strict'
 const { header, param } = require('express-validator')
-const statusService = require('../../services/status')
 
-exports.validate = method => {
-    switch (method) {
-        case 'getStatus':
-            return [
-                header('authorization').exists().isString(),
-                param('groupId').isInt().toInt()
-            ]
+class StatusController {
+    constructor(statusService) {
+        this._statusService = statusService
+    }
+
+    async getStatus(req, res) {
+        res.json(await this._statusService.getStatus(req.params.groupId))
+    }
+
+    validate(method) {
+        switch (method) {
+            case 'getStatus':
+                return [
+                    header('authorization').exists().isString(),
+                    param('groupId').isInt().toInt()
+                ]
+        }
     }
 }
 
-exports.getStatus = async (req, res) => {
-    res.json(await statusService.getStatus(req.params.groupId))
-}
+module.exports = StatusController

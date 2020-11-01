@@ -1,13 +1,20 @@
 'use strict'
-const robloxManager = require('../managers/roblox')
-const NotFoundError = require('../errors/not-found')
+const { NotFoundError } = require('../errors')
 
-exports.getStatus = async groupId => {
-    const client = robloxManager.getClient(groupId)
-    if (!client) {
-        throw new NotFoundError('Client not found.')
+class StatusService {
+    constructor(robloxManager) {
+        this._robloxManager = robloxManager
     }
 
-    const authenticationData = await client.apis.usersAPI.getAuthenticatedUserInformation()
-    return authenticationData !== undefined
+    async getStatus(groupId) {
+        const client = this._robloxManager.getClient(groupId)
+        if (!client) {
+            throw new NotFoundError('Client not found.')
+        }
+
+        const authenticationData = await client.apis.usersAPI.getAuthenticatedUserInformation()
+        return authenticationData !== undefined
+    }
 }
+
+module.exports = StatusService
