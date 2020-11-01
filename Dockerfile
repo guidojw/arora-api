@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:15.0.1
 
 # Install dependencies
 WORKDIR /opt/app
