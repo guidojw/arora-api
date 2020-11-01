@@ -11,7 +11,6 @@ function init(app, container) {
     const errorMiddleware = container.get('ErrorMiddleware')
 
     if (process.env.SENTRY_DSN) {
-        Sentry.init({ dsn: process.env.SENTRY_DSN })
         app.use(Sentry.Handlers.requestHandler())
     }
 
