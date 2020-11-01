@@ -2,15 +2,14 @@ version: '3'
 
 services:
   app:
-    build: .
-    image: nsadmin-api
+    image: docker.guidojw.nl/nsadmin/nsadmin-api:latest
     restart: unless-stopped
     env_file: .env
     environment:
       NODE_ENV: production
       POSTGRES_HOST: db
     volumes:
-      - node_modules:/opt/app/node_modules
+      - /opt/app/node_modules
       - /storage/backups:/storage/backups
     labels:
       - traefik.enable=true
@@ -26,5 +25,4 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  node_modules:
   postgres_data:
