@@ -7,11 +7,11 @@ function init (container) {
   for (const jobConfig of Object.values(cronConfig)) {
     const job = container.get(jobConfig.job)
 
-    if (Object.prototype.hasOwnProperty.call(jobConfig, 'args')) {
+    if (jobConfig.args) {
       const [...args] = jobConfig.args
-      cron.scheduleJob(job.expression, job.run.bind(null, ...args))
+      cron.scheduleJob(jobConfig.expression, job.run.bind(job, ...args))
     } else {
-      cron.scheduleJob(job.expression, job.run)
+      cron.scheduleJob(jobConfig.expression, job.run.bind(job))
     }
   }
 }
