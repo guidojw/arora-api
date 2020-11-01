@@ -16,6 +16,7 @@ function getBackupDate (name) {
 
   const dateInfo = timeHelper.getDateInfo(date)
   const timeInfo = timeHelper.getTimeInfo(time)
+
   return new Date(dateInfo.year, dateInfo.month, dateInfo.day, timeInfo.hours, timeInfo.minutes)
 }
 

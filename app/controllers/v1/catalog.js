@@ -8,7 +8,9 @@ class CatalogController {
 
   async getItems (req, res) {
     const queryStart = req.originalUrl.indexOf('?')
-    const queryString = queryStart > 0 ? req.originalUrl.slice(queryStart + 1) : ''
+    const queryString = queryStart > 0
+      ? req.originalUrl.slice(queryStart + 1)
+      : ''
     await res.json(await this._catalogService.getItems(queryString))
   }
 

@@ -26,7 +26,9 @@ class WebSocketManager {
       console.log('Connection closed!')
       this.removeConnection(connection)
     })
-    connection.on('pong', () => connection.isAlive = true)
+    connection.on('pong', () => {
+      connection.isAlive = true
+    })
 
     this.connections.push(connection)
   }

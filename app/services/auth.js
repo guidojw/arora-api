@@ -10,7 +10,7 @@ class AuthService {
     try {
       this._verify(token)
       return true
-    } catch {
+    } catch (err) {
       return false
     }
   }

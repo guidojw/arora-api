@@ -26,13 +26,16 @@ class AnnounceTrainingsJob {
 
     const now = new Date()
     const today = now.getDate()
-    const trainingsToday = trainings.filter(training => training.date.getDate() === today)
-    const trainingsTomorrow = trainings.filter(training => training.date.getDate() === today + 1)
+    const isDay = day => training => training.date.getDate() === day
+    const trainingsToday = trainings.filter(isDay(today))
+    const trainingsTomorrow = trainings.filter(isDay(today + 1))
     const authorIds = [...new Set([
       ...trainingsToday.map(training => training.authorId),
       ...trainingsTomorrow.map(training => training.authorId)
     ])]
-    const authors = authorIds.length > 0 ? await this._userService.getUsers(authorIds) : undefined
+    const authors = authorIds.length > 0
+      ? await this._userService.getUsers(authorIds)
+      : undefined
 
     let shout = 'Trainings today - '
     shout += getTrainingsInfo(trainingsToday, authors)

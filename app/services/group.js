@@ -71,7 +71,7 @@ class GroupService {
     if (oldRank >= 200) {
       throw new ForbiddenError('Can\'t change rank of HRs.')
     }
-    if (!(rank === 1 || rank >= 3 && rank <= 5 || rank >= 100 && rank <= 102)) {
+    if (!(rank === 1 || (rank >= 3 && rank <= 5) || (rank >= 100 && rank <= 102))) {
       throw new BadRequestError('Invalid rank.')
     }
 
