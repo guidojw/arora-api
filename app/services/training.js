@@ -26,7 +26,7 @@ class TrainingService {
     cron.scheduleJob(
             `training_${training.id}`,
             new Date(training.date.getTime() + 30 * 60 * 1000),
-            this._announceTrainingsJob.run.bind(null, robloxConfig.defaultGroup)
+            this._announceTrainingsJob.run.bind(this._announceTrainingsJob, robloxConfig.defaultGroup)
     )
 
     const dateString = timeHelper.getDate(training.date)
@@ -63,7 +63,7 @@ class TrainingService {
       cron.scheduleJob(
         jobName,
         training.date,
-        this._announceTrainingsJob.run.bind(null, robloxConfig.defaultGroup)
+        this._announceTrainingsJob.run.bind(this._announceTrainingsJob, robloxConfig.defaultGroup)
       )
     }
 

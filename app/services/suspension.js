@@ -63,7 +63,7 @@ class SuspensionService {
     cron.scheduleJob(
             `suspension_${suspension.id}`,
             await suspension.endDate,
-            this._finishSuspensionJob.run.bind(null, suspension)
+            this._finishSuspensionJob.run.bind(this._finishSuspensionJob, suspension)
     )
 
     const days = suspension.duration / 86400000
@@ -132,7 +132,7 @@ class SuspensionService {
     cron.scheduleJob(
       jobName,
       await suspension.endDate,
-      this._finishSuspensionJob.run.bind(null, suspension)
+      this._finishSuspensionJob.run.bind(this._finishSuspensionJob, suspension)
     )
 
     const [username, authorName] = await Promise.all([
