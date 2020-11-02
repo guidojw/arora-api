@@ -19,7 +19,7 @@ class CheckSuspensionsJob {
         const jobName = `suspension_${suspension.id}`
         const job = cron.scheduledJobs[jobName]
         if (!job) {
-          cron.scheduleJob(jobName, endDate, this._finishSuspensionJob.run.bind(null, suspension))
+          cron.scheduleJob(jobName, endDate, this._finishSuspensionJob.run.bind(this._finishSuspensionJob, suspension))
         }
       }
     }
