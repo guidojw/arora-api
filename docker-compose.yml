@@ -11,6 +11,8 @@ services:
     volumes:
       - /opt/app/node_modules
       - /storage/backups:/storage/backups
+      - ./private.key:/opt/app/private.key
+      - ./public.key:/opt/app/public.key
     labels:
       - traefik.enable=true
       - traefik.http.routers.nsadmin-api-production.rule=Host(`$HOST`)
