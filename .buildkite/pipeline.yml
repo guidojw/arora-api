@@ -46,6 +46,6 @@ steps:
     command: .buildkite/sentry.sh
     branches: master
 
-  - label: Inform api
+  - label: Inform Discord
     command: .buildkite/discord.sh
     branches: master
