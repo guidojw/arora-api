@@ -1,5 +1,6 @@
 nsadmin-api
 ================
+[![Build status](https://badge.buildkite.com/63cd463b34afdd64116e2983ec91e8b2d1755b5d1b35373718.svg)](https://buildkite.com/ns-roblox/nsadmin-api)
 
 ## Prerequisites
 * [Node.js](https://nodejs.org/en/download/current/)
