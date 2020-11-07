@@ -10,10 +10,6 @@ module.exports = {
     job: 'AcceptMtJoinRequestsJob',
     args: [1018818, 2661380]
   },
-  backupJob: {
-    expression: '0 0 */1 * *', // https://crontab.guru/#0_0_*/1_*_*
-    job: 'BackupJob'
-  },
   checkSuspensionsJob: {
     expression: '0 */1 * * *', // https://crontab.guru/#0_*/1_*_*_*
     job: 'CheckSuspensionsJob'

@@ -39,10 +39,6 @@ services:
     class: app/jobs
     main: AnnounceTrainingsJob
     arguments: ['@GroupService', '@UserService']
-  BackupJob:
-    class: app/jobs
-    main: BackupJob
-    arguments: ['@DiscordMessageJob']
   CheckSuspensionsJob:
     class: app/jobs
     main: CheckSuspensionsJob

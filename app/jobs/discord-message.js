@@ -7,8 +7,6 @@ class DiscordMessageJob {
       await this.sendLog(message)
     } else if (type === 'trello') {
       await this.sendTrello(message)
-    } else if (type === 'backupNotification') {
-      await this.sendBackupNotification(message)
     }
   }
 
@@ -24,14 +22,6 @@ class DiscordMessageJob {
     await axios({
       method: 'post',
       url: process.env.DISCORD_TRELLO_WEBHOOK_URL,
-      data: body
-    })
-  }
-
-  async sendBackupNotification (body) {
-    await axios({
-      method: 'post',
-      url: process.env.DISCORD_BACKUP_NOTIFICATION_WEBHOOK_URL,
       data: body
     })
   }
