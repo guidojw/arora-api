@@ -13,7 +13,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^5.27.2",
+    "@sentry/node": "^5.27.3",
     "axios": "^0.21.0",
     "bloxy": "^5.0.3",
     "debug": "^4.1.1",
@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
     "express-validator": "^6.6.1",
-    "helmet": "^4.1.1",
+    "helmet": "^4.2.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
@@ -36,7 +36,7 @@
     "ws": "^7.3.1"
   },
   "devDependencies": {
-    "eslint": "^7.12.1",
+    "eslint": "^7.13.0",
     "nodemon": "^2.0.6",
     "standard": "^16.0.1"
   }
