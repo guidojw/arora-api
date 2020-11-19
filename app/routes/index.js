@@ -4,6 +4,5 @@ module.exports = {
   CatalogRouter: require('./catalog'),
   GroupsRouter: require('./groups'),
   StatusRouter: require('./status'),
-  TrelloRouter: require('./trello'),
   UsersRouter: require('./users')
 }

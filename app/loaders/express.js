@@ -24,7 +24,6 @@ function init (app, container) {
   app.use('/api/v1/users', container.get('UsersRouter'))
   app.use('/api/v1/bans', container.get('BansRouter'))
   app.use('/api/v1/catalog', container.get('CatalogRouter'))
-  app.use('/api/v1/trello', container.get('TrelloRouter'))
   app.use('/api/v1/status', container.get('StatusRouter'))
 
   app.use(() => {

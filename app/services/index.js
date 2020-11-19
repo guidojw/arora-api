@@ -7,6 +7,5 @@ module.exports = {
   StatusService: require('./status'),
   SuspensionService: require('./suspension'),
   TrainingService: require('./training'),
-  TrelloService: require('./trello'),
   UserService: require('./user')
 }

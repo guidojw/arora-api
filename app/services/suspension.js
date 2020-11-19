@@ -71,7 +71,7 @@ class SuspensionService {
       this._userService.getUsername(suspension.userId),
       this._userService.getUsername(suspension.authorId)
     ])
-    this._discordMessageJob.run('log', `**${authorName}** suspended **${username}** for **${days}** ${pluralize('day', days)} with reason "*${suspension.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** suspended **${username}** for **${days}** ${pluralize('day', days)} with reason "*${suspension.reason}*"`)
 
     return suspension
   }
@@ -95,7 +95,7 @@ class SuspensionService {
       this._userService.getUsername(suspension.userId),
       this._userService.getUsername(cancellation.authorId)
     ])
-    this._discordMessageJob.run('log', `**${authorName}** cancelled **${username}**'s suspension with reason "*${cancellation.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** cancelled **${username}**'s suspension with reason "*${cancellation.reason}*"`)
 
     return cancellation
   }
@@ -140,7 +140,7 @@ class SuspensionService {
       this._userService.getUsername(extension.authorId)
     ])
     const extensionDays = extension.duration / 86400000
-    this._discordMessageJob.run('log', `**${authorName}** extended **${username}**'s suspension with **${extensionDays}** ${pluralize('day', extensionDays)}`)
+    this._discordMessageJob.run(`**${authorName}** extended **${username}**'s suspension with **${extensionDays}** ${pluralize('day', extensionDays)}`)
 
     return extension
   }
@@ -155,13 +155,13 @@ class SuspensionService {
     ])
     if (changes.authorId) {
       const authorName = await this._userService.getUsername(suspension.authorId)
-      this._discordMessageJob.run('log', `**${editorName}** changed the author of **${username}**'s suspension to **${authorName}**`)
+      this._discordMessageJob.run(`**${editorName}** changed the author of **${username}**'s suspension to **${authorName}**`)
     }
     if (changes.reason) {
-      this._discordMessageJob.run('log', `**${editorName}** changed the reason of **${username}**'s suspension to *"${suspension.reason}"*`)
+      this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s suspension to *"${suspension.reason}"*`)
     }
     if (changes.rankBack !== undefined) {
-      this._discordMessageJob.run('log', `**${editorName}** changed the rankBack option of **${username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
+      this._discordMessageJob.run(`**${editorName}** changed the rankBack option of **${username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
     }
 
     return suspension

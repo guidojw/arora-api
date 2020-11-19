@@ -43,7 +43,7 @@ class BanService {
       this._userService.getUsername(ban.userId),
       this._userService.getUsername(ban.authorId)
     ])
-    this._discordMessageJob.run('log', `**${authorName}** banned **${username}** with reason "*${ban.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** banned **${username}** with reason "*${ban.reason}*"`)
 
     return ban
   }
@@ -60,7 +60,7 @@ class BanService {
       this._userService.getUsername(ban.userId),
       this._userService.getUsername(cancellation.authorId)
     ])
-    this._discordMessageJob.run('log', `**${authorName}** unbanned **${username}** with reason "*${cancellation.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** unbanned **${username}** with reason "*${cancellation.reason}*"`)
 
     return cancellation
   }
@@ -74,11 +74,11 @@ class BanService {
       this._userService.getUsername(editorId)
     ])
     if (changes.reason) {
-      this._discordMessageJob.run('log', `**${editorName}** changed the reason of **${username}**'s ban to *"${ban.reason}"*`)
+      this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s ban to *"${ban.reason}"*`)
     }
     if (changes.authorId) {
       const authorName = await this._userService.getUsername(ban.authorId)
-      this._discordMessageJob.run('log', `**${editorName}** changed the author of **${username}**'s ban to **${authorName}**`)
+      this._discordMessageJob.run(`**${editorName}** changed the author of **${username}**'s ban to **${authorName}**`)
     }
 
     return ban
