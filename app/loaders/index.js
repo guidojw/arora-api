@@ -19,10 +19,10 @@ async function init (app) {
   container.get('WebSocketManager').init()
 
   expressLoader(app, container)
-  // cronLoader(container)
+  cronLoader(container)
 
-  // container.get('CheckSuspensionsJob').run()
-  // container.get('AnnounceTrainingsJob').run(robloxConfig.defaultGroup)
+  container.get('CheckSuspensionsJob').run()
+  container.get('AnnounceTrainingsJob').run(robloxConfig.defaultGroup)
 }
 
 module.exports = {
