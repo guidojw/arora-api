@@ -33,9 +33,9 @@ class GroupService {
     if (authorId) {
       const authorName = await this._userService.getUsername(authorId)
       if (shout.body === '') {
-        this._discordMessageJob.run('log', `**${authorName}** cleared the shout`)
+        this._discordMessageJob.run(`**${authorName}** cleared the shout`)
       } else {
-        this._discordMessageJob.run('log', `**${authorName}** shouted "*${shout.body}*"`)
+        this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
       }
     }
 
@@ -93,9 +93,9 @@ class GroupService {
     const username = await this._userService.getUsername(userId)
     if (authorId) {
       const authorName = await this._userService.getUsername(authorId)
-      this._discordMessageJob.run('log', `**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+      this._discordMessageJob.run(`**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     } else {
-      this._discordMessageJob.run('log', `${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+      this._discordMessageJob.run(`${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
     }
 
     return { oldRole, newRole }

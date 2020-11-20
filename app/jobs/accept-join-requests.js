@@ -20,14 +20,14 @@ class AcceptJoinRequestsJob {
 
         if (await Exile.findOne({ where: { userId } })) {
           await group.declineJoinRequest(userId)
-          this._discordMessageJob.run('log', `Declined **${request.requester.username}**'s join request`)
+          this._discordMessageJob.run(`Declined **${request.requester.username}**'s join request`)
         } else {
           await group.acceptJoinRequest(userId)
-          this._discordMessageJob.run('log', `Accepted **${request.requester.username}**'s join request`)
+          this._discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
 
           if (await Suspension.findOne({ where: { userId } })) {
             await this._groupService.setRank(groupId, userId, 2)
-            this._discordMessageJob.run('log', `Promoted **${request.requester.username}** from **Customer** to **Suspended**`)
+            this._discordMessageJob.run(`Promoted **${request.requester.username}** from **Customer** to **Suspended**`)
           }
         }
       }

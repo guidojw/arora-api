@@ -21,10 +21,10 @@ class AcceptMtJoinRequestsJob {
         if (rank >= 100) {
           await mtGroup.acceptJoinRequest(userId)
           await this._groupService.setRank(mtGroupId, userId, rank)
-          this._discordMessageJob.run('log', `Accepted **${request.requester.username}**'s MT join request`)
+          this._discordMessageJob.run(`Accepted **${request.requester.username}**'s MT join request`)
         } else {
           await mtGroup.declineJoinRequest(userId)
-          this._discordMessageJob.run('log', `Declined **${request.requester.username}**'s MT join request`)
+          this._discordMessageJob.run(`Declined **${request.requester.username}**'s MT join request`)
         }
       }
 

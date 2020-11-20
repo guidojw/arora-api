@@ -17,10 +17,6 @@ services:
     class: app/controllers/v1
     main: StatusController
     arguments: ['@StatusService']
-  TrelloController:
-    class: app/controllers/v1
-    main: TrelloController
-    arguments: ['@TrelloService', '@DiscordMessageJob']
   UserController:
     class: app/controllers/v1
     main: UserController
@@ -89,10 +85,6 @@ services:
     class: app/routes
     main: StatusRouter
     arguments: ['@StatusController', '@ErrorMiddleware', '@AuthMiddleware']
-  TrelloRouter:
-    class: app/routes
-    main: TrelloRouter
-    arguments: ['@TrelloController', '@ErrorMiddleware', '@AuthMiddleware']
   UsersRouter:
     class: app/routes
     main: UsersRouter
@@ -125,9 +117,6 @@ services:
     class: app/services
     main: TrainingService
     arguments: ['@AnnounceTrainingsJob', '@DiscordMessageJob', '@UserService']
-  TrelloService:
-    class: app/services
-    main: TrelloService
   UserService:
     class: app/services
     main: UserService

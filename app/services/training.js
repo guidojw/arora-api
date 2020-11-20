@@ -32,7 +32,7 @@ class TrainingService {
     const dateString = timeHelper.getDate(training.date)
     const timeString = timeHelper.getTime(training.date)
     const authorName = await this._userService.getUsername(training.authorId)
-    this._discordMessageJob.run('log', `**${authorName}** scheduled a **${training.type.toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
+    this._discordMessageJob.run(`**${authorName}** scheduled a **${training.type.toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
 
     return training
   }
@@ -70,18 +70,18 @@ class TrainingService {
     const editorName = await this._userService.getUsername(editorId)
     if (changes.authorId) {
       const authorName = await this._userService.getUsername(training.authorId)
-      this._discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s host to **${authorName}**`)
+      this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s host to **${authorName}**`)
     }
     if (changes.notes) {
-      this._discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s notes to "*${training.notes}*"`)
+      this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s notes to "*${training.notes}*"`)
     }
     if (changes.type) {
-      this._discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s type to **${training.type.toUpperCase()}**`)
+      this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s type to **${training.type.toUpperCase()}**`)
     }
     if (changes.date) {
       const dateString = timeHelper.getDate(training.date)
       const timeString = timeHelper.getTime(training.date)
-      this._discordMessageJob.run('log', `**${editorName}** changed training **${training.id}**'s date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
+      this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s date to **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**`)
     }
 
     return training
@@ -98,7 +98,7 @@ class TrainingService {
     }
 
     const authorName = await this._userService.getUsername(cancellation.authorId)
-    this._discordMessageJob.run('log', `**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)
 
     return cancellation
   }
