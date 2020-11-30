@@ -15,7 +15,7 @@
   "dependencies": {
     "@sentry/node": "^5.27.6",
     "axios": "^0.21.0",
-    "bloxy": "^5.0.32",
+    "bloxy": "^5.0.34",
     "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
