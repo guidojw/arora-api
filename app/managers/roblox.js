@@ -58,7 +58,7 @@ async function requester (options) {
   } catch (err) {
     // Let Bloxy handle it if it's a Token Validation Error.
     if (err.response && err.response.statusCode === 403) {
-      return err
+      return err.response
     } else {
       throw err
     }
