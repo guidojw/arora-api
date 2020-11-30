@@ -45,24 +45,15 @@ class RobloxManager {
 
 // Custom requester that uses Bloxy's default requester but
 // enables its throwHttpErrors option as the project relies on that.
-async function requester (options) {
+function requester (options) {
   // HTTP 403 is thrown on fetching a new X-CSRF token, Bloxy however
   // relies on this so don't throw HTTP errors then.
   if (options.xcsrf !== false && options.url !== 'https://auth.roblox.com/v2/login') {
     options.throwHttpErrors = true
   }
 
-  try {
-    // this refers to Bloxy's original requester.
-    return await this(options)
-  } catch (err) {
-    // Let Bloxy handle it if it's a Token Validation Error.
-    if (err.response && err.response.statusCode === 403) {
-      return err.response
-    } else {
-      throw err
-    }
-  }
+  // this refers to Bloxy's original requester.
+  return this(options)
 }
 
 module.exports = RobloxManager
