@@ -13,7 +13,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^5.29.0",
+    "@sentry/node": "^5.29.2",
     "axios": "^0.21.0",
     "bloxy": "^5.0.34",
     "debug": "^4.3.1",
@@ -35,7 +35,7 @@
     "ws": "^7.4.1"
   },
   "devDependencies": {
-    "eslint": "^7.15.0",
+    "eslint": "^7.16.0",
     "nodemon": "^2.0.6",
     "standard": "^16.0.3"
   }
