@@ -1,5 +1,6 @@
 'use strict'
 const { ForbiddenError, BadRequestError } = require('../errors')
+const { Exile } = require('../models')
 
 const robloxConfig = require('../../config/roblox')
 
@@ -99,6 +100,10 @@ class GroupService {
     }
 
     return { oldRole, newRole }
+  }
+
+  getExiles () {
+    return Exile.findAll()
   }
 }
 
