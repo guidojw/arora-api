@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const TrainingCancellation = sequelize.define('TrainingCancellation', {
     authorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
     },

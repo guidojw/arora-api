@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Suspension = sequelize.define('Suspension', {
     authorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
     },
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'user_id'
     },

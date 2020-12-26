@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const SuspensionCancellation = sequelize.define('SuspensionCancellation', {
     authorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
     },

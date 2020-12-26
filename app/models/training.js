@@ -4,7 +4,7 @@ const { Op } = require('sequelize')
 module.exports = (sequelize, DataTypes) => {
   const Training = sequelize.define('Training', {
     authorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
     },
