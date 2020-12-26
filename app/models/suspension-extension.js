@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const SuspensionExtension = sequelize.define('SuspensionExtension', {
     authorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
     },

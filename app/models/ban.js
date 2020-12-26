@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Ban = sequelize.define('Ban', {
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'user_id'
     },
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW
     },
     authorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
     }

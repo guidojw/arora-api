@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Exile = sequelize.define('Exile', {
     userId: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       field: 'user_id'
     }
   }, {
