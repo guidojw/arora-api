@@ -31,6 +31,13 @@ module.exports = (sequelize, DataTypes) => {
         name: 'trainingId'
       }
     })
+    Training.belongsTo(models.TrainingType, {
+      foreignKey: {
+        allowNull: false,
+        name: 'type'
+      },
+      onDelete: 'CASCADE'
+    })
   }
 
   Training.loadScopes = models => {
