@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     Training.belongsTo(models.TrainingType, {
       foreignKey: {
         allowNull: false,
-        name: 'type'
+        name: 'typeId'
       },
       onDelete: 'CASCADE'
     })

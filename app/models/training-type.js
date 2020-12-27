@@ -3,7 +3,17 @@ module.exports = (sequelize, DataTypes) => {
   const TrainingType = sequelize.define('TrainingType', {
     name: {
       type: DataTypes.STRING,
-      primaryKey: true
+      primaryKey: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    abbreviation: {
+      type: DataTypes.STRING(8),
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
     }
   }, {
     tableName: 'training_types'
@@ -13,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     TrainingType.hasOne(models.Training, {
       foreignKey: {
         allowNull: false,
-        name: 'type'
+        name: 'typeId'
       }
     })
   }

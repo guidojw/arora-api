@@ -238,6 +238,7 @@ class GroupController {
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           body('name').exists().isString(),
+          body('abbreviation').exists().isString()
         ]
 
       case 'putTraining':
@@ -256,7 +257,7 @@ class GroupController {
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
-          param('typeName').exists().isString()
+          param('typeId').isInt().toInt()
         ]
     }
   }
