@@ -25,16 +25,18 @@ module.exports = {
           abbreviation: trainingType.type
         }
       })
-    await queryInterface.bulkInsert('training_types', trainingTypes)
+    if (trainingTypes.length > 0) {
+      await queryInterface.bulkInsert('training_types', trainingTypes)
+    }
 
     const cdTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'cd'}},
+      { where: { abbreviation: 'cd' } },
       ['id']
     )
     const csrTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'csr'}},
+      { where: { abbreviation: 'csr' } },
       ['id']
     )
 
@@ -80,12 +82,12 @@ module.exports = {
 
     const cdTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'cd'}},
+      { where: { abbreviation: 'cd' } },
       ['id']
     )
     const csrTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'csr'}},
+      { where: { abbreviation: 'csr' } },
       ['id']
     )
 
