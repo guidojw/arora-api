@@ -235,7 +235,7 @@ class GroupController {
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
-          body('type').exists().isString(),
+          body('typeId').exists().isInt().toInt(),
           body('date').exists(),
           body('notes').optional().isString()
         ]
