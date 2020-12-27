@@ -104,29 +104,6 @@ class GroupsRouter {
         groupController.postTraining.bind(groupController)
       )
 
-    router.route('/:groupId/trainings/:trainingId')
-      .get(
-        groupController.validate('getTraining'),
-        handleValidationResult,
-        authenticate,
-        groupController.getTraining.bind(groupController)
-      )
-      .put(
-        groupController.validate('putTraining'),
-        handleValidationResult,
-        authenticate,
-        groupController.putTraining.bind(groupController)
-      )
-
-    router.post(
-      '/:groupId/trainings/:trainingId/cancel',
-      groupController.validate('cancelTraining'),
-      handleValidationResult,
-      authenticate,
-      groupController.cancelTraining.bind(groupController)
-    )
-
-
     router.route('/:groupId/trainings/types')
       .get(
         groupController.validate('getTrainingTypes'),
@@ -148,6 +125,28 @@ class GroupsRouter {
         authenticate,
         groupController.deleteTrainingType.bind(groupController)
       )
+
+    router.route('/:groupId/trainings/:trainingId')
+      .get(
+        groupController.validate('getTraining'),
+        handleValidationResult,
+        authenticate,
+        groupController.getTraining.bind(groupController)
+      )
+      .put(
+        groupController.validate('putTraining'),
+        handleValidationResult,
+        authenticate,
+        groupController.putTraining.bind(groupController)
+      )
+
+    router.post(
+      '/:groupId/trainings/:trainingId/cancel',
+      groupController.validate('cancelTraining'),
+      handleValidationResult,
+      authenticate,
+      groupController.cancelTraining.bind(groupController)
+    )
 
     return router
   }
