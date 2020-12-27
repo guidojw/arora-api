@@ -11,11 +11,6 @@ module.exports = (sequelize, DataTypes) => {
     notes: {
       type: DataTypes.STRING
     },
-    type: {
-      type: DataTypes.ENUM,
-      allowNull: false,
-      values: ['cd', 'csr']
-    },
     date: {
       type: DataTypes.DATE,
       allowNull: false
