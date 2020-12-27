@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         name: 'typeId'
       },
+      as: 'type',
       onDelete: 'CASCADE'
     })
   }
@@ -46,6 +47,9 @@ module.exports = (sequelize, DataTypes) => {
       include: [{
         model: models.TrainingCancellation,
         attributes: []
+      }, {
+        model: models.TrainingType,
+        as: 'type'
       }]
     })
   }

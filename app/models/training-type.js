@@ -24,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: {
         allowNull: false,
         name: 'typeId'
-      }
+      },
+      as: 'type'
     })
   }
 
