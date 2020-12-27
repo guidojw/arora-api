@@ -70,7 +70,7 @@ function getTrainingsInfo (trainings, authors) {
       const type = types[i]
       const typeTrainings = groupedTrainings[type]
 
-      result += `${type.toUpperCase()}:`
+      result += `${type}:`
 
       for (let j = 0; j < typeTrainings.length; j++) {
         const training = typeTrainings[j]
