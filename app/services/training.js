@@ -1,8 +1,8 @@
 'use strict'
 const cron = require('node-schedule')
 
-const { Training, TrainingCancellation } = require('../models')
-const { NotFoundError } = require('../errors')
+const { Training, TrainingCancellation, TrainingType } = require('../models')
+const { ConflictError, NotFoundError } = require('../errors')
 const { timeHelper } = require('../helpers')
 
 const robloxConfig = require('../../config/roblox')
@@ -101,6 +101,27 @@ class TrainingService {
     this._discordMessageJob.run(`**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)
 
     return cancellation
+  }
+
+  async createTrainingType (_groupId, { name }) {
+    if (await TrainingType.findOne({ where: { name } })) {
+      throw new ConflictError('Training type already exists.')
+    }
+
+    return TrainingType.create({ name })
+  }
+
+  getTrainingTypes () {
+    return TrainingType.findAll()
+  }
+
+  async deleteTrainingType (_groupId, typeName) {
+    const trainingType = await TrainingType.findOne({ where: { name: typeName } })
+    if (!trainingType) {
+      throw new NotFoundError('Training type not found.')
+    }
+
+    return trainingType.destroy()
   }
 }
 

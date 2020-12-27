@@ -70,6 +70,11 @@ class GroupController {
       .map(training => training.get({ plain: true })))
   }
 
+  async getTrainingTypes (req, res) {
+    res.json((await this._trainingService.getTrainingTypes(req.params.groupId))
+      .map(trainingType => trainingType.get({ plain: true })))
+  }
+
   async postSuspension (req, res) {
     res.json((await this._suspensionService.suspend(req.params.groupId, req.body.userId, req.body))
       .get({ raw: true }))
@@ -85,9 +90,18 @@ class GroupController {
       .get({ raw: true }))
   }
 
+  async postTrainingType (req, res) {
+    res.json((await this._trainingService.createTrainingType(req.params.groupId, req.body))
+      .get({ raw: true }))
+  }
+
   async putTraining (req, res) {
     res.json((await this._trainingService.changeTraining(req.params.groupId, req.params.trainingId, req.body))
       .get({ plain: true }))
+  }
+
+  async deleteTrainingType (req, res) {
+    res.json(await this._trainingService.deleteTrainingType(req.params.groupId, req.params.typeName))
   }
 
   validate (method) {
