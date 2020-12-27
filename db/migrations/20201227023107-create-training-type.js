@@ -20,9 +20,10 @@ module.exports = {
     const trainingTypes = (await queryInterface.sequelize.query('SELECT DISTINCT type FROM trainings'))
       .shift()
       .map(trainingType => {
+        const type = trainingType.type.toUpperCase()
         return {
-          name: trainingType.type.toUpperCase(),
-          abbreviation: trainingType.type
+          name: type,
+          abbreviation: type
         }
       })
     if (trainingTypes.length > 0) {
@@ -31,12 +32,12 @@ module.exports = {
 
     const cdTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'cd' } },
+      { where: { abbreviation: 'CD' } },
       ['id']
     )
     const csrTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'csr' } },
+      { where: { abbreviation: 'CSR' } },
       ['id']
     )
 
@@ -71,7 +72,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('training_types', { abbreviation: { [Sequelize.Op.notIn]: ['cd', 'csr'] } })
+    await queryInterface.bulkDelete('training_types', { abbreviation: { [Sequelize.Op.notIn]: ['CD', 'CSR'] } })
 
     await queryInterface.renameColumn('trainings', 'type_id', 'type')
     await queryInterface.removeConstraint('trainings', 'trainings_type_id_training_types_fk')
@@ -82,12 +83,12 @@ module.exports = {
 
     const cdTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'cd' } },
+      { where: { abbreviation: 'CD' } },
       ['id']
     )
     const csrTrainingTypeId = await queryInterface.rawSelect(
       'training_types',
-      { where: { abbreviation: 'csr' } },
+      { where: { abbreviation: 'CSR' } },
       ['id']
     )
 

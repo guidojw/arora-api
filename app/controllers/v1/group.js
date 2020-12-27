@@ -252,7 +252,7 @@ class GroupController {
           param('groupId').isInt().toInt(),
           param('trainingId').isInt().toInt(),
           body('editorId').exists().isInt().toInt(),
-          body('changes.type').optional().isString(),
+          body('changes.typeId').optional().isInt().toInt(),
           body('changes.date').optional().isInt().toInt(),
           body('changes.notes').optional().isString(),
           body('changes.authorId').optional().isInt().toInt()
@@ -263,6 +263,7 @@ class GroupController {
           param('groupId').isInt().toInt(),
           param('typeId').isInt().toInt(),
           body('changes.name').optional().isString(),
+          body('changes.abbreviation').optional().isString()
         ]
 
       case 'deleteTrainingType':
