@@ -196,6 +196,11 @@ class GroupController {
           param('trainingId').isInt().toInt(),
           query('scope').customSanitizer(decodeScopeQueryParam)
         ]
+      case 'getTrainingTypes':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt()
+        ]
 
       case 'postTraining':
         return [
@@ -214,6 +219,12 @@ class GroupController {
           body('authorId').exists().isInt().toInt(),
           body('reason').exists().isString()
         ]
+      case 'postTrainingType':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          body('name').exists().isString(),
+        ]
 
       case 'putTraining':
         return [
@@ -225,6 +236,13 @@ class GroupController {
           body('changes.date').optional().isInt().toInt(),
           body('changes.notes').optional().isString(),
           body('changes.authorId').optional().isInt().toInt()
+        ]
+
+      case 'deleteTrainingType':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('typeName').exists().isString()
         ]
     }
   }
