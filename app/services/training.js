@@ -115,8 +115,17 @@ class TrainingService {
     return TrainingType.findAll()
   }
 
-  async deleteTrainingType (_groupId, typeName) {
-    const trainingType = await TrainingType.findOne({ where: { name: typeName } })
+  async changeTrainingType (_groupId, typeId, { changes }) {
+    const trainingType = await TrainingType.findByPk(typeId)
+    if (!trainingType) {
+      throw new NotFoundError('Training type not found.')
+    }
+
+    return trainingType.update(changes)
+  }
+
+  async deleteTrainingType (_groupId, typeId) {
+    const trainingType = await TrainingType.findByPk(typeId)
     if (!trainingType) {
       throw new NotFoundError('Training type not found.')
     }

@@ -118,13 +118,19 @@ class GroupsRouter {
         groupController.postTrainingType.bind(groupController)
       )
 
-    router.delete(
-      '/:groupId/trainings/types/:typeId',
-      groupController.validate('deleteTrainingType'),
-      handleValidationResult,
-      authenticate,
-      groupController.deleteTrainingType.bind(groupController)
-    )
+    router.route('/:groupId/trainings/types/:typeId')
+      .put(
+        groupController.validate('putTrainingType'),
+        handleValidationResult,
+        authenticate,
+        groupController.putTrainingType.bind(groupController)
+      )
+      .delete(
+        groupController.validate('deleteTrainingType'),
+        handleValidationResult,
+        authenticate,
+        groupController.deleteTrainingType.bind(groupController)
+      )
 
     router.route('/:groupId/trainings/:trainingId')
       .get(

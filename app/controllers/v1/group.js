@@ -100,8 +100,13 @@ class GroupController {
       .get({ plain: true }))
   }
 
+  async putTrainingType (req, res) {
+    res.json((await this._trainingService.changeTrainingType(req.params.groupId, req.params.typeId, req.body))
+      .get({ plain: true }))
+  }
+
   async deleteTrainingType (req, res) {
-    res.json(await this._trainingService.deleteTrainingType(req.params.groupId, req.params.typeName))
+    res.json(await this._trainingService.deleteTrainingType(req.params.groupId, req.params.typeId))
   }
 
   validate (method) {
@@ -251,6 +256,13 @@ class GroupController {
           body('changes.date').optional().isInt().toInt(),
           body('changes.notes').optional().isString(),
           body('changes.authorId').optional().isInt().toInt()
+        ]
+      case 'putTrainingType':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('typeId').isInt().toInt(),
+          body('changes.name').optional().isString(),
         ]
 
       case 'deleteTrainingType':
