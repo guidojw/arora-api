@@ -21,6 +21,10 @@ class GroupController {
       .map(exile => exile.get({ raw: true })))
   }
 
+  async getRoles (req, res) {
+    res.json(await this._groupService.getRoles(req.params.groupId))
+  }
+
   async getGroup (req, res) {
     res.json(await this._groupService.getGroup(req.params.groupId))
   }
@@ -118,6 +122,11 @@ class GroupController {
           param('groupId').isInt().toInt()
         ]
       case 'getExiles':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt()
+        ]
+      case 'getRoles':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt()

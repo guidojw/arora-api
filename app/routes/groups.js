@@ -30,6 +30,13 @@ class GroupsRouter {
       groupController.getExiles.bind(groupController)
     )
     router.get(
+      '/:groupId/roles',
+      groupController.validate('getRoles'),
+      handleValidationResult,
+      authenticate,
+      groupController.getRoles.bind(groupController)
+    )
+    router.get(
       '/:groupId',
       groupController.validate('getGroup'),
       handleValidationResult,
