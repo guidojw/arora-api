@@ -21,6 +21,10 @@ class GroupController {
       .map(exile => exile.get({ raw: true })))
   }
 
+  async getRoles (req, res) {
+    res.json(await this._groupService.getRoles(req.params.groupId))
+  }
+
   async getGroup (req, res) {
     res.json(await this._groupService.getGroup(req.params.groupId))
   }
@@ -70,6 +74,11 @@ class GroupController {
       .map(training => training.get({ plain: true })))
   }
 
+  async getTrainingTypes (req, res) {
+    res.json((await this._trainingService.getTrainingTypes(req.params.groupId))
+      .map(trainingType => trainingType.get({ plain: true })))
+  }
+
   async postSuspension (req, res) {
     res.json((await this._suspensionService.suspend(req.params.groupId, req.body.userId, req.body))
       .get({ raw: true }))
@@ -85,9 +94,23 @@ class GroupController {
       .get({ raw: true }))
   }
 
+  async postTrainingType (req, res) {
+    res.json((await this._trainingService.createTrainingType(req.params.groupId, req.body))
+      .get({ raw: true }))
+  }
+
   async putTraining (req, res) {
     res.json((await this._trainingService.changeTraining(req.params.groupId, req.params.trainingId, req.body))
       .get({ plain: true }))
+  }
+
+  async putTrainingType (req, res) {
+    res.json((await this._trainingService.changeTrainingType(req.params.groupId, req.params.typeId, req.body))
+      .get({ plain: true }))
+  }
+
+  async deleteTrainingType (req, res) {
+    res.json(await this._trainingService.deleteTrainingType(req.params.groupId, req.params.typeId))
   }
 
   validate (method) {
@@ -99,6 +122,11 @@ class GroupController {
           param('groupId').isInt().toInt()
         ]
       case 'getExiles':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt()
+        ]
+      case 'getRoles':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt()
@@ -196,13 +224,18 @@ class GroupController {
           param('trainingId').isInt().toInt(),
           query('scope').customSanitizer(decodeScopeQueryParam)
         ]
+      case 'getTrainingTypes':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt()
+        ]
 
       case 'postTraining':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
-          body('type').exists().isString(),
+          body('typeId').exists().isInt().toInt(),
           body('date').exists(),
           body('notes').optional().isString()
         ]
@@ -214,6 +247,13 @@ class GroupController {
           body('authorId').exists().isInt().toInt(),
           body('reason').exists().isString()
         ]
+      case 'postTrainingType':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          body('name').exists().isString(),
+          body('abbreviation').exists().isString()
+        ]
 
       case 'putTraining':
         return [
@@ -221,10 +261,25 @@ class GroupController {
           param('groupId').isInt().toInt(),
           param('trainingId').isInt().toInt(),
           body('editorId').exists().isInt().toInt(),
-          body('changes.type').optional().isString(),
+          body('changes.typeId').optional().isInt().toInt(),
           body('changes.date').optional().isInt().toInt(),
           body('changes.notes').optional().isString(),
           body('changes.authorId').optional().isInt().toInt()
+        ]
+      case 'putTrainingType':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('typeId').isInt().toInt(),
+          body('changes.name').optional().isString(),
+          body('changes.abbreviation').optional().isString()
+        ]
+
+      case 'deleteTrainingType':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('typeId').isInt().toInt()
         ]
     }
   }

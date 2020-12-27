@@ -11,11 +11,6 @@ module.exports = (sequelize, DataTypes) => {
     notes: {
       type: DataTypes.STRING
     },
-    type: {
-      type: DataTypes.ENUM,
-      allowNull: false,
-      values: ['cd', 'csr']
-    },
     date: {
       type: DataTypes.DATE,
       allowNull: false
@@ -31,6 +26,14 @@ module.exports = (sequelize, DataTypes) => {
         name: 'trainingId'
       }
     })
+    Training.belongsTo(models.TrainingType, {
+      foreignKey: {
+        allowNull: false,
+        name: 'typeId'
+      },
+      as: 'type',
+      onDelete: 'CASCADE'
+    })
   }
 
   Training.loadScopes = models => {
@@ -44,6 +47,9 @@ module.exports = (sequelize, DataTypes) => {
       include: [{
         model: models.TrainingCancellation,
         attributes: []
+      }, {
+        model: models.TrainingType,
+        as: 'type'
       }]
     })
   }

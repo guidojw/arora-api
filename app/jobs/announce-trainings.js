@@ -70,7 +70,7 @@ function getTrainingsInfo (trainings, authors) {
       const type = types[i]
       const typeTrainings = groupedTrainings[type]
 
-      result += `${type.toUpperCase()}:`
+      result += `${type}:`
 
       for (let j = 0; j < typeTrainings.length; j++) {
         const training = typeTrainings[j]
@@ -98,10 +98,10 @@ function getTrainingsInfo (trainings, authors) {
 function groupTrainingsByType (trainings) {
   const result = {}
   for (const training of trainings) {
-    if (!result[training.type]) {
-      result[training.type] = []
+    if (!result[training.type.abbreviation]) {
+      result[training.type.abbreviation] = []
     }
-    result[training.type].push(training)
+    result[training.type.abbreviation].push(training)
   }
   return result
 }

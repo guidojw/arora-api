@@ -1,8 +1,9 @@
 'use strict'
 const cron = require('node-schedule')
 
-const { Training, TrainingCancellation } = require('../models')
-const { NotFoundError } = require('../errors')
+const { Op } = require('sequelize')
+const { Training, TrainingCancellation, TrainingType } = require('../models')
+const { ConflictError, NotFoundError } = require('../errors')
 const { timeHelper } = require('../helpers')
 
 const robloxConfig = require('../../config/roblox')
@@ -14,9 +15,9 @@ class TrainingService {
     this._userService = userService
   }
 
-  async addTraining ({ type, authorId, date, notes }) {
+  async addTraining ({ typeId, authorId, date, notes }) {
     const training = await Training.create({
-      type: type.toLowerCase(),
+      typeId,
       authorId,
       date,
       notes
@@ -32,7 +33,7 @@ class TrainingService {
     const dateString = timeHelper.getDate(training.date)
     const timeString = timeHelper.getTime(training.date)
     const authorName = await this._userService.getUsername(training.authorId)
-    this._discordMessageJob.run(`**${authorName}** scheduled a **${training.type.toUpperCase()}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
+    this._discordMessageJob.run(`**${authorName}** scheduled a **${training.type.abbreviation}** training at **${dateString} ${timeString} ${timeHelper.isDst(training.date) ? 'CEST' : 'CET'}**${training.notes ? ' with note "*' + training.notes + '*"' : ''}`)
 
     return training
   }
@@ -75,8 +76,8 @@ class TrainingService {
     if (changes.notes) {
       this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s notes to "*${training.notes}*"`)
     }
-    if (changes.type) {
-      this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s type to **${training.type.toUpperCase()}**`)
+    if (changes.typeId) {
+      this._discordMessageJob.run(`**${editorName}** changed training **${training.id}**'s type to **${training.type.abbreviation}**`)
     }
     if (changes.date) {
       const dateString = timeHelper.getDate(training.date)
@@ -101,6 +102,36 @@ class TrainingService {
     this._discordMessageJob.run(`**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)
 
     return cancellation
+  }
+
+  async createTrainingType (_groupId, { name, abbreviation }) {
+    if (await TrainingType.findOne({ where: { abbreviation: { [Op.iLike]: abbreviation.toLowerCase() } } })) {
+      throw new ConflictError('Training type already exists.')
+    }
+
+    return TrainingType.create({ name, abbreviation })
+  }
+
+  getTrainingTypes () {
+    return TrainingType.findAll()
+  }
+
+  async changeTrainingType (_groupId, typeId, { changes }) {
+    const trainingType = await TrainingType.findByPk(typeId)
+    if (!trainingType) {
+      throw new NotFoundError('Training type not found.')
+    }
+
+    return trainingType.update(changes)
+  }
+
+  async deleteTrainingType (_groupId, typeId) {
+    const trainingType = await TrainingType.findByPk(typeId)
+    if (!trainingType) {
+      throw new NotFoundError('Training type not found.')
+    }
+
+    return trainingType.destroy()
   }
 }
 

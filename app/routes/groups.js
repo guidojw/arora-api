@@ -30,6 +30,13 @@ class GroupsRouter {
       groupController.getExiles.bind(groupController)
     )
     router.get(
+      '/:groupId/roles',
+      groupController.validate('getRoles'),
+      handleValidationResult,
+      authenticate,
+      groupController.getRoles.bind(groupController)
+    )
+    router.get(
       '/:groupId',
       groupController.validate('getGroup'),
       handleValidationResult,
@@ -102,6 +109,34 @@ class GroupsRouter {
         handleValidationResult,
         authenticate,
         groupController.postTraining.bind(groupController)
+      )
+
+    router.route('/:groupId/trainings/types')
+      .get(
+        groupController.validate('getTrainingTypes'),
+        handleValidationResult,
+        authenticate,
+        groupController.getTrainingTypes.bind(groupController)
+      )
+      .post(
+        groupController.validate('postTrainingType'),
+        handleValidationResult,
+        authenticate,
+        groupController.postTrainingType.bind(groupController)
+      )
+
+    router.route('/:groupId/trainings/types/:typeId')
+      .put(
+        groupController.validate('putTrainingType'),
+        handleValidationResult,
+        authenticate,
+        groupController.putTrainingType.bind(groupController)
+      )
+      .delete(
+        groupController.validate('deleteTrainingType'),
+        handleValidationResult,
+        authenticate,
+        groupController.deleteTrainingType.bind(groupController)
       )
 
     router.route('/:groupId/trainings/:trainingId')
