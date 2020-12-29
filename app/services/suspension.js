@@ -5,8 +5,6 @@ const pluralize = require('pluralize')
 const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../models')
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
 
-const robloxConfig = require('../../config/roblox')
-
 class SuspensionService {
   constructor (groupService, userService, robloxManager, finishSuspensionJob, discordMessageJob) {
     this._groupService = groupService
@@ -42,13 +40,6 @@ class SuspensionService {
     }
     if (rank > 0 && rank !== 2) {
       await this._groupService.setRank(groupId, userId, 2)
-    }
-
-    const mtRank = await this._userService.getRank(userId, robloxConfig.mtGroup)
-    if (mtRank > 0) {
-      const client = this._robloxManager.getClient(robloxConfig.mtGroup)
-      const group = await client.getGroup(robloxConfig.mtGroup)
-      await group.kickMember(userId)
     }
 
     const suspension = await Suspension.create({
