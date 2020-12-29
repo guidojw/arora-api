@@ -27,10 +27,6 @@ services:
     class: app/jobs
     main: AcceptJoinRequestsJob
     arguments: ['@RobloxManager', '@GroupService', '@DiscordMessageJob']
-  AcceptMtJoinRequestsJob:
-    class: app/jobs
-    main: AcceptMtJoinRequestsJob
-    arguments: ['@RobloxManager', '@UserService', '@GroupService', '@DiscordMessageJob']
   AnnounceTrainingsJob:
     class: app/jobs
     main: AnnounceTrainingsJob
