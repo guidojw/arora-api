@@ -2,8 +2,6 @@
 const { ForbiddenError, BadRequestError } = require('../errors')
 const { Exile } = require('../models')
 
-const robloxConfig = require('../../config/roblox')
-
 class GroupService {
   constructor (robloxManager, userService, discordMessageJob, webSocketManager) {
     this._robloxManager = robloxManager
@@ -77,18 +75,6 @@ class GroupService {
     }
 
     const newRole = await this.setRank(groupId, userId, rank)
-
-    const mtRank = await this._userService.getRank(userId, robloxConfig.mtGroup)
-    if (mtRank > 0) {
-      if (rank < 100) {
-        const client = this._robloxManager.getClient(robloxConfig.mtGroup)
-        const group = await client.getGroup(robloxConfig.mtGroup)
-        await group.kickMember(userId)
-      } else {
-        await this.setRank(robloxConfig.mtGroup, userId, { rank })
-      }
-    }
-
     const roles = await this.getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await this._userService.getUsername(userId)
