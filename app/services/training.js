@@ -22,6 +22,7 @@ class TrainingService {
       date,
       notes
     })
+    await training.reload()
 
     this._announceTrainingsJob.run(robloxConfig.defaultGroup)
     cron.scheduleJob(
