@@ -26,9 +26,8 @@ const products = [
 const PAY_RATE = 0.5
 
 class PayoutTrainDevelopersJob {
-  constructor (robloxManager, userService, webSocketManager) {
+  constructor (robloxManager, webSocketManager) {
     this._robloxManager = robloxManager
-    this._userService = userService
     this._webSocketManager = webSocketManager
   }
 
@@ -110,24 +109,6 @@ class PayoutTrainDevelopersJob {
 
     // Only continue with payout logic if there are train transactions.
     if (trainTransactions.length > 0) {
-      // Build a PayoutRequest from the developer sales information.
-      const recipients = []
-      for (let [id, developerSales] of Object.entries(developersSales)) {
-        id = parseInt(id)
-
-        // Check if user is in the group.
-        if (await this._userService.getRank(id, groupId) !== 0) {
-          recipients.push({
-            userId: id,
-            amount: Math.ceil(developerSales.total.robux)
-          })
-        }
-      }
-      const payoutRequest = { type: 'FixedAmount', users: recipients }
-
-      // Make the payouts.
-      await group.payoutMembers(payoutRequest)
-
       // Add new payout row.
       await Payout.create({ until: new Date(trainTransactions[0].created) })
     }

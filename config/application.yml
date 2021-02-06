@@ -45,7 +45,7 @@ services:
   PayoutTrainDevelopersJob:
     class: app/jobs
     main: PayoutTrainDevelopersJob
-    arguments: ['@RobloxManager', '@UserService', '@WebSocketManager']
+    arguments: ['@RobloxManager', '@WebSocketManager']
 
   # Managers
   RobloxManager:
