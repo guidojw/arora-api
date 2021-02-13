@@ -52,8 +52,17 @@ function requester (options) {
     options.throwHttpErrors = true
   }
 
-  // this refers to Bloxy's original requester.
-  return this(options)
+  try {
+    // this refers to Bloxy's original requester.
+    return this(options)
+  } catch (err) {
+    if (err.response && err.response.statusCode === 403 && err.response.statusMessage
+      .includes('Token Validation Failed')) {
+      return err.response
+    }
+
+    throw err
+  }
 }
 
 module.exports = RobloxManager
