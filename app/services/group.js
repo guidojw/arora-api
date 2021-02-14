@@ -78,11 +78,13 @@ class GroupService {
     const roles = await this.getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await this._userService.getUsername(userId)
-    if (authorId) {
-      const authorName = await this._userService.getUsername(authorId)
-      this._discordMessageJob.run(`**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
-    } else {
-      this._discordMessageJob.run(`${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+    if (oldRole.id !== newRole.id) {
+      if (authorId) {
+        const authorName = await this._userService.getUsername(authorId)
+        this._discordMessageJob.run(`**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+      } else {
+        this._discordMessageJob.run(`${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+      }
     }
 
     return { oldRole, newRole }
