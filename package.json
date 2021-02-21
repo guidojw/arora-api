@@ -6,7 +6,7 @@
   "repository": "github:guidojw/nsadmin-api",
   "main": "app.js",
   "scripts": {
-    "start": "npm explore bloxy -- npm run build & node ./bin/www",
+    "start": "npm explore bloxy -- npm run build ; node ./bin/www",
     "start:dev": "nodemon ./bin/www",
     "lint": "eslint app"
   },
