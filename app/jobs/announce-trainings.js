@@ -19,7 +19,7 @@ class AnnounceTrainingsJob {
         cron.scheduleJob(
           jobName,
           new Date(training.date.getTime() + 30 * 60 * 1000),
-          this.run.bind(null, groupId)
+          this.run.bind(this, groupId)
         )
       }
     }
