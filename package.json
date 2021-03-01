@@ -20,7 +20,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
-    "express-validator": "^6.9.2",
+    "express-validator": "^6.10.0",
     "helmet": "^4.4.1",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
@@ -32,11 +32,11 @@
     "pluralize": "^8.0.0",
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
-    "typescript": "^4.1.5",
+    "typescript": "^4.2.2",
     "ws": "^7.4.3"
   },
   "devDependencies": {
-    "eslint": "^7.20.0",
+    "eslint": "^7.21.0",
     "nodemon": "^2.0.7",
     "standard": "^16.0.3"
   }
