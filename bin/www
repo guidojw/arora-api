@@ -13,7 +13,7 @@ const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
 const server = http.createServer(app)
-const wss = new WebSocket.Server({ noServer: true, path: '/api/v1' })
+const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
 
 wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
 

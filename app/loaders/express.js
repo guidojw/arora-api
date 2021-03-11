@@ -20,11 +20,11 @@ function init (app, container) {
   app.use(helmet())
   app.use(hpp())
 
-  app.use('/api/v1/groups', container.get('GroupsRouter'))
-  app.use('/api/v1/users', container.get('UsersRouter'))
-  app.use('/api/v1/bans', container.get('BansRouter'))
-  app.use('/api/v1/catalog', container.get('CatalogRouter'))
-  app.use('/api/v1/status', container.get('StatusRouter'))
+  app.use('/v1/groups', container.get('GroupsRouter'))
+  app.use('/v1/users', container.get('UsersRouter'))
+  app.use('/v1/bans', container.get('BansRouter'))
+  app.use('/v1/catalog', container.get('CatalogRouter'))
+  app.use('/v1/status', container.get('StatusRouter'))
 
   app.use(() => {
     throw new NotFoundError()
