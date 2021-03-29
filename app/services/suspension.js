@@ -6,10 +6,9 @@ const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
 
 class SuspensionService {
-  constructor (groupService, userService, robloxManager, finishSuspensionJob, discordMessageJob) {
+  constructor (groupService, userService, finishSuspensionJob, discordMessageJob) {
     this._groupService = groupService
     this._userService = userService
-    this._robloxManager = robloxManager
     this._finishSuspensionJob = finishSuspensionJob
     this._discordMessageJob = discordMessageJob
   }

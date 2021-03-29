@@ -1,6 +1,5 @@
 'use strict'
 const { ForbiddenError, BadRequestError } = require('../errors')
-const { Exile } = require('../models')
 
 class GroupService {
   constructor (robloxManager, userService, discordMessageJob, webSocketManager) {
@@ -90,8 +89,12 @@ class GroupService {
     return { oldRole, newRole }
   }
 
-  getExiles () {
-    return Exile.findAll()
+  async kick (groupId, userId) {
+    const client = this._robloxManager.getClient(groupId)
+    const group = await client.getGroup(groupId)
+    await group.kickMember(userId)
+
+    this._webSocketManager.broadcast('rankChanged', { groupId, userId, rank: 0 })
   }
 }
 
