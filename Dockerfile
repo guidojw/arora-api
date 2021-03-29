@@ -8,6 +8,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN chmod +x ./bin/wait-for-it.sh
+
 EXPOSE 3000
 
 CMD npm start
