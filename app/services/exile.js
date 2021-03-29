@@ -31,7 +31,9 @@ class ExileService {
       throw new ForbiddenError('User is unexilable.')
     }
 
-    await this._groupService.kick(groupId, userId)
+    try {
+      await this._groupService.kick(groupId, userId)
+    } catch {} // eslint-disable-line no-empty
     const exile = await Exile.create({
       userId
     })
