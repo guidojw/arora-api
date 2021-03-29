@@ -23,13 +23,6 @@ class GroupsRouter {
       )
 
     router.get(
-      '/:groupId/exiles',
-      groupController.validate('getExiles'),
-      handleValidationResult,
-      authenticate,
-      groupController.getExiles.bind(groupController)
-    )
-    router.get(
       '/:groupId/roles',
       groupController.validate('getRoles'),
       handleValidationResult,
@@ -51,6 +44,35 @@ class GroupsRouter {
       authenticate,
       groupController.putUser.bind(groupController)
     )
+
+    // ExileService
+    router.route('/:groupId/exiles')
+      .get(
+        groupController.validate('getExiles'),
+        handleValidationResult,
+        authenticate,
+        groupController.getExiles.bind(groupController)
+      )
+      .post(
+        groupController.validate('postExile'),
+        handleValidationResult,
+        authenticate,
+        groupController.postExile.bind(groupController)
+      )
+
+    router.route('/:groupId/exiles/:userId')
+      .get(
+        groupController.validate('getExile'),
+        handleValidationResult,
+        authenticate,
+        groupController.getExile.bind(groupController)
+      )
+      .delete(
+        groupController.validate('deleteExile'),
+        handleValidationResult,
+        authenticate,
+        groupController.deleteExile.bind(groupController)
+      )
 
     // SuspensionService
     router.route('/:groupId/suspensions')

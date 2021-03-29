@@ -5,7 +5,8 @@ const { requestHelper } = require('../../helpers')
 const { decodeScopeQueryParam, decodeSortQueryParam } = requestHelper
 
 class GroupController {
-  constructor (groupService, suspensionService, trainingService) {
+  constructor (exileService, groupService, suspensionService, trainingService) {
+    this._exileService = exileService
     this._groupService = groupService
     this._suspensionService = suspensionService
     this._trainingService = trainingService
@@ -14,11 +15,6 @@ class GroupController {
   // GroupService
   async getShout (req, res) {
     res.json(await this._groupService.getShout(req.params.groupId))
-  }
-
-  async getExiles (req, res) {
-    res.json((await this._groupService.getExiles())
-      .map(exile => exile.get({ raw: true })))
   }
 
   async getRoles (req, res) {
@@ -37,6 +33,27 @@ class GroupController {
     res.json(await this._groupService.changeRank(req.params.groupId, req.params.userId, req.body))
   }
 
+  // ExileService
+  async getExiles (req, res) {
+    res.json((await this._exileService.getExiles(req.params.groupId))
+      .map(exile => exile.get({ raw: true })))
+  }
+
+  async getExile (req, res) {
+    res.json((await this._exileService.getExile(req.params.groupId, req.params.userId))
+      .get({ raw: true }))
+  }
+
+  async postExile (req, res) {
+    res.json((await this._exileService.exile(req.params.groupId, req.body.userId, req.body))
+      .get({ raw: true }))
+  }
+
+  async deleteExile (req, res) {
+    res.json((await this._exileService.unexile(req.params.groupId, req.params.userId, req.body))
+      .get({ raw: true }))
+  }
+
   // SuspensionService
   async getSuspensions (req, res) {
     res.json((await this._suspensionService.getSuspensions(req.query.scope, req.query.sort))
@@ -46,6 +63,11 @@ class GroupController {
   async getSuspension (req, res) {
     res.json((await this._suspensionService.getSuspension(req.params.userId, req.query.scope))
       .get({ plain: true }))
+  }
+
+  async postSuspension (req, res) {
+    res.json((await this._suspensionService.suspend(req.params.groupId, req.body.userId, req.body))
+      .get({ raw: true }))
   }
 
   async cancelSuspension (req, res) {
@@ -77,11 +99,6 @@ class GroupController {
   async getTrainingTypes (req, res) {
     res.json((await this._trainingService.getTrainingTypes(req.params.groupId))
       .map(trainingType => trainingType.get({ plain: true })))
-  }
-
-  async postSuspension (req, res) {
-    res.json((await this._suspensionService.suspend(req.params.groupId, req.body.userId, req.body))
-      .get({ raw: true }))
   }
 
   async postTraining (req, res) {
@@ -121,11 +138,6 @@ class GroupController {
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt()
         ]
-      case 'getExiles':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt()
-        ]
       case 'getRoles':
         return [
           header('authorization').exists().isString(),
@@ -152,6 +164,33 @@ class GroupController {
           param('userId').isInt().toInt(),
           body('rank').exists().isInt().toInt(),
           body('authorId').optional().isInt().toInt()
+        ]
+
+        // ExileService
+      case 'getExiles':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt()
+        ]
+      case 'getExile':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt()
+        ]
+      case 'postExile':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          body('userId').exists().isInt().toInt(),
+          body('authorId').exists().isInt().toInt()
+        ]
+      case 'deleteExile':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt(),
+          body('authorId').exists().isInt().toInt()
         ]
 
         // SuspensionService
