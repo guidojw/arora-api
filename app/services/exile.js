@@ -34,9 +34,7 @@ class ExileService {
     try {
       await this._groupService.kick(groupId, userId)
     } catch {} // eslint-disable-line no-empty
-    const exile = await Exile.create({
-      userId
-    })
+    const exile = await Exile.create({ userId })
 
     const [username, authorName] = await Promise.all([
       this._userService.getUsername(exile.userId),
