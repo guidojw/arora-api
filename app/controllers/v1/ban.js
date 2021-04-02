@@ -1,8 +1,7 @@
 'use strict'
-const { param, body, header, query } = require('express-validator')
 
-const { requestHelper } = require('../../helpers')
-const { decodeScopeQueryParam, decodeSortQueryParam } = requestHelper
+const { param, body, header, query } = require('express-validator')
+const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers').requestHelper
 
 class BanController {
   constructor (banService) {

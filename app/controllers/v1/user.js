@@ -1,4 +1,5 @@
 'use strict'
+
 const { param, header, body } = require('express-validator')
 
 class UserController {

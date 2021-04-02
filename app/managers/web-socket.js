@@ -1,4 +1,7 @@
 'use strict'
+
+const PING_INTERVAL = 30 * 1000
+
 class WebSocketManager {
   constructor () {
     this.connections = []
@@ -14,7 +17,7 @@ class WebSocketManager {
 
         connection.ping()
       }
-    }, 30000)
+    }, PING_INTERVAL)
   }
 
   addConnection (connection) {

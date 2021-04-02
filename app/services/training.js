@@ -1,10 +1,11 @@
 'use strict'
+
 const cron = require('node-schedule')
 
 const { Op } = require('sequelize')
-const { Training, TrainingCancellation, TrainingType } = require('../models')
 const { ConflictError, NotFoundError } = require('../errors')
 const { timeHelper } = require('../helpers')
+const { Training, TrainingCancellation, TrainingType } = require('../models')
 
 const robloxConfig = require('../../config/roblox')
 

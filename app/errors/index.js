@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = {
   BadRequestError: require('./bad-request'),
   ConflictError: require('./conflict'),

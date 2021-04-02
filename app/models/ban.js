@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = (sequelize, DataTypes) => {
   const Ban = sequelize.define('Ban', {
     userId: {

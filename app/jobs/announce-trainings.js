@@ -1,4 +1,5 @@
 'use strict'
+
 const cron = require('node-schedule')
 
 const { Training } = require('../models')

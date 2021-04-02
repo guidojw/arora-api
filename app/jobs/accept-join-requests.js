@@ -1,11 +1,12 @@
 'use strict'
+
 const { Exile, Suspension } = require('../models')
 
 class AcceptJoinRequestsJob {
-  constructor (robloxManager, groupService, discordMessageJob) {
-    this._robloxManager = robloxManager
-    this._groupService = groupService
+  constructor (discordMessageJob, groupService, robloxManager) {
     this._discordMessageJob = discordMessageJob
+    this._groupService = groupService
+    this._robloxManager = robloxManager
   }
 
   async run (groupId) {

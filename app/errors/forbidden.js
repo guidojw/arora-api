@@ -1,4 +1,5 @@
 'use strict'
+
 class ForbiddenError extends Error {
   constructor (message) {
     super(message || 'Forbidden')

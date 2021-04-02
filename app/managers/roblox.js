@@ -1,4 +1,5 @@
 'use strict'
+
 const { Client } = require('bloxy')
 
 class RobloxManager {

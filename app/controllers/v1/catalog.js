@@ -1,4 +1,5 @@
 'use strict'
+
 const { header, query } = require('express-validator')
 
 class CatalogController {

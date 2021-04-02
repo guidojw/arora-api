@@ -1,16 +1,17 @@
 'use strict'
+
 const cron = require('node-schedule')
 const pluralize = require('pluralize')
 
-const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../models')
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
+const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../models')
 
 class SuspensionService {
-  constructor (groupService, userService, finishSuspensionJob, discordMessageJob) {
+  constructor (discordMessageJob, finishSuspensionJob, groupService, userService) {
+    this._discordMessageJob = discordMessageJob
+    this._finishSuspensionJob = finishSuspensionJob
     this._groupService = groupService
     this._userService = userService
-    this._finishSuspensionJob = finishSuspensionJob
-    this._discordMessageJob = discordMessageJob
   }
 
   getSuspensions (scope, sort) {
@@ -150,7 +151,7 @@ class SuspensionService {
     if (changes.reason) {
       this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s suspension to *"${suspension.reason}"*`)
     }
-    if (changes.rankBack !== undefined) {
+    if (typeof changes.rankBack !== 'undefined') {
       this._discordMessageJob.run(`**${editorName}** changed the rankBack option of **${username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
     }
 

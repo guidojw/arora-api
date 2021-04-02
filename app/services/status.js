@@ -1,4 +1,5 @@
 'use strict'
+
 const { NotFoundError } = require('../errors')
 
 class StatusService {
@@ -13,7 +14,7 @@ class StatusService {
     }
 
     const authenticationData = await client.apis.usersAPI.getAuthenticatedUserInformation()
-    return authenticationData !== undefined
+    return typeof authenticationData !== 'undefined'
   }
 }
 

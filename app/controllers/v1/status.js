@@ -1,4 +1,5 @@
 'use strict'
+
 const { header, param } = require('express-validator')
 
 class StatusController {

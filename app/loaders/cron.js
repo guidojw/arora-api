@@ -1,4 +1,5 @@
 'use strict'
+
 const cron = require('node-schedule')
 
 const cronConfig = require('../../config/cron')

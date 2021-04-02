@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = {
   AcceptJoinRequestsJob: require('./accept-join-requests'),
   AnnounceTrainingsJob: require('./announce-trainings'),

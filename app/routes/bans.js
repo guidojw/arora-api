@@ -1,10 +1,11 @@
 'use strict'
+
 const express = require('express')
 
 class BansRouter {
-  constructor (banController, errorMiddleware, authMiddleware) {
-    const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+  constructor (authMiddleware, banController, errorMiddleware) {
     const authenticate = authMiddleware.authenticate.bind(authMiddleware)
+    const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
     const router = express.Router()
 
     router.route('/')
