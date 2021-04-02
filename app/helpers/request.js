@@ -1,4 +1,5 @@
 'use strict'
+
 function decodeScopeQueryParam (param = '') {
   const result = param
     .split(',')

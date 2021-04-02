@@ -1,6 +1,6 @@
 'use strict'
-const Sentry = require('@sentry/node')
 
+const Sentry = require('@sentry/node')
 const expressLoader = require('./express')
 const containerLoader = require('./container')
 const cronLoader = require('./cron')

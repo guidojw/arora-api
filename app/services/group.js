@@ -1,11 +1,12 @@
 'use strict'
+
 const { ForbiddenError, BadRequestError } = require('../errors')
 
 class GroupService {
-  constructor (robloxManager, userService, discordMessageJob, webSocketManager) {
+  constructor (discordMessageJob, robloxManager, userService, webSocketManager) {
+    this._discordMessageJob = discordMessageJob
     this._robloxManager = robloxManager
     this._userService = userService
-    this._discordMessageJob = discordMessageJob
     this._webSocketManager = webSocketManager
   }
 

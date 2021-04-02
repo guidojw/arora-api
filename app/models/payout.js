@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = (sequelize, DataTypes) => {
   const Payout = sequelize.define('Payout', {
     until: {

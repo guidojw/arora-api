@@ -26,7 +26,7 @@ services:
   AcceptJoinRequestsJob:
     class: app/jobs
     main: AcceptJoinRequestsJob
-    arguments: ['@RobloxManager', '@GroupService', '@DiscordMessageJob']
+    arguments: ['@DiscordMessageJob', '@GroupService', '@RobloxManager']
   AnnounceTrainingsJob:
     class: app/jobs
     main: AnnounceTrainingsJob
@@ -41,7 +41,7 @@ services:
   FinishSuspensionJob:
     class: app/jobs
     main: FinishSuspensionJob
-    arguments: ['@UserService', '@GroupService', '@DiscordMessageJob']
+    arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
   PayoutTrainDevelopersJob:
     class: app/jobs
     main: PayoutTrainDevelopersJob
@@ -68,23 +68,23 @@ services:
   BansRouter:
     class: app/routes
     main: BansRouter
-    arguments: ['@BanController', '@ErrorMiddleware', '@AuthMiddleware']
+    arguments: ['@AuthMiddleware', '@BanController', '@ErrorMiddleware']
   CatalogRouter:
     class: app/routes
     main: CatalogRouter
-    arguments: ['@CatalogController', '@ErrorMiddleware', '@AuthMiddleware']
+    arguments: ['@AuthMiddleware', '@CatalogController', '@ErrorMiddleware']
   GroupsRouter:
     class: app/routes
     main: GroupsRouter
-    arguments: ['@GroupController', '@ErrorMiddleware', '@AuthMiddleware']
+    arguments: ['@AuthMiddleware', '@GroupController', '@ErrorMiddleware']
   StatusRouter:
     class: app/routes
     main: StatusRouter
-    arguments: ['@StatusController', '@ErrorMiddleware', '@AuthMiddleware']
+    arguments: ['@AuthMiddleware', '@StatusController', '@ErrorMiddleware']
   UsersRouter:
     class: app/routes
     main: UsersRouter
-    arguments: ['@UserController', '@ErrorMiddleware', '@AuthMiddleware']
+    arguments: ['@AuthMiddleware', '@UserController', '@ErrorMiddleware']
 
   # Services
   AuthService:
@@ -93,7 +93,7 @@ services:
   BanService:
     class: app/services
     main: BanService
-    arguments: ['@UserService', '@DiscordMessageJob']
+    arguments: ['@DiscordMessageJob', '@UserService']
   CatalogService:
     class: app/services
     main: CatalogService
@@ -104,7 +104,7 @@ services:
   GroupService:
     class: app/services
     main: GroupService
-    arguments: ['@RobloxManager', '@UserService', '@DiscordMessageJob', '@WebSocketManager']
+    arguments: ['@DiscordMessageJob', '@RobloxManager', '@UserService', '@WebSocketManager']
   StatusService:
     class: app/services
     main: StatusService
@@ -112,7 +112,7 @@ services:
   SuspensionService:
     class: app/services
     main: SuspensionService
-    arguments: ['@GroupService', '@UserService', '@FinishSuspensionJob', '@DiscordMessageJob']
+    arguments: ['@DiscordMessageJob', '@FinishSuspensionJob', '@GroupService', '@UserService']
   TrainingService:
     class: app/services
     main: TrainingService

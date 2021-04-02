@@ -1,6 +1,7 @@
 'use strict'
-const { Exile } = require('../models')
+
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
+const { Exile } = require('../models')
 
 class ExileService {
   constructor (discordMessageJob, groupService, userService) {
@@ -46,7 +47,7 @@ class ExileService {
   }
 
   async unexile (groupId, userId, { authorId }) {
-    const exile = await this.getExile(userId)
+    const exile = await this.getExile(groupId, userId)
     await exile.destroy()
 
     const [username, authorName] = await Promise.all([

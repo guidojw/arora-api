@@ -1,10 +1,11 @@
 'use strict'
+
 const express = require('express')
 
 class UsersRouter {
-  constructor (userController, errorMiddleware, authMiddleware) {
-    const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+  constructor (authMiddleware, userController, errorMiddleware) {
     const authenticate = authMiddleware.authenticate.bind(authMiddleware)
+    const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
     const router = express.Router()
 
     router.get(

@@ -1,4 +1,5 @@
 'use strict'
+
 const { Payout } = require('../models')
 
 const developers = {

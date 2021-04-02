@@ -1,4 +1,5 @@
 'use strict'
+
 const { validationResult } = require('express-validator')
 
 class ErrorMiddleware {

@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = {
   AuthService: require('./auth'),
   BanService: require('./ban'),

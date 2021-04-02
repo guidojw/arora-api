@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = (sequelize, DataTypes) => {
   const SuspensionExtension = sequelize.define('SuspensionExtension', {
     authorId: {

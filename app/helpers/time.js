@@ -1,4 +1,5 @@
 'use strict'
+
 function getDate (date) {
   const day = date.getDate()
   const month = date.getMonth()
@@ -18,23 +19,8 @@ function isDst (date) {
   return Math.max(jan, jul) !== date.getTimezoneOffset()
 }
 
-function getDateInfo (dateString) {
-  const day = parseInt(dateString.substring(0, dateString.indexOf('-')))
-  const month = parseInt(dateString.substring(dateString.indexOf('-') + 1, dateString.lastIndexOf('-')))
-  const year = parseInt(dateString.substring(dateString.lastIndexOf('-') + 1, dateString.length))
-  return { day, month: month - 1, year }
-}
-
-function getTimeInfo (timeString) {
-  const hours = parseInt(timeString.substring(0, timeString.indexOf(':')))
-  const minutes = parseInt(timeString.substring(timeString.indexOf(':') + 1, timeString.length))
-  return { hours, minutes }
-}
-
 module.exports = {
   getDate,
   getTime,
-  isDst,
-  getDateInfo,
-  getTimeInfo
+  isDst
 }

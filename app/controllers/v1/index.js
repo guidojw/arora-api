@@ -1,4 +1,5 @@
 'use strict'
+
 module.exports = {
   BanController: require('./ban'),
   CatalogController: require('./catalog'),

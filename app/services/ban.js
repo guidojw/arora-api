@@ -1,13 +1,14 @@
 'use strict'
-const { Ban, BanCancellation } = require('../models')
+
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
+const { Ban, BanCancellation } = require('../models')
 
 const robloxConfig = require('../../config/roblox')
 
 class BanService {
-  constructor (userService, discordMessageJob) {
-    this._userService = userService
+  constructor (discordMessageJob, userService) {
     this._discordMessageJob = discordMessageJob
+    this._userService = userService
   }
 
   getBans (scope, sort) {

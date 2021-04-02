@@ -1,16 +1,17 @@
 'use strict'
+
 const cron = require('node-schedule')
 const pluralize = require('pluralize')
 
-const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../models')
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
+const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../models')
 
 class SuspensionService {
-  constructor (groupService, userService, finishSuspensionJob, discordMessageJob) {
+  constructor (discordMessageJob, finishSuspensionJob, groupService, userService) {
+    this._discordMessageJob = discordMessageJob
+    this._finishSuspensionJob = finishSuspensionJob
     this._groupService = groupService
     this._userService = userService
-    this._finishSuspensionJob = finishSuspensionJob
-    this._discordMessageJob = discordMessageJob
   }
 
   getSuspensions (scope, sort) {

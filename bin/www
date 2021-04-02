@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 'use strict'
+
 const debug = require('debug')('nsadmin-api:server')
 const http = require('http')
 const WebSocket = require('ws')
 
 const app = require('../app')
 const container = app.get('container')
-const webSocketManager = container.get('WebSocketManager')
 const authMiddleware = container.get('AuthMiddleware')
+const webSocketManager = container.get('WebSocketManager')
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)

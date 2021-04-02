@@ -1,11 +1,12 @@
 'use strict'
+
 const robloxConfig = require('../../config/roblox')
 
 class FinishSuspensionJob {
-  constructor (userService, groupService, discordMessageJob) {
-    this._userService = userService
-    this._groupService = groupService
+  constructor (discordMessageJob, groupService, userService) {
     this._discordMessageJob = discordMessageJob
+    this._groupService = groupService
+    this._userService = userService
   }
 
   async run (suspension) {

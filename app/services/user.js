@@ -1,4 +1,5 @@
 'use strict'
+
 const { NotFoundError } = require('../errors')
 
 const robloxConfig = require('../../config/roblox')

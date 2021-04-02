@@ -1,9 +1,10 @@
 'use strict'
+
 const Sentry = require('@sentry/node')
 const express = require('express')
-const logger = require('morgan')
 const helmet = require('helmet')
 const hpp = require('hpp')
+const logger = require('morgan')
 
 const { NotFoundError } = require('../errors')
 

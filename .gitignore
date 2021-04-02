@@ -1,5 +1,7 @@
-/.idea/*
-/node_modules
 .env
-ecosystem.config.js
 *.key
+
+/node_modules
+
+ecosystem.config.js
+/.idea/*

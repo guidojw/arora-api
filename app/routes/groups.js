@@ -1,10 +1,11 @@
 'use strict'
+
 const express = require('express')
 
 class GroupsRouter {
-  constructor (groupController, errorMiddleware, authMiddleware) {
-    const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
+  constructor (authMiddleware, groupController, errorMiddleware) {
     const authenticate = authMiddleware.authenticate.bind(authMiddleware)
+    const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
     const router = express.Router()
 
     // GroupService

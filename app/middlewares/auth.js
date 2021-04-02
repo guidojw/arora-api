@@ -1,4 +1,5 @@
 'use strict'
+
 const { UnauthorizedError } = require('../errors')
 
 class AuthMiddleware {
