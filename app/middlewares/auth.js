@@ -19,7 +19,7 @@ class AuthMiddleware {
   authenticateWebSocketConnection (req) {
     // Check for existence of the authorization header as these
     // requests are not checked by express-validator
-    const token = req.headers.authorization !== undefined
+    const token = typeof req.headers.authorization !== 'undefined'
       ? req.headers.authorization.replace('Bearer ', '')
       : undefined
 

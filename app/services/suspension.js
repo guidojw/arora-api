@@ -151,7 +151,7 @@ class SuspensionService {
     if (changes.reason) {
       this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s suspension to *"${suspension.reason}"*`)
     }
-    if (changes.rankBack !== undefined) {
+    if (typeof changes.rankBack !== 'undefined') {
       this._discordMessageJob.run(`**${editorName}** changed the rankBack option of **${username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
     }
 

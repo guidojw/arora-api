@@ -14,7 +14,7 @@ class UserService {
     const user = await client.getUserIdFromUsername(username)
 
     // This Roblox endpoint doesn't throw HTTP 404 if a user doesn't exist..
-    if (user.id === undefined) {
+    if (typeof user.id === 'undefined') {
       throw new NotFoundError('User not found')
     }
 
