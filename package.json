@@ -8,7 +8,7 @@
   "scripts": {
     "start": "npm explore bloxy -- npm run build ; node ./bin/www",
     "start:dev": "nodemon ./bin/www",
-    "lint": "eslint app"
+    "lint": "eslint src"
   },
   "author": "Guido de Jong",
   "license": "MIT",

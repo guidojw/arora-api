@@ -2,122 +2,122 @@
 services:
   # Controllers
   BanController:
-    class: app/controllers/v1
+    class: src/controllers/v1
     main: BanController
     arguments: ['@BanService']
   CatalogController:
-    class: app/controllers/v1
+    class: src/controllers/v1
     arguments: ['@CatalogService']
     main: CatalogController
   GroupController:
-    class: app/controllers/v1
+    class: src/controllers/v1
     main: GroupController
     arguments: ['@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
   StatusController:
-    class: app/controllers/v1
+    class: src/controllers/v1
     main: StatusController
     arguments: ['@StatusService']
   UserController:
-    class: app/controllers/v1
+    class: src/controllers/v1
     main: UserController
     arguments: ['@UserService']
 
   # Jobs
   AcceptJoinRequestsJob:
-    class: app/jobs
+    class: src/jobs
     main: AcceptJoinRequestsJob
     arguments: ['@DiscordMessageJob', '@GroupService', '@RobloxManager']
   AnnounceTrainingsJob:
-    class: app/jobs
+    class: src/jobs
     main: AnnounceTrainingsJob
     arguments: ['@GroupService', '@UserService']
   CheckSuspensionsJob:
-    class: app/jobs
+    class: src/jobs
     main: CheckSuspensionsJob
     arguments: ['@FinishSuspensionJob']
   DiscordMessageJob:
-    class: app/jobs
+    class: src/jobs
     main: DiscordMessageJob
   FinishSuspensionJob:
-    class: app/jobs
+    class: src/jobs
     main: FinishSuspensionJob
     arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
   PayoutTrainDevelopersJob:
-    class: app/jobs
+    class: src/jobs
     main: PayoutTrainDevelopersJob
     arguments: ['@RobloxManager', '@WebSocketManager']
 
   # Managers
   RobloxManager:
-    class: app/managers
+    class: src/managers
     main: RobloxManager
   WebSocketManager:
-    class: app/managers
+    class: src/managers
     main: WebSocketManager
 
   # Middlewares
   AuthMiddleware:
-    class: app/middlewares
+    class: src/middlewares
     main: AuthMiddleware
     arguments: ['@AuthService']
   ErrorMiddleware:
-    class: app/middlewares
+    class: src/middlewares
     main: ErrorMiddleware
 
   # Routes
   BansRouter:
-    class: app/routes
+    class: src/routes
     main: BansRouter
     arguments: ['@AuthMiddleware', '@BanController', '@ErrorMiddleware']
   CatalogRouter:
-    class: app/routes
+    class: src/routes
     main: CatalogRouter
     arguments: ['@AuthMiddleware', '@CatalogController', '@ErrorMiddleware']
   GroupsRouter:
-    class: app/routes
+    class: src/routes
     main: GroupsRouter
     arguments: ['@AuthMiddleware', '@ErrorMiddleware', '@GroupController']
   StatusRouter:
-    class: app/routes
+    class: src/routes
     main: StatusRouter
     arguments: ['@AuthMiddleware', '@ErrorMiddleware', '@StatusController']
   UsersRouter:
-    class: app/routes
+    class: src/routes
     main: UsersRouter
     arguments: ['@AuthMiddleware', '@ErrorMiddleware', '@UserController']
 
   # Services
   AuthService:
-    class: app/services
+    class: src/services
     main: AuthService
   BanService:
-    class: app/services
+    class: src/services
     main: BanService
     arguments: ['@DiscordMessageJob', '@UserService']
   CatalogService:
-    class: app/services
+    class: src/services
     main: CatalogService
   ExileService:
-    class: app/services
+    class: src/services
     main: ExileService
     arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
   GroupService:
-    class: app/services
+    class: src/services
     main: GroupService
     arguments: ['@DiscordMessageJob', '@RobloxManager', '@UserService', '@WebSocketManager']
   StatusService:
-    class: app/services
+    class: src/services
     main: StatusService
     arguments: ['@RobloxManager']
   SuspensionService:
-    class: app/services
+    class: src/services
     main: SuspensionService
     arguments: ['@DiscordMessageJob', '@FinishSuspensionJob', '@GroupService', '@UserService']
   TrainingService:
-    class: app/services
+    class: src/services
     main: TrainingService
     arguments: ['@AnnounceTrainingsJob', '@DiscordMessageJob', '@UserService']
   UserService:
-    class: app/services
+    class: src/services
     main: UserService
     arguments: ['@RobloxManager']
