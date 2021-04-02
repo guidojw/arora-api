@@ -76,15 +76,15 @@ services:
   GroupsRouter:
     class: app/routes
     main: GroupsRouter
-    arguments: ['@AuthMiddleware', '@GroupController', '@ErrorMiddleware']
+    arguments: ['@AuthMiddleware', '@ErrorMiddleware', '@GroupController']
   StatusRouter:
     class: app/routes
     main: StatusRouter
-    arguments: ['@AuthMiddleware', '@StatusController', '@ErrorMiddleware']
+    arguments: ['@AuthMiddleware', '@ErrorMiddleware', '@StatusController']
   UsersRouter:
     class: app/routes
     main: UsersRouter
-    arguments: ['@AuthMiddleware', '@UserController', '@ErrorMiddleware']
+    arguments: ['@AuthMiddleware', '@ErrorMiddleware', '@UserController']
 
   # Services
   AuthService:

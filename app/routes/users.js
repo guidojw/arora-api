@@ -3,7 +3,7 @@
 const express = require('express')
 
 class UsersRouter {
-  constructor (authMiddleware, userController, errorMiddleware) {
+  constructor (authMiddleware, errorMiddleware, userController) {
     const authenticate = authMiddleware.authenticate.bind(authMiddleware)
     const handleValidationResult = errorMiddleware.handleValidationResult.bind(errorMiddleware)
     const router = express.Router()
