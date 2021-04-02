@@ -4,7 +4,7 @@ require('dotenv').config()
 
 const express = require('express')
 
-const loaders = require('./app/loaders')
+const loaders = require('./src/loaders')
 
 const app = express()
 require('express-async-errors')
