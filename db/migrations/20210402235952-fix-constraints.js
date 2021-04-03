@@ -47,10 +47,10 @@ module.exports = {
     )
 
     await Promise.all([
-      updateForeignKey(queryInterface, 'training_cancellations', 'training_id', 'trainings', 'CASCADE'),
-      updateForeignKey(queryInterface, 'suspension_extensions', 'suspension_id', 'suspensions', 'CASCADE'),
-      updateForeignKey(queryInterface, 'suspension_cancellations', 'suspension_id', 'suspensions', 'CASCADE'),
-      updateForeignKey(queryInterface, 'ban_cancellations', 'ban_id', 'bans', 'CASCADE')
+      updateForeignKey(queryInterface, 'training_cancellations', 'training_id', 'trainings'),
+      updateForeignKey(queryInterface, 'suspension_extensions', 'suspension_id', 'suspensions'),
+      updateForeignKey(queryInterface, 'suspension_cancellations', 'suspension_id', 'suspensions'),
+      updateForeignKey(queryInterface, 'ban_cancellations', 'ban_id', 'bans')
     ])
   }
 }
