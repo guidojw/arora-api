@@ -20,8 +20,11 @@ module.exports = (sequelize, DataTypes) => {
 
   BanCancellation.associate = models => {
     BanCancellation.belongsTo(models.Ban, {
-      foreignKey: { allowNull: false, name: 'banId' },
-      onDelete: 'cascade'
+      foreignKey: {
+        allowNull: false,
+        name: 'banId'
+      },
+      onDelete: 'CASCADE'
     })
   }
 

@@ -33,7 +33,12 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   Ban.associate = models => {
-    Ban.hasOne(models.BanCancellation, { foreignKey: { allowNull: false, name: 'banId' } })
+    Ban.hasOne(models.BanCancellation, {
+      foreignKey: {
+        allowNull: false,
+        name: 'banId'
+      }
+    })
   }
 
   Ban.loadScopes = models => {
