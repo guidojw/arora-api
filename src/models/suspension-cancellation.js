@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         name: 'suspensionId'
       },
-      onDelete: 'cascade'
+      onDelete: 'CASCADE'
     })
   }
 

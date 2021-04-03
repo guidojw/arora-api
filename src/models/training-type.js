@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   TrainingType.associate = models => {
-    TrainingType.hasOne(models.Training, {
+    TrainingType.hasMany(models.Training, {
       foreignKey: {
         allowNull: false,
         name: 'typeId'

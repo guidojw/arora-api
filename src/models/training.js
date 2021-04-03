@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         name: 'typeId'
       },
       as: 'type',
-      onDelete: 'CASCADE'
+      onDelete: 'SET NULL'
     })
   }
 
@@ -41,9 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     Training.addScope('defaultScope', {
       where: {
         '$TrainingCancellation.id$': null,
-        date: {
-          [Op.gt]: sequelize.literal('NOW() - INTERVAL \'15 minutes\'')
-        }
+        date: { [Op.gt]: sequelize.literal('NOW() - INTERVAL \'15 minutes\'') }
       },
       include: [{
         model: models.TrainingCancellation,
