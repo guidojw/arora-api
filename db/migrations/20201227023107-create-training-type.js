@@ -43,7 +43,7 @@ module.exports = {
     )
 
     await queryInterface.changeColumn('trainings', 'type', {
-      type: `VARCHAR(255) USING CAST ( "type" as VARCHAR(255) )`,
+      type: 'VARCHAR(255) USING CAST ( "type" as VARCHAR(255) )',
       allowNull: false
     })
     await queryInterface.dropEnum('enum_trainings_type')
@@ -52,11 +52,11 @@ module.exports = {
       await queryInterface.bulkUpdate('trainings', { type: cdTrainingTypeId.toString() }, { type: 'cd' })
     }
     if (csrTrainingTypeId) {
-      await queryInterface.bulkUpdate('trainings', { type: csrTrainingTypeId.toString()}, { type: 'csr' })
+      await queryInterface.bulkUpdate('trainings', { type: csrTrainingTypeId.toString() }, { type: 'csr' })
     }
 
     await queryInterface.changeColumn('trainings', 'type', {
-      type: `INTEGER USING CAST ( "type" as INTEGER )`,
+      type: 'INTEGER USING CAST ( "type" as INTEGER )',
       allowNull: false
     })
     await queryInterface.addConstraint('trainings', {
@@ -78,7 +78,7 @@ module.exports = {
     await queryInterface.renameColumn('trainings', 'type_id', 'type')
     await queryInterface.removeConstraint('trainings', 'trainings_type_id_training_types_fk')
     await queryInterface.changeColumn('trainings', 'type', {
-      type: `VARCHAR(255) USING CAST ( "type" as VARCHAR(255) )`,
+      type: 'VARCHAR(255) USING CAST ( "type" as VARCHAR(255) )',
       allowNull: false
     })
 
@@ -104,7 +104,7 @@ module.exports = {
 
     await queryInterface.sequelize.query('CREATE TYPE enum_trainings_type AS ENUM (\'cd\', \'csr\')')
     return queryInterface.changeColumn('trainings', 'type', {
-      type: `enum_trainings_type USING CAST ( "type" AS enum_trainings_type )`,
+      type: 'enum_trainings_type USING CAST ( "type" AS enum_trainings_type )',
       allowNull: false
     })
   }
