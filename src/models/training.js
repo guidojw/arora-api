@@ -28,10 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     })
     Training.belongsTo(models.TrainingType, {
-      foreignKey: {
-        allowNull: false,
-        name: 'typeId'
-      },
+      foreignKey: 'typeId',
       as: 'type',
       onDelete: 'SET NULL'
     })
