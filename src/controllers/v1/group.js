@@ -4,7 +4,8 @@ const { param, body, header, query } = require('express-validator')
 const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers').requestHelper
 
 class GroupController {
-  constructor (exileService, groupService, suspensionService, trainingService) {
+  constructor (banService, exileService, groupService, suspensionService, trainingService) {
+    this._banService = banService
     this._exileService = exileService
     this._groupService = groupService
     this._suspensionService = suspensionService
@@ -28,8 +29,42 @@ class GroupController {
     res.json(await this._groupService.shout(req.params.groupId, req.body.message, req.body.authorId))
   }
 
-  async putUser (req, res) {
-    res.json(await this._groupService.changeRank(req.params.groupId, req.params.userId, req.body))
+  async promoteMember (req, res) {
+    res.json(await this._groupService.promoteMember(req.params.groupId, req.params.userId, req.body.authorId))
+  }
+
+  async demoteMember (req, res) {
+    res.json(await this._groupService.demoteMember(req.params.groupId, req.params.userId, req.body.authorId))
+  }
+
+  async changeMemberRank (req, res) {
+    res.json(await this._groupService.changeMemberRank(req.params.groupId, req.params.userId, req.body))
+  }
+
+  // BanService
+  async getBans (req, res) {
+    res.json((await this._banService.getBans(req.params.groupId, req.query.scope, req.query.sort))
+      .map(ban => ban.get({ plain: true })))
+  }
+
+  async getBan (req, res) {
+    res.json((await this._banService.getBan(req.params.groupId, req.params.userId, req.query.scope))
+      .get({ plain: true }))
+  }
+
+  async postBan (req, res) {
+    res.json((await this._banService.ban(req.params.groupId, req.body.userId, req.body))
+      .get({ raw: true }))
+  }
+
+  async cancelBan (req, res) {
+    res.json((await this._banService.cancelBan(req.params.groupId, req.params.userId, req.body))
+      .get({ raw: true }))
+  }
+
+  async putBan (req, res) {
+    res.json((await this._banService.changeBan(req.params.groupId, req.params.userId, req.body))
+      .get({ plain: true }))
   }
 
   // ExileService
@@ -55,12 +90,12 @@ class GroupController {
 
   // SuspensionService
   async getSuspensions (req, res) {
-    res.json((await this._suspensionService.getSuspensions(req.query.scope, req.query.sort))
+    res.json((await this._suspensionService.getSuspensions(req.params.groupId, req.query.scope, req.query.sort))
       .map(suspension => suspension.get({ plain: true })))
   }
 
   async getSuspension (req, res) {
-    res.json((await this._suspensionService.getSuspension(req.params.userId, req.query.scope))
+    res.json((await this._suspensionService.getSuspension(req.params.groupId, req.params.userId, req.query.scope))
       .get({ plain: true }))
   }
 
@@ -85,14 +120,14 @@ class GroupController {
   }
 
   // TrainingService
-  async getTraining (req, res) {
-    res.json((await this._trainingService.getTraining(req.params.trainingId, req.query.scope))
-      .get({ plain: true }))
+  async getTrainings (req, res) {
+    res.json((await this._trainingService.getTrainings(req.params.groupId, req.query.scope, req.query.sort))
+      .map(training => training.get({ plain: true })))
   }
 
-  async getTrainings (req, res) {
-    res.json((await this._trainingService.getTrainings(req.query.scope, req.query.sort))
-      .map(training => training.get({ plain: true })))
+  async getTraining (req, res) {
+    res.json((await this._trainingService.getTraining(req.params.groupId, req.params.trainingId, req.query.scope))
+      .get({ plain: true }))
   }
 
   async getTrainingTypes (req, res) {
@@ -101,7 +136,7 @@ class GroupController {
   }
 
   async postTraining (req, res) {
-    res.json((await this._trainingService.addTraining(req.body))
+    res.json((await this._trainingService.addTraining(req.params.groupId, req.body))
       .get({ raw: true }))
   }
 
@@ -156,13 +191,71 @@ class GroupController {
           body('message').exists().isString()
         ]
 
-      case 'putUser':
+      case 'promoteMember':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt(),
+          body('authorId').optional().isInt().toInt()
+        ]
+      case 'demoteMember':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt(),
+          body('authorId').optional().isInt().toInt()
+        ]
+
+      case 'changeMemberRank':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           param('userId').isInt().toInt(),
           body('rank').exists().isInt().toInt(),
           body('authorId').optional().isInt().toInt()
+        ]
+
+        // BanService
+      case 'getBans':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          query('scope').customSanitizer(decodeScopeQueryParam),
+          query('sort').customSanitizer(decodeSortQueryParam)
+        ]
+      case 'getBan':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt(),
+          query('scope').customSanitizer(decodeScopeQueryParam)
+        ]
+
+      case 'postBan':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          body('userId').exists().isInt().toInt(),
+          body('authorId').exists().isInt().toInt(),
+          body('reason').exists().isString()
+        ]
+      case 'cancelBan':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt(),
+          body('authorId').exists().isInt().toInt(),
+          body('reason').exists().isString()
+        ]
+
+      case 'putBan':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').exists().isInt().toInt(),
+          body('editorId').exists().isInt().toInt(),
+          body('changes.authorId').optional().isInt().toInt(),
+          body('changes.reason').optional().isString()
         ]
 
         // ExileService

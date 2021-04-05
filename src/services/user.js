@@ -2,8 +2,6 @@
 
 const { NotFoundError } = require('../errors')
 
-const robloxConfig = require('../../config/roblox')
-
 class UserService {
   constructor (robloxManager) {
     this._robloxManager = robloxManager
@@ -22,7 +20,7 @@ class UserService {
   }
 
   async hasBadge (userId, badgeId) {
-    const client = this._robloxManager.getClient(robloxConfig.defaultGroup)
+    const client = this._robloxManager.getClient()
     return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
       userId,
       itemType: 'Badge',

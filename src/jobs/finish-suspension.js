@@ -1,7 +1,5 @@
 'use strict'
 
-const robloxConfig = require('../../config/roblox')
-
 class FinishSuspensionJob {
   constructor (discordMessageJob, groupService, userService) {
     this._discordMessageJob = discordMessageJob
@@ -10,11 +8,11 @@ class FinishSuspensionJob {
   }
 
   async run (suspension) {
-    const rank = await this._userService.getRank(suspension.userId, robloxConfig.defaultGroup)
+    const rank = await this._userService.getRank(suspension.userId, suspension.groupId)
 
     if (rank !== 0) {
-      await this._groupService.setRank(
-        robloxConfig.defaultGroup,
+      await this._groupService.setMemberRank(
+        suspension.groupId,
         suspension.userId,
         suspension.rankBack && suspension.rank > 0 ? suspension.rank : 1)
     }

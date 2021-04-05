@@ -8,7 +8,7 @@ class ErrorMiddleware {
     if (errors.isEmpty()) {
       return next()
     }
-    this.sendErrors(res, 422, errors.array({ firstErrorOnly: true }))
+    this.sendErrors(res, 422, errors.array({ onlyFirstError: true }))
   }
 
   sendError (res, statusCode, message) {

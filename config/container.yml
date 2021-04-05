@@ -1,10 +1,6 @@
 # Configuration for DI
 services:
   # Controllers
-  BanController:
-    class: src/controllers/v1
-    main: BanController
-    arguments: ['@BanService']
   CatalogController:
     class: src/controllers/v1
     arguments: ['@CatalogService']
@@ -12,7 +8,7 @@ services:
   GroupController:
     class: src/controllers/v1
     main: GroupController
-    arguments: ['@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
+    arguments: ['@BanService', '@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
   StatusController:
     class: src/controllers/v1
     main: StatusController
@@ -65,10 +61,6 @@ services:
     main: ErrorMiddleware
 
   # Routes
-  BansRouter:
-    class: src/routes
-    main: BansRouter
-    arguments: ['@AuthMiddleware', '@BanController', '@ErrorMiddleware']
   CatalogRouter:
     class: src/routes
     main: CatalogRouter

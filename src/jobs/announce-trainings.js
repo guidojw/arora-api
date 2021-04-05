@@ -3,7 +3,7 @@
 const cron = require('node-schedule')
 
 const { Training } = require('../models')
-const { timeHelper } = require('../helpers')
+const { getTime, getTimeZoneAbbreviation } = require('../helpers').timeHelper
 
 class AnnounceTrainingsJob {
   constructor (groupService, userService) {
@@ -12,7 +12,15 @@ class AnnounceTrainingsJob {
   }
 
   async run (groupId) {
-    const trainings = await Training.findAll()
+    if (typeof groupId === 'undefined') {
+      const groupIds = (await Training.findAll({
+        attributes: ['groupId'],
+        group: ['groupId', 'type.id']
+      })).map(training => training.groupId)
+      return Promise.all(groupIds.map(groupId => this.run(groupId)))
+    }
+
+    const trainings = await Training.findAll({ where: { groupId } })
     for (const training of trainings) {
       const jobName = `training_${training.id}`
       const job = cron.scheduledJobs[jobName]
@@ -36,7 +44,7 @@ class AnnounceTrainingsJob {
     ])]
     const authors = authorIds.length > 0
       ? await this._userService.getUsers(authorIds)
-      : undefined
+      : []
 
     let shout = 'Trainings today - '
     shout += getTrainingsInfo(trainingsToday, authors)
@@ -44,16 +52,16 @@ class AnnounceTrainingsJob {
     shout += getTrainingsInfo(trainingsTomorrow, authors)
     shout += '.'
 
-    const addition = ` (Timezone: ${timeHelper.isDst(now) ? 'CEST' : 'CET'})`
+    const addition = ` (Timezone: ${getTimeZoneAbbreviation(now)})`
 
-    // Cut excessive characters of shout
+    // Cut excessive characters of shout.
     if (shout.length > 255 - addition.length) {
       shout = `${shout.substring(0, 255 - addition.length - 3)}...`
     }
 
     shout += addition
 
-    // Compare current shout with new shout and update if they differ
+    // Compare current shout with new shout and update if they differ.
     const oldShout = await this._groupService.getShout(groupId)
     if (shout !== oldShout.body) {
       await this._groupService.shout(groupId, shout)
@@ -75,10 +83,10 @@ function getTrainingsInfo (trainings, authors) {
 
       for (let j = 0; j < typeTrainings.length; j++) {
         const training = typeTrainings[j]
-        const timeString = timeHelper.getTime(training.date)
+        const timeString = getTime(training.date)
         const author = authors.find(author => author.id === training.authorId)
 
-        result += ` ${timeString} (host: ${author.name})`
+        result += ` ${timeString} (host: ${author.name ?? 'unknown'})`
         if (j < typeTrainings.length - 2) {
           result += ','
         } else if (j === typeTrainings.length - 2) {

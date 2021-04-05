@@ -5,8 +5,6 @@ const expressLoader = require('./express')
 const containerLoader = require('./container')
 const cronLoader = require('./cron')
 
-const robloxConfig = require('../../config/roblox')
-
 async function init (app) {
   if (process.env.SENTRY_DSN) {
     Sentry.init({ dsn: process.env.SENTRY_DSN })
@@ -21,8 +19,10 @@ async function init (app) {
   expressLoader(app, container)
   cronLoader(container)
 
-  container.get('CheckSuspensionsJob').run()
-  container.get('AnnounceTrainingsJob').run(robloxConfig.defaultGroup)
+  await Promise.all([
+    container.get('CheckSuspensionsJob').run(),
+    container.get('AnnounceTrainingsJob').run()
+  ])
 }
 
 module.exports = {
