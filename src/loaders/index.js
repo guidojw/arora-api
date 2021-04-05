@@ -5,6 +5,8 @@ const expressLoader = require('./express')
 const containerLoader = require('./container')
 const cronLoader = require('./cron')
 
+const cronConfig = require('../../config/cron')
+
 async function init (app) {
   if (process.env.SENTRY_DSN) {
     Sentry.init({ dsn: process.env.SENTRY_DSN })
@@ -19,10 +21,12 @@ async function init (app) {
   expressLoader(app, container)
   cronLoader(container)
 
-  await Promise.all([
-    container.get('CheckSuspensionsJob').run(),
-    container.get('AnnounceTrainingsJob').run()
-  ])
+  if (cronConfig.announceTrainingsJob) {
+    await container.get('CheckSuspensionsJob').run()
+  }
+  if (cronConfig.checkSuspensionsJob) {
+    await container.get('AnnounceTrainingsJob').run()
+  }
 }
 
 module.exports = {
