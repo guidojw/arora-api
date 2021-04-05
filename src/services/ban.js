@@ -50,7 +50,7 @@ class BanService {
     return ban
   }
 
-  async cancelBan (groupId, userId, { authorId, reason }) {
+  async unban (groupId, userId, { authorId, reason }) {
     const ban = await this.getBan(groupId, userId)
     const cancellation = await BanCancellation.create({ banId: ban.id, authorId, reason })
 

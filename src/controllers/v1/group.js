@@ -58,7 +58,7 @@ class GroupController {
   }
 
   async cancelBan (req, res) {
-    res.json((await this._banService.cancelBan(req.params.groupId, req.params.userId, req.body))
+    res.json((await this._banService.unban(req.params.groupId, req.params.userId, req.body))
       .get({ raw: true }))
   }
 
@@ -105,7 +105,7 @@ class GroupController {
   }
 
   async cancelSuspension (req, res) {
-    res.json((await this._suspensionService.cancelSuspension(req.params.groupId, req.params.userId, req.body))
+    res.json((await this._suspensionService.unsuspend(req.params.groupId, req.params.userId, req.body))
       .get({ raw: true }))
   }
 

@@ -67,7 +67,7 @@ class SuspensionService {
     return suspension
   }
 
-  async cancelSuspension (groupId, userId, { authorId, reason }) {
+  async unsuspend (groupId, userId, { authorId, reason }) {
     const suspension = await this.getSuspension(groupId, userId)
     const rank = await this._userService.getRank(suspension.userId, groupId)
 
@@ -86,7 +86,7 @@ class SuspensionService {
       this._userService.getUsername(suspension.userId),
       this._userService.getUsername(cancellation.authorId)
     ])
-    this._discordMessageJob.run(`**${authorName}** cancelled **${username}**'s suspension with reason "*${cancellation.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** unsuspended **${username}**'s with reason "*${cancellation.reason}*"`)
 
     return cancellation
   }
