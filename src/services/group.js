@@ -92,7 +92,7 @@ class GroupService {
     const roles = await this.getRoles(groupId)
     const role = roles.roles
       .sort((roleA, roleB) => roleA.rank - roleB.rank)
-      .slice(roles.roles.findIndex(role => role.rank === rank))
+      .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
     if (!role) {
       throw new ForbiddenError('Member is already the highest obtainable rank.')
@@ -108,7 +108,7 @@ class GroupService {
     const roles = await this.getRoles(groupId)
     const role = roles.roles
       .sort((roleA, roleB) => roleB.rank - roleA.rank)
-      .slice(roles.roles.findIndex(role => role.rank === rank))
+      .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
     if (!role) {
       throw new ForbiddenError('Member is already the lowest obtainable rank.')
