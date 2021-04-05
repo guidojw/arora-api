@@ -89,9 +89,10 @@ class GroupService {
     if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot promote members on this rank.')
     }
-    const roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleA.rank - roleB.rank)
-    const role = roles
-      .slice(roles.findIndex(role => role.rank === rank))
+    const roles = await this.getRoles(groupId)
+    const role = roles.roles
+      .sort((roleA, roleB) => roleA.rank - roleB.rank)
+      .slice(roles.roles.findIndex(role => role.rank === rank))
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
     if (!role) {
       throw new ForbiddenError('Member is already the highest obtainable rank.')
@@ -104,9 +105,10 @@ class GroupService {
     if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot demote members on this rank.')
     }
-    const roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleB.rank - roleA.rank)
-    const role = roles
-      .slice(roles.findIndex(role => role.rank === rank))
+    const roles = await this.getRoles(groupId)
+    const role = roles.roles
+      .sort((roleA, roleB) => roleB.rank - roleA.rank)
+      .slice(roles.roles.findIndex(role => role.rank === rank))
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
     if (!role) {
       throw new ForbiddenError('Member is already the lowest obtainable rank.')
