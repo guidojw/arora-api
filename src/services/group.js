@@ -64,7 +64,7 @@ class GroupService {
 
   async changeMemberRank (groupId, userId, { rank, authorId }) {
     const oldRank = await this._userService.getRank(userId, groupId)
-    if ([0, 255].includes(oldRank) || applicationConfig.unchangeableRanks.some(range => inRange(oldRank, range))) {
+    if ([0, 255].includes(oldRank)) {
       throw new ForbiddenError('Cannot promote members on this rank.')
     }
 
@@ -86,7 +86,7 @@ class GroupService {
 
   async promoteMember (groupId, userId, authorId) {
     const rank = await this._userService.getRank(userId, groupId)
-    if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
+    if ([0, 255].includes(rank) || applicationConfig.unpromotableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot promote members on this rank.')
     }
     const roles = await this.getRoles(groupId)
@@ -94,7 +94,7 @@ class GroupService {
       .sort((roleA, roleB) => roleA.rank - roleB.rank)
       .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
-    if (!role) {
+    if (!role || role.rank === 255) {
       throw new ForbiddenError('Member is already the highest obtainable rank.')
     }
     return this.changeMemberRank(groupId, userId, { rank: role, authorId })
@@ -102,7 +102,7 @@ class GroupService {
 
   async demoteMember (groupId, userId, authorId) {
     const rank = await this._userService.getRank(userId, groupId)
-    if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
+    if ([0, 255].includes(rank) || applicationConfig.undemotableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot demote members on this rank.')
     }
     const roles = await this.getRoles(groupId)
@@ -110,7 +110,7 @@ class GroupService {
       .sort((roleA, roleB) => roleB.rank - roleA.rank)
       .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
-    if (!role) {
+    if (!role || role.rank === 0) {
       throw new ForbiddenError('Member is already the lowest obtainable rank.')
     }
     return this.changeMemberRank(groupId, userId, { rank: role, authorId })
