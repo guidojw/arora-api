@@ -23,7 +23,6 @@ function init (app, container) {
 
   app.use('/v1/groups', container.get('GroupsRouter'))
   app.use('/v1/users', container.get('UsersRouter'))
-  app.use('/v1/bans', container.get('BansRouter'))
   app.use('/v1/catalog', container.get('CatalogRouter'))
   app.use('/v1/status', container.get('StatusRouter'))
 

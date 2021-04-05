@@ -1,6 +1,9 @@
 'use strict'
 
-const { ForbiddenError, BadRequestError } = require('../errors')
+const { ForbiddenError, NotFoundError } = require('../errors')
+const { inRange } = require('../helpers').dataHelper
+
+const applicationConfig = require('../../config/application')
 
 class GroupService {
   constructor (discordMessageJob, robloxManager, userService, webSocketManager) {
@@ -41,61 +44,82 @@ class GroupService {
     return shout
   }
 
-  async setRank (groupId, userId, rank) {
-    const roles = await this.getRoles(groupId)
-    const role = roles.roles.find(role => role.rank === rank)
+  async setMemberRank (groupId, userId, rank) {
+    let role = rank
+    if (typeof role === 'number') {
+      const roles = await this.getRoles(groupId)
+      role = roles.roles.find(otherRole => otherRole.rank === role)
+      if (!role) {
+        throw new NotFoundError('Rank not found.')
+      }
+    }
     const client = this._robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     await group.updateMember(userId, role.id)
 
-    this._webSocketManager.broadcast('rankChanged', { groupId, userId, rank })
+    this._webSocketManager.broadcast('rankChange', { groupId, userId, rank: role.rank })
 
     return role
   }
 
-  async changeRank (groupId, userId, { rank, authorId }) {
+  async changeMemberRank (groupId, userId, { rank, authorId }) {
     const oldRank = await this._userService.getRank(userId, groupId)
-    if (oldRank === 0) {
-      throw new ForbiddenError('Can\'t change rank of non members.')
-    }
-    if (oldRank === 1 && authorId) {
-      throw new ForbiddenError('Can\'t change rank of customers.')
-    }
-    if (oldRank === 2) {
-      throw new ForbiddenError('Can\'t change rank of suspended members.')
-    }
-    if (oldRank === 99) {
-      throw new ForbiddenError('Can\'t change rank of partners.')
-    }
-    if (oldRank >= 200) {
-      throw new ForbiddenError('Can\'t change rank of HRs.')
-    }
-    if (!(rank === 1 || (rank >= 3 && rank <= 5) || (rank >= 100 && rank <= 102))) {
-      throw new BadRequestError('Invalid rank.')
+    if ([0, 255].includes(oldRank) || applicationConfig.unchangeableRanks.some(range => inRange(oldRank, range))) {
+      throw new ForbiddenError('Cannot promote members on this rank.')
     }
 
-    const newRole = await this.setRank(groupId, userId, rank)
+    const newRole = await this.setMemberRank(groupId, userId, rank)
     const roles = await this.getRoles(groupId)
     const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await this._userService.getUsername(userId)
     if (oldRole.id !== newRole.id) {
-      if (authorId) {
+      if (typeof authorId !== 'undefined') {
         const authorName = await this._userService.getUsername(authorId)
-        this._discordMessageJob.run(`**${authorName}** ${rank > oldRank ? 'promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+        this._discordMessageJob.run(`**${authorName}** changed **${username}**'s rank from **${oldRole.name}** to **${newRole.name}**`)
       } else {
-        this._discordMessageJob.run(`${rank > oldRank ? 'Promoted' : 'demoted'} **${username}** from **${oldRole.name}** to **${newRole.name}**`)
+        this._discordMessageJob.run(`Changed **${username}**'s rank from **${oldRole.name}** to **${newRole.name}**`)
       }
     }
 
     return { oldRole, newRole }
   }
 
-  async kick (groupId, userId) {
+  async promoteMember (groupId, userId, authorId) {
+    const rank = await this._userService.getRank(userId, groupId)
+    if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
+      throw new ForbiddenError('Cannot promote members on this rank.')
+    }
+    const roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleA.rank - roleB.rank)
+    const role = roles
+      .slice(roles.findIndex(role => role.rank === rank))
+      .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
+    if (!role) {
+      throw new ForbiddenError('Member is already the highest obtainable rank.')
+    }
+    return this.changeMemberRank(groupId, userId, { rank: role, authorId })
+  }
+
+  async demoteMember (groupId, userId, authorId) {
+    const rank = await this._userService.getRank(userId, groupId)
+    if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
+      throw new ForbiddenError('Cannot demote members on this rank.')
+    }
+    const roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleB.rank - roleA.rank)
+    const role = roles
+      .slice(roles.findIndex(role => role.rank === rank))
+      .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
+    if (!role) {
+      throw new ForbiddenError('Member is already the lowest obtainable rank.')
+    }
+    return this.changeMemberRank(groupId, userId, { rank: role, authorId })
+  }
+
+  async kickMember (groupId, userId) {
     const client = this._robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     await group.kickMember(userId)
 
-    this._webSocketManager.broadcast('rankChanged', { groupId, userId, rank: 0 })
+    this._webSocketManager.broadcast('rankChange', { groupId, userId, rank: 0 })
   }
 }
 

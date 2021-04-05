@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     date: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+    groupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'group_id'
     }
   }, {
     tableName: 'trainings'

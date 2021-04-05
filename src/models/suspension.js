@@ -42,18 +42,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: false
     },
-    endDate: {
-      type: DataTypes.VIRTUAL,
-      async get () {
-        let duration = this.duration
-        const extensions = await sequelize.models.SuspensionExtension.findAll({
-          where: { suspensionId: this.id }
-        })
-        for (const extension of extensions) {
-          duration += extension.duration
-        }
-        return new Date(this.date.getTime() + duration)
-      }
+    groupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'group_id'
     }
   }, {
     tableName: 'suspensions'
@@ -66,7 +58,6 @@ module.exports = (sequelize, DataTypes) => {
         name: 'suspensionId'
       }
     })
-
     Suspension.hasMany(models.SuspensionExtension, {
       foreignKey: {
         allowNull: false,
@@ -78,6 +69,15 @@ module.exports = (sequelize, DataTypes) => {
 
   Suspension.loadScopes = models => {
     Suspension.addScope('defaultScope', {
+      attributes: {
+        include: [
+          [
+            sequelize.literal('date + ("Suspension".duration||\' milliseconds\')::INTERVAL + ' +
+              '(COALESCE(SUM(extensions.duration), 0)||\' milliseconds\')::INTERVAL'),
+            'endsAt'
+          ]
+        ]
+      },
       where: {
         '$SuspensionCancellation.id$': null,
         finished: false
@@ -89,9 +89,9 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
+      group: ['Suspension.id', 'extensions.id'],
       subQuery: false
     })
-
     Suspension.addScope('finished', {
       where: {
         '$SuspensionCancellation.id$': null,

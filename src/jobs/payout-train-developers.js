@@ -4,7 +4,7 @@ const { Payout } = require('../models')
 
 const developers = {
   Supersnel11: { robloxId: 32851718, discordId: '228110777825886210' },
-  AmericanKay: { robloxId: 7050507, discordId: '175345544799977472' },
+  KaySherman: { robloxId: 7050507, discordId: '175345544799977472' },
   DerailingOn: { robloxId: 21753709, discordId: '273910287663497216' },
   Happywalker: { robloxId: 6882179, discordId: '235476265325428736' },
   BuildIntoTrains: { robloxId: 49248891, discordId: '263770097288609794' },
@@ -14,10 +14,10 @@ const developers = {
 const products = [
   { id: 1371397, developers: [developers.Supersnel11] },
   { id: 1547370, developers: [developers.Supersnel11] },
-  { id: 1373258, developers: [developers.AmericanKay] },
-  { id: 2300769, developers: [developers.AmericanKay] },
-  { id: 3886194, developers: [developers.AmericanKay] },
-  { id: 4787242, developers: [developers.AmericanKay] },
+  { id: 1373258, developers: [developers.KaySherman] },
+  { id: 2300769, developers: [developers.KaySherman] },
+  { id: 3886194, developers: [developers.KaySherman] },
+  { id: 4787242, developers: [developers.KaySherman] },
   { id: 1399819, developers: [developers.DerailingOn, developers.Happywalker] },
   { id: 1492453, developers: [developers.BuildIntoTrains] },
   { id: 1426909, developers: [developers.COEN1000] },
@@ -34,7 +34,7 @@ class PayoutTrainDevelopersJob {
 
   async run (groupId) {
     // Get last payout and its last transaction.
-    const lastPayout = await Payout.getLast()
+    const lastPayout = await Payout.getLast(groupId)
     if (!lastPayout) {
       throw new Error('Could not get last transaction!')
     }
@@ -111,11 +111,11 @@ class PayoutTrainDevelopersJob {
     // Only continue with payout logic if there are train transactions.
     if (trainTransactions.length > 0) {
       // Add new payout row.
-      await Payout.create({ until: new Date(trainTransactions[0].created) })
+      await Payout.create({ groupId, until: new Date(trainTransactions[0].created) })
     }
 
     // Broadcast information about the payouts over the WebSocket.
-    this._webSocketManager.broadcast('trainDeveloperPayoutReport', { developersSales })
+    this._webSocketManager.broadcast('trainDeveloperPayoutReport', { groupId, developersSales })
   }
 }
 

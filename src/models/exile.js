@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
     userId: {
       type: DataTypes.BIGINT,
       field: 'user_id'
+    },
+    groupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'group_id'
     }
   }, {
     tableName: 'exiles'

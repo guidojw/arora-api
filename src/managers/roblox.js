@@ -15,9 +15,8 @@ class RobloxManager {
           cookie: process.env.ROBLOX_COOKIE
         }
       })
-      // Set the client's requester to the custom requester.
-      // Needs to be done after instantiation as we need to
-      // know what the original requester was.
+      // Set the client's requester to the custom requester. Needs to be done
+      // after instantiation as we need to know what the original requester was.
       client.rest.requester = requester.bind(client.rest.requester)
 
       await client.login()
@@ -47,8 +46,8 @@ class RobloxManager {
 // Custom requester that uses Bloxy's default requester but
 // enables its throwHttpErrors option as the project relies on that.
 async function requester (options) {
-  // HTTP 403 is thrown on fetching a new X-CSRF token, Bloxy however
-  // relies on this so don't throw HTTP errors then.
+  // HTTP 403s are thrown on fetching new X-CSRF tokens, Bloxy's token refresh
+  // mechanism however relies on this so don't throw HTTP errors then.
   if (options.xcsrf !== false && options.url !== 'https://auth.roblox.com/v2/login') {
     options.throwHttpErrors = true
   }
