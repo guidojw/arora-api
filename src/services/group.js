@@ -89,7 +89,7 @@ class GroupService {
     if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot promote members on this rank.')
     }
-    let roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleA.rank - roleB.rank)
+    const roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleA.rank - roleB.rank)
     const role = roles
       .slice(roles.findIndex(role => role.rank === rank))
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
@@ -104,7 +104,7 @@ class GroupService {
     if ([0, 255].includes(rank) || applicationConfig.unchangeableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot demote members on this rank.')
     }
-    let roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleB.rank - roleA.rank)
+    const roles = (await this.getRoles(groupId)).sort((roleA, roleB) => roleB.rank - roleA.rank)
     const role = roles
       .slice(roles.findIndex(role => role.rank === rank))
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))

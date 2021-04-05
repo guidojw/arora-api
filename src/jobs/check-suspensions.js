@@ -12,7 +12,6 @@ class CheckSuspensionsJob {
   async run () {
     const suspensions = await Suspension.findAll()
     for (const suspension of suspensions) {
-
       if (suspension.endsAt <= Date.now()) {
         this._finishSuspensionJob.run(suspension)
       } else {
