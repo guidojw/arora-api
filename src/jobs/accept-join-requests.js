@@ -3,9 +3,10 @@
 const { Exile, Suspension } = require('../models')
 
 class AcceptJoinRequestsJob {
-  constructor (discordMessageJob, groupService, robloxManager) {
+  constructor (discordMessageJob, groupService, healthCheckJob, robloxManager) {
     this._discordMessageJob = discordMessageJob
     this._groupService = groupService
+    this._healthCheckJob = healthCheckJob
     this._robloxManager = robloxManager
   }
 
@@ -35,6 +36,8 @@ class AcceptJoinRequestsJob {
 
       cursor = requests.nextPageCursor
     } while (cursor)
+
+    await this._healthCheckJob.run('acceptJoinRequestsJob')
   }
 }
 

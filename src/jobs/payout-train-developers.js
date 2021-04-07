@@ -27,7 +27,8 @@ const products = [
 const PAY_RATE = 0.5
 
 class PayoutTrainDevelopersJob {
-  constructor (robloxManager, webSocketManager) {
+  constructor (healthCheckJob, robloxManager, webSocketManager) {
+    this._healthCheckJob = healthCheckJob
     this._robloxManager = robloxManager
     this._webSocketManager = webSocketManager
   }
@@ -116,6 +117,9 @@ class PayoutTrainDevelopersJob {
 
     // Broadcast information about the payouts over the WebSocket.
     this._webSocketManager.broadcast('trainDeveloperPayoutReport', { groupId, developersSales })
+
+    // Ping Healthchecks.io
+    await this._healthCheckJob.run('payoutTrainDevelopersJob')
   }
 }
 
