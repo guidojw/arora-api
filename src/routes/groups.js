@@ -38,12 +38,64 @@ class GroupsRouter {
       groupController.getGroup.bind(groupController)
     )
 
-    router.put(
-      '/:groupId/users/:userId',
-      groupController.validate('putUser'),
+    router.post(
+      '/:groupId/users/:userId/promote',
+      groupController.validate('promoteMember'),
       handleValidationResult,
       authenticate,
-      groupController.putUser.bind(groupController)
+      groupController.promoteMember.bind(groupController)
+    )
+    router.post(
+      '/:groupId/users/:userId/demote',
+      groupController.validate('demoteMember'),
+      handleValidationResult,
+      authenticate,
+      groupController.demoteMember.bind(groupController)
+    )
+
+    router.put(
+      '/:groupId/users/:userId',
+      groupController.validate('changeMemberRank'),
+      handleValidationResult,
+      authenticate,
+      groupController.changeMemberRank.bind(groupController)
+    )
+
+    // BanService
+    router.route('/:groupId/bans')
+      .get(
+        groupController.validate('getBans'),
+        handleValidationResult,
+        authenticate,
+        groupController.getBans.bind(groupController)
+      )
+      .post(
+        groupController.validate('postBan'),
+        handleValidationResult,
+        authenticate,
+        groupController.postBan.bind(groupController)
+      )
+
+    router.route('/:groupId/bans/:userId')
+      .get(
+        groupController.validate('getBan'),
+        handleValidationResult,
+        authenticate,
+        groupController.getBan.bind(groupController)
+      )
+      .put(
+        groupController.validate('putBan'),
+        handleValidationResult,
+        authenticate,
+        groupController.putBan.bind(groupController)
+      )
+
+    router.post(
+      '/:groupId/bans/:userId/cancel',
+      groupController.validate('cancelBan'),
+      handleValidationResult,
+      authenticate,
+      groupController.cancelBan.bind(groupController)
     )
 
     // ExileService

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 
-const debug = require('debug')('nsadmin-api:server')
+const debug = require('debug')('arora-api:server')
 const http = require('http')
 const WebSocket = require('ws')
 

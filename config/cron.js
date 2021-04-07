@@ -15,6 +15,11 @@ module.exports = {
     expression: '0 */1 * * *', // https://crontab.guru/#0_*/1_*_*_*
     job: 'CheckSuspensionsJob'
   },
+  healthCheckJob: {
+    expression: '*/5 * * * *', // https://crontab.guru/#*/5_*_*_*_*
+    job: 'HealthCheckJob',
+    args: ['main']
+  },
   payoutTrainDevelopersJob: {
     expression: '0 12 * * 6', // https://crontab.guru/#0_12_*_*_6
     job: 'PayoutTrainDevelopersJob',

@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: false,
       field: 'author_id'
+    },
+    groupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'group_id'
     }
   }, {
     tableName: 'bans'
@@ -44,7 +49,10 @@ module.exports = (sequelize, DataTypes) => {
   Ban.loadScopes = models => {
     Ban.addScope('defaultScope', {
       where: { '$BanCancellation.id$': null },
-      include: [{ model: models.BanCancellation, attributes: [] }]
+      include: [{
+        model: models.BanCancellation,
+        attributes: []
+      }]
     })
   }
 

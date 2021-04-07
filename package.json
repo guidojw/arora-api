@@ -1,14 +1,13 @@
 {
-  "name": "nsadmin-api",
+  "name": "arora-api",
   "version": "0.0.0",
-  "description": "Backend of the NSadmin Roblox group bot.",
   "private": true,
-  "repository": "github:guidojw/nsadmin-api",
+  "repository": "github:guidojw/arora-api",
   "main": "app.js",
   "scripts": {
     "start": "npm explore bloxy -- npm run build ; node ./bin/www",
     "start:dev": "nodemon ./bin/www",
-    "lint": "eslint src"
+    "lint": "eslint src db"
   },
   "author": "Guido de Jong",
   "license": "MIT",
@@ -24,6 +23,7 @@
     "helmet": "^4.4.1",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "node-dependency-injection": "^2.6.11",
     "node-schedule": "^2.0.0",

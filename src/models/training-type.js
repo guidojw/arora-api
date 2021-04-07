@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notEmpty: true
       }
+    },
+    groupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'group_id'
     }
   }, {
     tableName: 'training_types'

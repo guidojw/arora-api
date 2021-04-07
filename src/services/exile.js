@@ -1,7 +1,10 @@
 'use strict'
 
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
+const { inRange } = require('../helpers').dataHelper
 const { Exile } = require('../models')
+
+const applicationConfig = require('../../config/application')
 
 class ExileService {
   constructor (discordMessageJob, groupService, userService) {
@@ -14,8 +17,8 @@ class ExileService {
     return Exile.findAll()
   }
 
-  async getExile (_groupId, userId) {
-    const exile = await Exile.findOne({ where: { userId } })
+  async getExile (groupId, userId) {
+    const exile = await Exile.findOne({ where: { groupId, userId } })
     if (!exile) {
       throw new NotFoundError('Exile not found.')
     }
@@ -23,19 +26,18 @@ class ExileService {
   }
 
   async exile (groupId, userId, { authorId }) {
-    if (await Exile.findOne({ where: { userId } })) {
+    if (await Exile.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already exiled.')
     }
-
     const rank = await this._userService.getRank(userId, groupId)
-    if (rank >= 200 || rank === 99 || rank === 103) {
-      throw new ForbiddenError('User is unexilable.')
+    if (applicationConfig.unexilableRanks.some(range => inRange(rank, range))) {
+      throw new ForbiddenError('Cannot exile members on this rank.')
     }
 
     try {
-      await this._groupService.kick(groupId, userId)
+      await this._groupService.kickMember(groupId, userId)
     } catch (err) {} // eslint-disable-line no-empty
-    const exile = await Exile.create({ userId })
+    const exile = await Exile.create({ groupId, userId })
 
     const [username, authorName] = await Promise.all([
       this._userService.getUsername(exile.userId),

@@ -12,15 +12,17 @@ class CheckSuspensionsJob {
   async run () {
     const suspensions = await Suspension.findAll()
     for (const suspension of suspensions) {
-      const endDate = await suspension.endDate
-
-      if (endDate <= Date.now()) {
+      if (suspension.endsAt <= Date.now()) {
         this._finishSuspensionJob.run(suspension)
       } else {
         const jobName = `suspension_${suspension.id}`
         const job = cron.scheduledJobs[jobName]
         if (!job) {
-          cron.scheduleJob(jobName, endDate, this._finishSuspensionJob.run.bind(this._finishSuspensionJob, suspension))
+          cron.scheduleJob(
+            jobName,
+            suspension.endsAt,
+            this._finishSuspensionJob.run.bind(this._finishSuspensionJob, suspension)
+          )
         }
       }
     }

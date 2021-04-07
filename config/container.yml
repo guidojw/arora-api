@@ -1,18 +1,14 @@
 # Configuration for DI
 services:
   # Controllers
-  BanController:
-    class: src/controllers/v1
-    main: BanController
-    arguments: ['@BanService']
   CatalogController:
     class: src/controllers/v1
-    arguments: ['@CatalogService']
     main: CatalogController
+    arguments: ['@CatalogService']
   GroupController:
     class: src/controllers/v1
     main: GroupController
-    arguments: ['@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
+    arguments: ['@BanService', '@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
   StatusController:
     class: src/controllers/v1
     main: StatusController
@@ -26,7 +22,7 @@ services:
   AcceptJoinRequestsJob:
     class: src/jobs
     main: AcceptJoinRequestsJob
-    arguments: ['@DiscordMessageJob', '@GroupService', '@RobloxManager']
+    arguments: ['@DiscordMessageJob', '@GroupService', '@HealthCheckJob', '@RobloxManager']
   AnnounceTrainingsJob:
     class: src/jobs
     main: AnnounceTrainingsJob
@@ -42,10 +38,13 @@ services:
     class: src/jobs
     main: FinishSuspensionJob
     arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
+  HealthCheckJob:
+    class: src/jobs
+    main: HealthCheckJob
   PayoutTrainDevelopersJob:
     class: src/jobs
     main: PayoutTrainDevelopersJob
-    arguments: ['@RobloxManager', '@WebSocketManager']
+    arguments: ['@HealthCheckJob', '@RobloxManager', '@WebSocketManager']
 
   # Managers
   RobloxManager:
@@ -65,10 +64,6 @@ services:
     main: ErrorMiddleware
 
   # Routes
-  BansRouter:
-    class: src/routes
-    main: BansRouter
-    arguments: ['@AuthMiddleware', '@BanController', '@ErrorMiddleware']
   CatalogRouter:
     class: src/routes
     main: CatalogRouter

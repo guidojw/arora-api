@@ -5,14 +5,25 @@ module.exports = (sequelize, DataTypes) => {
     until: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+    groupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'group_id'
     }
   }, {
     tableName: 'payouts'
   })
 
-  Payout.getLast = async () => {
+  Payout.getLast = async (groupId) => {
     return (await Payout.findAll({
-      attributes: [[sequelize.fn('MAX', sequelize.col('until')), 'until']]
+      where: { groupId },
+      attributes: [
+        [
+          sequelize.fn('MAX', sequelize.col('until')),
+          'until'
+        ]
+      ]
     }))[0]
   }
 
