@@ -68,8 +68,7 @@ module.exports = (sequelize, DataTypes) => {
       '("Suspension".duration||\' milliseconds\')::INTERVAL + ' +
       '(COALESCE(SUM(extensions.duration), 0)||\' milliseconds\')::INTERVAL'
     )
-
-    Suspension.addScope('defaultScope', {
+    const baseScope = {
       attributes: {
         include: [
           [endsAtLiteral, 'endsAt']
@@ -83,24 +82,15 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id'],
+      group: ['Suspension.id', 'extensions.id']
+    }
+
+    Suspension.addScope('defaultScope', {
+      ...baseScope,
       having: sequelize.literal(`${endsAtLiteral.val} > NOW()`)
     })
     Suspension.addScope('finished', {
-      attributes: {
-        include: [
-          [endsAtLiteral, 'endsAt']
-        ]
-      },
-      where: { '$SuspensionCancellation.id$': null },
-      include: [{
-        model: models.SuspensionCancellation,
-        attributes: []
-      }, {
-        model: models.SuspensionExtension,
-        as: 'extensions'
-      }],
-      group: ['Suspension.id', 'extensions.id'],
+      ...baseScope,
       having: sequelize.literal(`${endsAtLiteral.val} <= NOW()`)
     })
   }
