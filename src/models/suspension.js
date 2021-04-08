@@ -37,11 +37,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    finished: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
-    },
     groupId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -68,20 +63,18 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Suspension.loadScopes = models => {
-    Suspension.addScope('defaultScope', {
+    const endsAtLiteral = sequelize.literal(
+      'date + ' +
+      '("Suspension".duration||\' milliseconds\')::INTERVAL + ' +
+      '(COALESCE(SUM(extensions.duration), 0)||\' milliseconds\')::INTERVAL'
+    )
+    const baseScope = {
       attributes: {
         include: [
-          [
-            sequelize.literal('date + ("Suspension".duration||\' milliseconds\')::INTERVAL + ' +
-              '(COALESCE(SUM(extensions.duration), 0)||\' milliseconds\')::INTERVAL'),
-            'endsAt'
-          ]
+          [endsAtLiteral, 'endsAt']
         ]
       },
-      where: {
-        '$SuspensionCancellation.id$': null,
-        finished: false
-      },
+      where: { '$SuspensionCancellation.id$': null },
       include: [{
         model: models.SuspensionCancellation,
         attributes: []
@@ -89,22 +82,16 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id'],
-      subQuery: false
+      group: ['Suspension.id', 'extensions.id']
+    }
+
+    Suspension.addScope('defaultScope', {
+      ...baseScope,
+      having: sequelize.literal(`${endsAtLiteral.val} > NOW()`)
     })
     Suspension.addScope('finished', {
-      where: {
-        '$SuspensionCancellation.id$': null,
-        finished: true
-      },
-      include: [{
-        model: models.SuspensionCancellation,
-        attributes: []
-      }, {
-        model: models.SuspensionExtension,
-        as: 'extensions'
-      }],
-      subQuery: false
+      ...baseScope,
+      having: sequelize.literal(`${endsAtLiteral.val} <= NOW()`)
     })
   }
 

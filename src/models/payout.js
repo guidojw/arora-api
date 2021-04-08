@@ -19,10 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     return (await Payout.findAll({
       where: { groupId },
       attributes: [
-        [
-          sequelize.fn('MAX', sequelize.col('until')),
-          'until'
-        ]
+        [sequelize.fn('MAX', sequelize.col('until')), 'until']
       ]
     }))[0]
   }
