@@ -1,5 +1,7 @@
 'use strict'
 
+const { Op } = require('sequelize')
+
 module.exports = (sequelize, DataTypes) => {
   const Suspension = sequelize.define('Suspension', {
     authorId: {
@@ -68,19 +70,21 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Suspension.loadScopes = models => {
+    const endsAtLiteral = sequelize.literal(
+      'date + ' +
+      '("Suspension".duration||\' milliseconds\')::INTERVAL + ' +
+      '(COALESCE(SUM(extensions.duration), 0)||\' milliseconds\')::INTERVAL'
+    )
+
     Suspension.addScope('defaultScope', {
       attributes: {
         include: [
-          [
-            sequelize.literal('date + ("Suspension".duration||\' milliseconds\')::INTERVAL + ' +
-              '(COALESCE(SUM(extensions.duration), 0)||\' milliseconds\')::INTERVAL'),
-            'endsAt'
-          ]
+          [endsAtLiteral, 'endsAt']
         ]
       },
       where: {
         '$SuspensionCancellation.id$': null,
-        finished: false
+        endsAt: { [Op.gt]: sequelize.literal('NOW()') }
       },
       include: [{
         model: models.SuspensionCancellation,
@@ -89,13 +93,17 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id'],
-      subQuery: false
+      group: ['Suspension.id', 'extensions.id']
     })
     Suspension.addScope('finished', {
+      attributes: {
+        include: [
+          [endsAtLiteral, 'endsAt']
+        ]
+      },
       where: {
         '$SuspensionCancellation.id$': null,
-        finished: true
+        endsAt: { [Op.lte]: sequelize.literal('NOW()') }
       },
       include: [{
         model: models.SuspensionCancellation,
@@ -104,7 +112,7 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      subQuery: false
+      group: ['Suspension.id', 'extensions.id']
     })
   }
 
