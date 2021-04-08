@@ -8,7 +8,7 @@ if [ "$STAGE" != 'production' ] && [ "$STAGE" != 'staging' ]; then
   exit 0
 fi
 
-cd /opt/docker/nsadmin-api/$STAGE || exit
+cd /opt/docker/arora-api/$STAGE || exit
 docker-compose pull app
 docker-compose build app
 docker-compose run --rm app npx sequelize-cli db:migrate

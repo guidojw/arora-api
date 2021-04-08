@@ -9,7 +9,7 @@ module.exports = {
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
     host: '127.0.0.1',
-    database: 'nsadmin_development',
+    database: 'arora_api_development',
 
     dialect: 'postgres',
     operatorsAliases: '0',
@@ -24,7 +24,7 @@ module.exports = {
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
     host: process.env.POSTGRES_HOST,
-    database: 'nsadmin_production',
+    database: 'arora_api_production',
 
     dialect: 'postgres',
     operatorsAliases: '0',
