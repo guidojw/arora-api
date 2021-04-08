@@ -1,7 +1,5 @@
 'use strict'
 
-const { Op } = require('sequelize')
-
 module.exports = (sequelize, DataTypes) => {
   const Suspension = sequelize.define('Suspension', {
     authorId: {
@@ -77,10 +75,7 @@ module.exports = (sequelize, DataTypes) => {
           [endsAtLiteral, 'endsAt']
         ]
       },
-      where: {
-        '$SuspensionCancellation.id$': null,
-        endsAt: { [Op.gt]: sequelize.literal('NOW()') }
-      },
+      where: { '$SuspensionCancellation.id$': null },
       include: [{
         model: models.SuspensionCancellation,
         attributes: []
@@ -88,7 +83,8 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id']
+      group: ['Suspension.id', 'extensions.id'],
+      having: sequelize.literal(`${endsAtLiteral.val} > NOW()`)
     })
     Suspension.addScope('finished', {
       attributes: {
@@ -96,10 +92,7 @@ module.exports = (sequelize, DataTypes) => {
           [endsAtLiteral, 'endsAt']
         ]
       },
-      where: {
-        '$SuspensionCancellation.id$': null,
-        endsAt: { [Op.lte]: sequelize.literal('NOW()') }
-      },
+      where: { '$SuspensionCancellation.id$': null },
       include: [{
         model: models.SuspensionCancellation,
         attributes: []
@@ -107,7 +100,8 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id']
+      group: ['Suspension.id', 'extensions.id'],
+      having: sequelize.literal(`${endsAtLiteral.val} <= NOW()`)
     })
   }
 
