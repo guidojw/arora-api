@@ -57,7 +57,7 @@ class SuspensionService {
       this._finishSuspensionJob.run.bind(this._finishSuspensionJob, suspension)
     )
 
-    const days = suspension.duration / 24 * 60 * 60 * 1000
+    const days = suspension.duration / (24 * 60 * 60 * 1000)
     const [username, authorName] = await Promise.all([
       this._userService.getUsername(suspension.userId),
       this._userService.getUsername(suspension.authorId)
@@ -99,7 +99,7 @@ class SuspensionService {
         newDuration += extension.duration
       }
     }
-    const days = newDuration / 24 * 60 * 60 * 1000
+    const days = newDuration / (24 * 60 * 60 * 1000)
 
     if (days < 1) {
       throw new ForbiddenError('Insufficient amount of days.')
@@ -130,7 +130,7 @@ class SuspensionService {
       this._userService.getUsername(suspension.userId),
       this._userService.getUsername(extension.authorId)
     ])
-    const extensionDays = extension.duration / 24 * 60 * 60 * 1000
+    const extensionDays = extension.duration / (24 * 60 * 60 * 1000)
     this._discordMessageJob.run(`**${authorName}** extended **${username}**'s suspension with **${pluralize('day', extensionDays, true)}**`)
 
     return extension
