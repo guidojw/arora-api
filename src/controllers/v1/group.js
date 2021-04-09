@@ -312,7 +312,7 @@ class GroupController {
           body('authorId').exists().isInt().toInt(),
           body('reason').exists().isString(),
           body('duration').exists().isInt().toInt(),
-          body('rankBack').exists().isBoolean().toBoolean()
+          body('roleBack').exists().isBoolean().toBoolean()
         ]
       case 'cancelSuspension':
         return [
@@ -340,7 +340,7 @@ class GroupController {
           body('editorId').exists().isInt().toInt(),
           body('changes.authorId').optional().isInt().toInt(),
           body('changes.reason').optional().isString(),
-          body('changes.rankBack').optional().isBoolean().toBoolean()
+          body('changes.roleBack').optional().isBoolean().toBoolean()
         ]
 
         // TrainingService
