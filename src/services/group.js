@@ -62,14 +62,12 @@ class GroupService {
   }
 
   async changeMemberRole (groupId, userId, { role, authorId }) {
-    const oldRank = await this._userService.getRank(userId, groupId)
-    if ([0, 255].includes(oldRank)) {
-      throw new ForbiddenError('Cannot promote members on this rank.')
+    const oldRole = await this._userService.getRole(userId, groupId)
+    if ([0, 255].includes(oldRole.rank)) {
+      throw new ForbiddenError('Cannot promote members on this role.')
     }
 
     const newRole = await this.setMemberRole(groupId, userId, role)
-    const roles = await this.getRoles(groupId)
-    const oldRole = roles.roles.find(role => role.rank === oldRank)
     const username = await this._userService.getUsername(userId)
     if (oldRole.id !== newRole.id) {
       if (typeof authorId !== 'undefined') {
