@@ -9,7 +9,7 @@ const {
 
 const ExileModel = require('../../../src/models/exile')
 
-describe('src/models/ban', () => {
+describe('src/models/exile', () => {
   const Exile = ExileModel(sequelize, dataTypes)
   const exile = new Exile()
 

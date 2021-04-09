@@ -3,7 +3,7 @@
 const cron = require('node-schedule')
 
 const { Training } = require('../models')
-const { getTime, getTimeZoneAbbreviation } = require('../helpers').timeHelper
+const { getTime, getTimeZoneAbbreviation } = require('../util').timeUtil
 
 class AnnounceTrainingsJob {
   constructor (groupService, userService) {

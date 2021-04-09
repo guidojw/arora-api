@@ -4,7 +4,7 @@ const cron = require('node-schedule')
 
 const { Op } = require('sequelize')
 const { ConflictError, NotFoundError } = require('../errors')
-const { getDate, getTime, getTimeZoneAbbreviation } = require('../helpers').timeHelper
+const { getDate, getTime, getTimeZoneAbbreviation } = require('../util').timeUtil
 const { Training, TrainingCancellation, TrainingType } = require('../models')
 
 class TrainingService {

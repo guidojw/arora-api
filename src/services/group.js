@@ -1,7 +1,7 @@
 'use strict'
 
 const { ForbiddenError, NotFoundError } = require('../errors')
-const { inRange } = require('../helpers').dataHelper
+const { inRange } = require('../util').util
 
 const applicationConfig = require('../../config/application')
 

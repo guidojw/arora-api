@@ -1,7 +1,7 @@
 'use strict'
 
 const { param, body, header, query } = require('express-validator')
-const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../helpers').requestHelper
+const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../util').requestUtil
 
 class GroupController {
   constructor (banService, exileService, groupService, suspensionService, trainingService) {
