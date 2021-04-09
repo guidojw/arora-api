@@ -4,7 +4,7 @@ const cron = require('node-schedule')
 const pluralize = require('pluralize')
 
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
-const { inRange } = require('../helpers').dataHelper
+const { inRange } = require('../util').util
 const { Suspension, SuspensionCancellation, SuspensionExtension } = require('../models')
 
 const applicationConfig = require('../../config/application')
