@@ -28,17 +28,17 @@ class BanService {
     if (await Ban.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already banned.')
     }
-    const rank = await this._userService.getRank(userId, groupId)
-    if (applicationConfig.unbannableRanks.some(range => inRange(rank, range))) {
-      throw new ForbiddenError('User\'s rank is unbannable.')
+    const role = await this._userService.getRole(userId, groupId)
+    if (applicationConfig.unbannableRanks.some(range => inRange(role.rank, range))) {
+      throw new ForbiddenError('User\'s role is unbannable.')
     }
 
     const ban = await Ban.create({
-      groupId,
-      authorId,
       userId,
-      rank,
-      reason
+      authorId,
+      groupId,
+      reason,
+      roleId: role.id
     })
 
     const [username, authorName] = await Promise.all([
