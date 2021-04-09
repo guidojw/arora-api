@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface /* , Sequelize */) => {
     try {
       await queryInterface.describeTable('SequelizeMeta')
-      await queryInterface.dropTable('SequelizeMeta')
+      return queryInterface.dropTable('SequelizeMeta')
     } catch (err) {
       if (!err.message.includes('No description found for "SequelizeMeta" table.')) {
         throw err
