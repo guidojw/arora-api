@@ -28,7 +28,7 @@ class AcceptJoinRequestsJob {
           this._discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
 
           if (await Suspension.findOne({ where: { groupId, userId } })) {
-            await this._groupService.setMemberRank(groupId, userId, 2)
+            await this._groupService.setMemberRole(groupId, userId, 2)
             this._discordMessageJob.run(`Promoted **${request.requester.username}** from **Customer** to **Suspended**`)
           }
         }

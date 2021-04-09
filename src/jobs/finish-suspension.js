@@ -11,7 +11,7 @@ class FinishSuspensionJob {
     const rank = await this._userService.getRank(suspension.userId, suspension.groupId)
 
     if (rank !== 0) {
-      await this._groupService.setMemberRank(
+      await this._groupService.setMemberRole(
         suspension.groupId,
         suspension.userId,
         suspension.rankBack && suspension.rank > 0 ? suspension.rank : 1)

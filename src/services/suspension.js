@@ -39,7 +39,7 @@ class SuspensionService {
     }
 
     if (rank > 0 && rank !== 2) {
-      await this._groupService.setMemberRank(groupId, userId, 2)
+      await this._groupService.setMemberRole(groupId, userId, 2)
     }
     const suspension = await Suspension.create({
       groupId,
@@ -72,7 +72,7 @@ class SuspensionService {
     const rank = await this._userService.getRank(suspension.userId, groupId)
 
     if (rank !== 0) {
-      await this._groupService.setMemberRank(groupId, suspension.userId, suspension.rank)
+      await this._groupService.setMemberRole(groupId, suspension.userId, suspension.rank)
     }
 
     const cancellation = await SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason })

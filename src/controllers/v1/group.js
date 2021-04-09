@@ -37,8 +37,11 @@ class GroupController {
     res.json(await this._groupService.demoteMember(req.params.groupId, req.params.userId, req.body.authorId))
   }
 
-  async changeMemberRank (req, res) {
-    res.json(await this._groupService.changeMemberRank(req.params.groupId, req.params.userId, req.body))
+  async changeMemberRole (req, res) {
+    res.json(await this._groupService.changeMemberRole(req.params.groupId, req.params.userId, {
+      role: req.body.rank,
+      authorId: req.body.authorId
+    }))
   }
 
   // BanService
@@ -206,7 +209,7 @@ class GroupController {
           body('authorId').optional().isInt().toInt()
         ]
 
-      case 'changeMemberRank':
+      case 'changeMemberRole':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
