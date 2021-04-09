@@ -46,7 +46,7 @@ class UserService {
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
     const group = groups.data.find(group => group.group.id === groupId)
-    return group ? group.role.name : 'Guest'
+    return group?.role ?? { name: 'Guest', rank: 0 }
   }
 
   async getUsername (userId) {
