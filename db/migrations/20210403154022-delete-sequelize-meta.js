@@ -12,7 +12,8 @@ module.exports = {
     }
   },
 
-  down: async (/* queryInterface, Sequelize */) => {
+  down: (/* queryInterface, Sequelize */) => {
     // Do nothing, we want to keep using the underscored table name.
+    return Promise.resolve()
   }
 }
