@@ -5,9 +5,10 @@
   "repository": "github:guidojw/arora-api",
   "main": "app.js",
   "scripts": {
+    "lint": "eslint src db",
     "start": "npm explore bloxy -- npm run build ; node ./bin/www",
     "start:dev": "nodemon ./bin/www",
-    "lint": "eslint src db"
+    "test": "mocha --require ./test/helper.js --recursive "
   },
   "author": "Guido de Jong",
   "license": "MIT",
@@ -36,11 +37,16 @@
     "ws": "^7.4.4"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
     "eslint": "^7.23.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
-    "nodemon": "^2.0.7"
+    "mocha": "^8.3.2",
+    "nodemon": "^2.0.7",
+    "sequelize-test-helpers": "^1.3.2",
+    "sinon": "^10.0.1",
+    "sinon-chai": "^3.6.0"
   }
 }
