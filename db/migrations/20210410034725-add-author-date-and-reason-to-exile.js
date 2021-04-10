@@ -10,17 +10,27 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: false,
           defaultValue: Sequelize.fn('NOW')
+        }, { transaction: t }),
+
+        queryInterface.changeColumn('exiles', 'user_id', {
+          type: Sequelize.INTEGER,
+          allowNull: false
         }, { transaction: t })
       ])
     })
   },
 
-  down: (queryInterface /* , Sequelize */) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(t => {
       return Promise.all([
         queryInterface.removeColumn('exiles', 'author_id', { transaction: t }),
         queryInterface.removeColumn('exiles', 'date', { transaction: t }),
-        queryInterface.removeColumn('exiles', 'reason', { transaction: t })
+        queryInterface.removeColumn('exiles', 'reason', { transaction: t }),
+
+        queryInterface.changeColumn('exiles', 'user_id', {
+          type: Sequelize.INTEGER,
+          allowNull: true
+        }, { transaction: t })
       ])
     })
   }
