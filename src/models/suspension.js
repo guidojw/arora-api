@@ -83,7 +83,8 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id']
+      group: ['Suspension.id', 'extensions.id'],
+      subQuery: false
     }
 
     Suspension.addScope('defaultScope', {
