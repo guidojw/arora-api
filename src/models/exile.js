@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   const Exile = sequelize.define('Exile', {
     authorId: {
       type: DataTypes.BIGINT,
+      allowNull: false,
       field: 'author_id'
     },
     date: {
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     userId: {
       type: DataTypes.BIGINT,
+      allowNull: false,
       field: 'user_id'
     }
   }, {
