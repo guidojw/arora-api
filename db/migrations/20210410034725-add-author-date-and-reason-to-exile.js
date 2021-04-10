@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: false,
           defaultValue: Sequelize.fn('NOW')
-        }, { transaction: t }),
+        }, { transaction: t })
       ])
     })
   },

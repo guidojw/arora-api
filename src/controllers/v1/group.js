@@ -276,7 +276,7 @@ class GroupController {
           param('groupId').isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
           body('reason').exists().isString(),
-          body('userId').exists().isInt().toInt(),
+          body('userId').exists().isInt().toInt()
         ]
       case 'deleteExile':
         return [
