@@ -2,14 +2,27 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Exile = sequelize.define('Exile', {
-    userId: {
+    authorId: {
       type: DataTypes.BIGINT,
-      field: 'user_id'
+      field: 'author_id'
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
     },
     groupId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       field: 'group_id'
+    },
+    reason: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    userId: {
+      type: DataTypes.BIGINT,
+      field: 'user_id'
     }
   }, {
     tableName: 'exiles'
