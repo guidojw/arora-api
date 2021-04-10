@@ -16,7 +16,10 @@ class FinishSuspensionJob {
           suspension.groupId,
           suspension.userId,
           suspension.roleBack ? { id: suspension.roleId } : 1)
-      } catch {
+      } catch (err) {
+        if (!suspension.roleBack) {
+          throw err
+        }
         await this._groupService.setMemberRole(suspension.groupId, suspension.userId, 1)
       }
     }
