@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface /* , Sequelize */) => {
     try {
       await queryInterface.describeTable('SequelizeMeta')
-      await queryInterface.dropTable('SequelizeMeta')
+      return queryInterface.dropTable('SequelizeMeta')
     } catch (err) {
       if (!err.message.includes('No description found for "SequelizeMeta" table.')) {
         throw err
@@ -12,7 +12,8 @@ module.exports = {
     }
   },
 
-  down: async (/* queryInterface, Sequelize */) => {
+  down: (/* queryInterface, Sequelize */) => {
     // Do nothing, we want to keep using the underscored table name.
+    return Promise.resolve()
   }
 }

@@ -32,6 +32,7 @@ module.exports = {
       }
     })
   },
+
   down: (queryInterface /* , Sequelize */) => {
     return queryInterface.dropTable('training_cancellations')
   }
