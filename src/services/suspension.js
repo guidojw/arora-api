@@ -33,7 +33,7 @@ class SuspensionService {
     if (await Suspension.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already suspended.')
     }
-    const role = await this._userService.getRole(userId, groupId)
+    const role = await this._groupService.getRole(groupId, userId)
     if (applicationConfig.unbannableRanks.some(range => inRange(role.rank, range))) {
       throw new ForbiddenError('User\'s role is unsuspendable.')
     }
@@ -69,7 +69,7 @@ class SuspensionService {
 
   async unsuspend (groupId, userId, { authorId, reason }) {
     const suspension = await this.getSuspension(groupId, userId)
-    const role = await this._userService.getRole(suspension.userId, groupId)
+    const role = await this._groupService.getRole(groupId, suspension.userId)
 
     if (role.rank !== 0) {
       try {

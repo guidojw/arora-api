@@ -8,7 +8,7 @@ class FinishSuspensionJob {
   }
 
   async run (suspension) {
-    const role = await this._userService.getRole(suspension.userId, suspension.groupId)
+    const role = await this._groupService.getRole(suspension.groupId, suspension.userId)
 
     if (role.rank !== 0) {
       try {

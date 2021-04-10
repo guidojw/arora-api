@@ -7,8 +7,9 @@ const { Ban, BanCancellation } = require('../models')
 const applicationConfig = require('../../config/application')
 
 class BanService {
-  constructor (discordMessageJob, userService) {
+  constructor (discordMessageJob, groupService, userService) {
     this._discordMessageJob = discordMessageJob
+    this._groupService = groupService
     this._userService = userService
   }
 
@@ -28,7 +29,7 @@ class BanService {
     if (await Ban.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already banned.')
     }
-    const role = await this._userService.getRole(userId, groupId)
+    const role = await this._groupService.getRole(groupId, groupId)
     if (applicationConfig.unbannableRanks.some(range => inRange(role.rank, range))) {
       throw new ForbiddenError('User\'s role is unbannable.')
     }

@@ -3,7 +3,8 @@
 const { param, header, body } = require('express-validator')
 
 class UserController {
-  constructor (userService) {
+  constructor (groupService, userService) {
+    this._groupService = groupService
     this._userService = userService
   }
 
@@ -20,11 +21,11 @@ class UserController {
   }
 
   async getRank (req, res) {
-    res.json(await this._userService.getRank(req.params.userId, req.params.groupId))
+    res.json(await this._groupService.getRank(req.params.groupId, req.params.userId))
   }
 
   async getRole (req, res) {
-    res.json(await this._userService.getRole(req.params.userId, req.params.groupId))
+    res.json(await this._groupService.getRole(req.params.groupId, req.params.userId))
   }
 
   async getUser (req, res) {

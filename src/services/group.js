@@ -23,6 +23,27 @@ class GroupService {
     return client.apis.groupsAPI.getGroup({ groupId })
   }
 
+  async getRank (groupId, userId) {
+    const client = this._robloxManager.getClient(groupId)
+    const user = await client.getUser(userId)
+    const groups = await user.getGroups()
+    const group = groups.data.find(group => group.group.id === groupId)
+    return group ? group.role.rank : 0
+  }
+
+  async getRole (groupId, userId) {
+    const client = this._robloxManager.getClient(groupId)
+    const user = await client.getUser(userId)
+    const groups = await user.getGroups()
+    const group = groups.data.find(group => group.group.id === groupId)
+    let role = group?.role
+    if (!group) {
+      const roles = await this.getRoles(groupId)
+      role = roles.roles.find(role => role.rank === 0)
+    }
+    return role
+  }
+
   getRoles (groupId) {
     const client = this._robloxManager.getClient(groupId)
     return client.apis.groupsAPI.getGroupRoles({ groupId })
@@ -62,9 +83,9 @@ class GroupService {
   }
 
   async changeMemberRole (groupId, userId, { role, authorId }) {
-    const oldRole = await this._userService.getRole(userId, groupId)
+    const oldRole = await this.getRole(groupId, userId)
     if ([0, 255].includes(oldRole.rank)) {
-      throw new ForbiddenError('Cannot promote members on this role.')
+      throw new ForbiddenError('Cannot change role of members on this role.')
     }
 
     const newRole = await this.setMemberRole(groupId, userId, role)
@@ -82,7 +103,7 @@ class GroupService {
   }
 
   async promoteMember (groupId, userId, authorId) {
-    const rank = await this._userService.getRank(userId, groupId)
+    const rank = await this.getRank(groupId, userId)
     if ([0, 255].includes(rank) || applicationConfig.unpromotableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot promote members on this role.')
     }
@@ -98,7 +119,7 @@ class GroupService {
   }
 
   async demoteMember (groupId, userId, authorId) {
-    const rank = await this._userService.getRank(userId, groupId)
+    const rank = await this.getRank(groupId, userId)
     if ([0, 255].includes(rank) || applicationConfig.undemotableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot demote members on this role.')
     }
