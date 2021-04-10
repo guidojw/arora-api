@@ -73,7 +73,7 @@ class SuspensionService {
 
     if (role.rank !== 0) {
       try {
-        await this._groupService.setMemberRole(groupId, suspension.userId, suspension.roleId)
+        await this._groupService.setMemberRole(groupId, suspension.userId, { id: suspension.roleId })
       } catch {
         await this._groupService.setMemberRole(groupId, suspension.userId, 1)
       }
