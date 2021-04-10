@@ -274,15 +274,17 @@ class GroupController {
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
+          body('authorId').exists().isInt().toInt(),
+          body('reason').exists().isString(),
           body('userId').exists().isInt().toInt(),
-          body('authorId').exists().isInt().toInt()
         ]
       case 'deleteExile':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           param('userId').isInt().toInt(),
-          body('authorId').exists().isInt().toInt()
+          body('authorId').exists().isInt().toInt(),
+          body('reason').exists().isString()
         ]
 
         // SuspensionService
