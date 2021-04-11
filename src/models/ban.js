@@ -14,9 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true
       }
     },
-    rank: {
+    roleId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      field: 'role_id'
     },
     date: {
       type: DataTypes.DATE,

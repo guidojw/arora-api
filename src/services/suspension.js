@@ -29,26 +29,26 @@ class SuspensionService {
     return suspension
   }
 
-  async suspend (groupId, userId, { rankBack, duration, authorId, reason }) {
+  async suspend (groupId, userId, { authorId, duration, reason, roleBack }) {
     if (await Suspension.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already suspended.')
     }
-    const rank = await this._userService.getRank(userId, groupId)
-    if (applicationConfig.unbannableRanks.some(range => inRange(rank, range))) {
-      throw new ForbiddenError('User\'s rank is unsuspendable.')
+    const role = await this._groupService.getRole(groupId, userId)
+    if (applicationConfig.unbannableRanks.some(range => inRange(role.rank, range))) {
+      throw new ForbiddenError('User\'s role is unsuspendable.')
     }
 
-    if (rank > 0 && rank !== 2) {
-      await this._groupService.setMemberRank(groupId, userId, 2)
+    if (role.rank > 0 && role.rank !== 2) {
+      await this._groupService.setMemberRole(groupId, userId, 2)
     }
     const suspension = await Suspension.create({
-      groupId,
       authorId,
-      userId,
-      rank,
       duration,
-      rankBack,
-      reason
+      groupId,
+      reason,
+      roleBack,
+      roleId: role.id,
+      userId
     })
 
     cron.scheduleJob(
@@ -69,13 +69,17 @@ class SuspensionService {
 
   async unsuspend (groupId, userId, { authorId, reason }) {
     const suspension = await this.getSuspension(groupId, userId)
-    const rank = await this._userService.getRank(suspension.userId, groupId)
+    const role = await this._groupService.getRole(groupId, suspension.userId)
 
-    if (rank !== 0) {
-      await this._groupService.setMemberRank(groupId, suspension.userId, suspension.rank)
+    if (role.rank !== 0) {
+      try {
+        await this._groupService.setMemberRole(groupId, suspension.userId, { id: suspension.roleId })
+      } catch {
+        await this._groupService.setMemberRole(groupId, suspension.userId, 1)
+      }
     }
 
-    const cancellation = await SuspensionCancellation.create({ suspensionId: suspension.id, authorId, reason })
+    const cancellation = await SuspensionCancellation.create({ authorId, reason, suspensionId: suspension.id })
 
     const job = cron.scheduledJobs[`suspension_${suspension.id}`]
     if (job) {
@@ -151,8 +155,8 @@ class SuspensionService {
     if (typeof changes.reason !== 'undefined') {
       this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s suspension to *"${suspension.reason}"*`)
     }
-    if (typeof changes.rankBack !== 'undefined') {
-      this._discordMessageJob.run(`**${editorName}** changed the rankBack option of **${username}**'s suspension to **${suspension.rankBack ? 'yes' : 'no'}**`)
+    if (typeof changes.roleBack !== 'undefined') {
+      this._discordMessageJob.run(`**${editorName}** changed the roleBack option of **${username}**'s suspension to **${suspension.roleBack ? 'yes' : 'no'}**`)
     }
 
     return suspension

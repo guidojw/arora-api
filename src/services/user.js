@@ -33,22 +33,6 @@ class UserService {
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
   }
 
-  async getRank (userId, groupId) {
-    const client = this._robloxManager.getClient(groupId)
-    const user = await client.getUser(userId)
-    const groups = await user.getGroups()
-    const group = groups.data.find(group => group.group.id === groupId)
-    return group ? group.role.rank : 0
-  }
-
-  async getRole (userId, groupId) {
-    const client = this._robloxManager.getClient(groupId)
-    const user = await client.getUser(userId)
-    const groups = await user.getGroups()
-    const group = groups.data.find(group => group.group.id === groupId)
-    return group ? group.role.name : 'Guest'
-  }
-
   async getUsername (userId) {
     return (await this.getUser(userId)).name
   }

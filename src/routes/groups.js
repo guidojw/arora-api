@@ -55,10 +55,10 @@ class GroupsRouter {
 
     router.put(
       '/:groupId/users/:userId',
-      groupController.validate('changeMemberRank'),
+      groupController.validate('changeMemberRole'),
       handleValidationResult,
       authenticate,
-      groupController.changeMemberRank.bind(groupController)
+      groupController.changeMemberRole.bind(groupController)
     )
 
     // BanService

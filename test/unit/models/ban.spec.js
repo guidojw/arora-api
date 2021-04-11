@@ -18,7 +18,7 @@ describe('src/models/ban', () => {
   checkModelName(Ban)('Ban')
 
   context('properties', () => {
-    ['authorId', 'date', 'groupId', 'rank', 'reason', 'userId'].forEach(checkPropertyExists(ban))
+    ['authorId', 'date', 'groupId', 'reason', 'roleId', 'userId'].forEach(checkPropertyExists(ban))
   })
 
   context('associations', () => {

@@ -28,14 +28,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    rankBack: {
+    roleBack: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      field: 'rank_back'
+      field: 'role_back'
     },
-    rank: {
+    roleId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      field: 'role_id'
     },
     groupId: {
       type: DataTypes.INTEGER,
@@ -82,7 +83,8 @@ module.exports = (sequelize, DataTypes) => {
         model: models.SuspensionExtension,
         as: 'extensions'
       }],
-      group: ['Suspension.id', 'extensions.id']
+      group: ['Suspension.id', 'extensions.id'],
+      subQuery: false
     }
 
     Suspension.addScope('defaultScope', {

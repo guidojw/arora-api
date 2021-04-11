@@ -37,8 +37,11 @@ class GroupController {
     res.json(await this._groupService.demoteMember(req.params.groupId, req.params.userId, req.body.authorId))
   }
 
-  async changeMemberRank (req, res) {
-    res.json(await this._groupService.changeMemberRank(req.params.groupId, req.params.userId, req.body))
+  async changeMemberRole (req, res) {
+    res.json(await this._groupService.changeMemberRole(req.params.groupId, req.params.userId, {
+      role: req.body.rank,
+      authorId: req.body.authorId
+    }))
   }
 
   // BanService
@@ -206,7 +209,7 @@ class GroupController {
           body('authorId').optional().isInt().toInt()
         ]
 
-      case 'changeMemberRank':
+      case 'changeMemberRole':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
@@ -311,7 +314,7 @@ class GroupController {
           body('authorId').exists().isInt().toInt(),
           body('reason').exists().isString(),
           body('duration').exists().isInt().toInt(),
-          body('rankBack').exists().isBoolean().toBoolean()
+          body('roleBack').exists().isBoolean().toBoolean()
         ]
       case 'cancelSuspension':
         return [
@@ -339,7 +342,7 @@ class GroupController {
           body('editorId').exists().isInt().toInt(),
           body('changes.authorId').optional().isInt().toInt(),
           body('changes.reason').optional().isString(),
-          body('changes.rankBack').optional().isBoolean().toBoolean()
+          body('changes.roleBack').optional().isBoolean().toBoolean()
         ]
 
         // TrainingService

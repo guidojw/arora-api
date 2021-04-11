@@ -8,13 +8,20 @@ class FinishSuspensionJob {
   }
 
   async run (suspension) {
-    const rank = await this._userService.getRank(suspension.userId, suspension.groupId)
+    const role = await this._groupService.getRole(suspension.groupId, suspension.userId)
 
-    if (rank !== 0) {
-      await this._groupService.setMemberRank(
-        suspension.groupId,
-        suspension.userId,
-        suspension.rankBack && suspension.rank > 0 ? suspension.rank : 1)
+    if (role.rank !== 0) {
+      try {
+        await this._groupService.setMemberRole(
+          suspension.groupId,
+          suspension.userId,
+          suspension.roleBack ? { id: suspension.roleId } : 1)
+      } catch (err) {
+        if (!suspension.roleBack) {
+          throw err
+        }
+        await this._groupService.setMemberRole(suspension.groupId, suspension.userId, 1)
+      }
     }
 
     const username = await this._userService.getUsername(suspension.userId)

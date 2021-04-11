@@ -16,7 +16,7 @@ services:
   UserController:
     class: src/controllers/v1
     main: UserController
-    arguments: ['@UserService']
+    arguments: ['@GroupService', '@UserService']
 
   # Jobs
   AcceptJoinRequestsJob:
@@ -88,7 +88,7 @@ services:
   BanService:
     class: src/services
     main: BanService
-    arguments: ['@DiscordMessageJob', '@UserService']
+    arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
   CatalogService:
     class: src/services
     main: CatalogService

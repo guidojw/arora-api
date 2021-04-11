@@ -29,7 +29,7 @@ class ExileService {
     if (await Exile.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already exiled.')
     }
-    const rank = await this._userService.getRank(userId, groupId)
+    const rank = await this._groupService.getRank(groupId, userId)
     if (applicationConfig.unexilableRanks.some(range => inRange(rank, range))) {
       throw new ForbiddenError('Cannot exile members on this rank.')
     }

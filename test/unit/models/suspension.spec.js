@@ -20,7 +20,7 @@ describe('src/models/suspension', () => {
 
   context('properties', () => {
     [
-      'authorId', 'date', 'duration', 'groupId', 'rank', 'rankBack', 'reason', 'userId'
+      'authorId', 'date', 'duration', 'groupId', 'reason', 'roleBack', 'roleId', 'userId'
     ].forEach(checkPropertyExists(suspension))
   })
 
