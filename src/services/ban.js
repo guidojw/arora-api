@@ -29,7 +29,7 @@ class BanService {
     if (await Ban.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already banned.')
     }
-    const role = await this._groupService.getRole(groupId, groupId)
+    const role = await this._groupService.getRole(groupId, userId)
     if (applicationConfig.unbannableRanks.some(range => inRange(role.rank, range))) {
       throw new ForbiddenError('User\'s role is unbannable.')
     }
