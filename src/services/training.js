@@ -19,7 +19,7 @@ class TrainingService {
   }
 
   async getTraining (groupId, trainingId, scope) {
-    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, trainingId } })
+    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, id: trainingId } })
     if (!training) {
       throw new NotFoundError('Training not found.')
     }
