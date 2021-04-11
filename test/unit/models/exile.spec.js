@@ -16,6 +16,6 @@ describe('src/models/exile', () => {
   checkModelName(Exile)('Exile')
 
   context('properties', () => {
-    ['groupId', 'userId'].forEach(checkPropertyExists(exile))
+    ['authorId', 'date', 'groupId', 'reason', 'userId'].forEach(checkPropertyExists(exile))
   })
 })

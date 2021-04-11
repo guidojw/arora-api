@@ -25,7 +25,7 @@ class ExileService {
     return exile
   }
 
-  async exile (groupId, userId, { authorId }) {
+  async exile (groupId, userId, { authorId, reason }) {
     if (await Exile.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already exiled.')
     }
@@ -37,18 +37,18 @@ class ExileService {
     try {
       await this._groupService.kickMember(groupId, userId)
     } catch (err) {} // eslint-disable-line no-empty
-    const exile = await Exile.create({ groupId, userId })
+    const exile = await Exile.create({ authorId, groupId, reason, userId })
 
     const [username, authorName] = await Promise.all([
       this._userService.getUsername(exile.userId),
       this._userService.getUsername(authorId)
     ])
-    this._discordMessageJob.run(`**${authorName}** exiled **${username}**`)
+    this._discordMessageJob.run(`**${authorName}** exiled **${username}** with reason **${exile.reason}**`)
 
     return exile
   }
 
-  async unexile (groupId, userId, { authorId }) {
+  async unexile (groupId, userId, { authorId, reason }) {
     const exile = await this.getExile(groupId, userId)
     await exile.destroy()
 
@@ -56,7 +56,7 @@ class ExileService {
       this._userService.getUsername(exile.userId),
       this._userService.getUsername(authorId)
     ])
-    this._discordMessageJob.run(`**${authorName}** unexiled **${username}**`)
+    this._discordMessageJob.run(`**${authorName}** unexiled **${username}** with reason **${reason}**`)
 
     return exile
   }
