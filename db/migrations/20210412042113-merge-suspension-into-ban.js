@@ -10,7 +10,7 @@ module.exports = {
           autoIncrement: true
         },
         author_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.BIGINT,
           allowNull: false
         },
         ban_id: {
@@ -86,7 +86,7 @@ module.exports = {
             autoIncrement: true
           },
           author_id: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.BIGINT,
             allowNull: false
           },
           date: {
@@ -114,7 +114,7 @@ module.exports = {
             allowNull: false
           },
           user_id: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.BIGINT,
             allowNull: false
           }
         }, { transaction: t }),
@@ -125,7 +125,7 @@ module.exports = {
             autoIncrement: true
           },
           author_id: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.BIGINT,
             allowNull: false
           },
           reason: {
@@ -149,7 +149,7 @@ module.exports = {
             autoIncrement: true
           },
           author_id: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.BIGINT,
             allowNull: false
           },
           duration: {
