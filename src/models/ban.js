@@ -81,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Ban.addScope('defaultScope', {
       ...baseScope,
-      having: sequelize.literal(`${endsAtLiteral.val} > NOW()`)
+      having: sequelize.literal(`"Ban".duration IS NULL OR ${endsAtLiteral.val} > NOW()`)
     })
     Ban.addScope('finished', {
       ...baseScope,
