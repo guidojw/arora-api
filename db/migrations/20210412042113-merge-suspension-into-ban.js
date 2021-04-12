@@ -76,7 +76,7 @@ module.exports = {
     })
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async t => {
       await Promise.all([
         queryInterface.createTable('suspensions', {
