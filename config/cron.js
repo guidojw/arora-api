@@ -11,10 +11,6 @@ module.exports = {
     job: 'AnnounceTrainingsJob',
     args: [1018818]
   },
-  checkSuspensionsJob: {
-    expression: '0 */1 * * *', // https://crontab.guru/#0_*/1_*_*_*
-    job: 'CheckSuspensionsJob'
-  },
   healthCheckJob: {
     expression: '*/5 * * * *', // https://crontab.guru/#*/5_*_*_*_*
     job: 'HealthCheckJob',

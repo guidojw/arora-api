@@ -27,17 +27,9 @@ services:
     class: src/jobs
     main: AnnounceTrainingsJob
     arguments: ['@GroupService', '@UserService']
-  CheckSuspensionsJob:
-    class: src/jobs
-    main: CheckSuspensionsJob
-    arguments: ['@FinishSuspensionJob']
   DiscordMessageJob:
     class: src/jobs
     main: DiscordMessageJob
-  FinishSuspensionJob:
-    class: src/jobs
-    main: FinishSuspensionJob
-    arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
   HealthCheckJob:
     class: src/jobs
     main: HealthCheckJob

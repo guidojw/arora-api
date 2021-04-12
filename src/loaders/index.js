@@ -22,9 +22,6 @@ async function init (app) {
   cronLoader(container)
 
   if (cronConfig.announceTrainingsJob) {
-    await container.get('CheckSuspensionsJob').run()
-  }
-  if (cronConfig.checkSuspensionsJob) {
     await container.get('AnnounceTrainingsJob').run()
   }
 }
