@@ -38,35 +38,40 @@ module.exports = {
       const suspensions = (await queryInterface.sequelize.query(
         'SELECT id, author_id, reason, date, user_id, duration, role_id, group_id FROM suspensions'
       )).shift()
-      const suspensionCancellations = (await queryInterface.sequelize.query(
-        'SELECT author_id, reason, suspension_id FROM suspension_cancellations'
-      )).shift()
-      const suspensionExtensions = (await queryInterface.sequelize.query(
-        'SELECT author_id, reason, duration, suspension_id FROM suspension_extensions'
-      )).shift()
 
-      const insertedBans = await queryInterface.bulkInsert(
-        'bans',
-        suspensions.map(suspension => (
-          {
-            author_id: suspension.author_id,
-            date: suspension.date,
-            duration: suspension.duration,
-            group_id: suspension.group_id,
-            reason: suspension.reason,
-            role_id: suspension.role_id,
-            user_id: suspension.user_id
-          }
-        )),
-        { returning: true, transaction: t }
-      )
+      if (suspensions.length > 0) {
+        const suspensionCancellations = (await queryInterface.sequelize.query(
+          'SELECT author_id, reason, suspension_id FROM suspension_cancellations'
+        )).shift()
+        const suspensionExtensions = (await queryInterface.sequelize.query(
+          'SELECT author_id, reason, duration, suspension_id FROM suspension_extensions'
+        )).shift()
 
-      const banCancellations = getCancellations(insertedBans, suspensions, suspensionCancellations, 'ban')
-      const banExtensions = getExtensions(insertedBans, suspensions, suspensionExtensions, 'ban')
-      await Promise.all([
-        queryInterface.bulkInsert('ban_cancellations', banCancellations, { transaction: t }),
-        queryInterface.bulkInsert('ban_extensions', banExtensions, { transaction: t })
-      ])
+        const insertedBans = await queryInterface.bulkInsert(
+          'bans',
+          suspensions.map(suspension => (
+            {
+              author_id: suspension.author_id,
+              date: suspension.date,
+              duration: suspension.duration,
+              group_id: suspension.group_id,
+              reason: suspension.reason,
+              role_id: suspension.role_id,
+              user_id: suspension.user_id
+            }
+          )),
+          { returning: true, transaction: t }
+        )
+
+        const banCancellations = getCancellations(insertedBans, suspensions, suspensionCancellations, 'ban')
+        const banExtensions = getExtensions(insertedBans, suspensions, suspensionExtensions, 'ban')
+        if (banCancellations.length > 0 ) {
+          await queryInterface.bulkInsert('ban_cancellations', banCancellations, { transaction: t })
+        }
+        if (banExtensions.length > 0) {
+          await queryInterface.bulkInsert('ban_extensions', banExtensions, { transaction: t })
+        }
+      }
 
       return Promise.all([
         queryInterface.dropTable('suspension_cancellations', { transaction: t }),
@@ -163,42 +168,47 @@ module.exports = {
       const bans = (await queryInterface.sequelize.query(
         'SELECT id, author_id, reason, date, user_id, duration, role_id, group_id FROM bans WHERE duration IS NOT NULL'
       )).shift()
-      const banCancellations = (await queryInterface.sequelize.query(
-        'SELECT author_id, reason, ban_id FROM ban_cancellations'
-      )).shift()
-      const banExtensions = (await queryInterface.sequelize.query(
-        'SELECT author_id, reason, duration, ban_id FROM ban_extensions'
-      )).shift()
+      if (bans.length > 0) {
+        const banCancellations = (await queryInterface.sequelize.query(
+          'SELECT author_id, reason, ban_id FROM ban_cancellations'
+        )).shift()
+        const banExtensions = (await queryInterface.sequelize.query(
+          'SELECT author_id, reason, duration, ban_id FROM ban_extensions'
+        )).shift()
 
-      const insertedSuspensions = await queryInterface.bulkInsert(
-        'suspensions',
-        bans.map(ban => (
-          {
-            author_id: ban.author_id,
-            date: ban.date,
-            duration: ban.duration,
-            group_id: ban.group_id,
-            reason: ban.reason,
-            role_id: ban.role_id,
-            role_back: false,
-            user_id: ban.user_id
-          }
-        )),
-        { returning: true, transaction: t }
-      )
+        const insertedSuspensions = await queryInterface.bulkInsert(
+          'suspensions',
+          bans.map(ban => (
+            {
+              author_id: ban.author_id,
+              date: ban.date,
+              duration: ban.duration,
+              group_id: ban.group_id,
+              reason: ban.reason,
+              role_id: ban.role_id,
+              role_back: false,
+              user_id: ban.user_id
+            }
+          )),
+          { returning: true, transaction: t }
+        )
 
-      const suspensionCancellations = getCancellations(insertedSuspensions, bans, banCancellations, 'suspension')
-      const suspensionExtensions = getExtensions(insertedSuspensions, bans, banExtensions, 'suspension')
-      await Promise.all([
-        queryInterface.bulkInsert('suspension_cancellations', suspensionCancellations, { transaction: t }),
-        queryInterface.bulkInsert('suspension_extensions', suspensionExtensions, { transaction: t })
-      ])
+        const suspensionCancellations = getCancellations(insertedSuspensions, bans, banCancellations, 'suspension')
+        const suspensionExtensions = getExtensions(insertedSuspensions, bans, banExtensions, 'suspension')
+        if (suspensionCancellations.length > 0) {
+          await queryInterface.bulkInsert('suspension_cancellations', suspensionCancellations, { transaction: t })
+        }
+        if (suspensionExtensions.length > 0) {
+          await queryInterface.bulkInsert('suspension_extensions', suspensionExtensions, { transaction: t })
+        }
 
-      await queryInterface.bulkDelete(
-        'bans',
-        { id: { [Sequelize.Op.in]: bans.map(ban => ban.id) } },
-        { transaction: t }
-      )
+        await queryInterface.bulkDelete(
+          'bans',
+          { id: { [Sequelize.Op.in]: bans.map(ban => ban.id) } },
+          { transaction: t }
+        )
+      }
+
       await queryInterface.removeColumn('bans', 'duration', { transaction: t })
       return queryInterface.dropTable('ban_extensions', { transaction: t })
     })
