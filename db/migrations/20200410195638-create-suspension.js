@@ -16,10 +16,7 @@ module.exports = {
       },
       reason: {
         type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true
-        }
+        allowNull: false
       },
       date: {
         type: Sequelize.DATE,
