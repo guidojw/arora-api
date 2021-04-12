@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = (sequelize, DataTypes) => {
-  const SuspensionExtension = sequelize.define('SuspensionExtension', {
+  const BanExtension = sequelize.define('BanExtension', {
     authorId: {
       type: DataTypes.BIGINT,
       allowNull: false,
@@ -19,18 +19,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     }
   }, {
-    tableName: 'suspension_extensions'
+    tableName: 'ban_extensions'
   })
 
-  SuspensionExtension.associate = models => {
-    SuspensionExtension.belongsTo(models.Suspension, {
+  BanExtension.associate = models => {
+    BanExtension.belongsTo(models.Ban, {
       foreignKey: {
         allowNull: false,
-        name: 'suspensionId'
+        name: 'banId'
       },
       onDelete: 'CASCADE'
     })
   }
 
-  return SuspensionExtension
+  return BanExtension
 }

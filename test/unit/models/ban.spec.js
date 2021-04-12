@@ -10,6 +10,7 @@ const {
 
 const BanModel = require('../../../src/models/ban')
 const BanCancellationModel = require('../../../src/models/ban-cancellation')
+const BanExtensionModel = require('../../../src/models/ban-extension')
 
 describe('src/models/ban', () => {
   const Ban = BanModel(sequelize, dataTypes)
@@ -18,14 +19,15 @@ describe('src/models/ban', () => {
   checkModelName(Ban)('Ban')
 
   context('properties', () => {
-    ['authorId', 'date', 'groupId', 'reason', 'roleId', 'userId'].forEach(checkPropertyExists(ban))
+    ['authorId', 'date', 'duration', 'groupId', 'reason', 'roleId', 'userId'].forEach(checkPropertyExists(ban))
   })
 
   context('associations', () => {
     const BanCancellation = BanCancellationModel(sequelize, dataTypes)
+    const BanExtension = BanExtensionModel(sequelize, dataTypes)
 
     before(() => {
-      Ban.associate({ BanCancellation })
+      Ban.associate({ BanCancellation, BanExtension })
     })
 
     it('defined a hasOne association with BanCancellation', () => {
@@ -34,6 +36,16 @@ describe('src/models/ban', () => {
           allowNull: false,
           name: 'banId'
         }
+      })
+    })
+
+    it('defined a hasMany association with BanExtension', () => {
+      expect(Ban.hasMany).to.have.been.calledWith(BanExtension, {
+        foreignKey: {
+          allowNull: false,
+          name: 'banId'
+        },
+        as: 'extensions'
       })
     })
   })

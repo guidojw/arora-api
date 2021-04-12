@@ -8,7 +8,7 @@ services:
   GroupController:
     class: src/controllers/v1
     main: GroupController
-    arguments: ['@BanService', '@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
+    arguments: ['@BanService', '@ExileService', '@GroupService', '@TrainingService']
   StatusController:
     class: src/controllers/v1
     main: StatusController
@@ -22,22 +22,14 @@ services:
   AcceptJoinRequestsJob:
     class: src/jobs
     main: AcceptJoinRequestsJob
-    arguments: ['@DiscordMessageJob', '@GroupService', '@HealthCheckJob', '@RobloxManager']
+    arguments: ['@DiscordMessageJob', '@HealthCheckJob', '@RobloxManager']
   AnnounceTrainingsJob:
     class: src/jobs
     main: AnnounceTrainingsJob
     arguments: ['@GroupService', '@UserService']
-  CheckSuspensionsJob:
-    class: src/jobs
-    main: CheckSuspensionsJob
-    arguments: ['@FinishSuspensionJob']
   DiscordMessageJob:
     class: src/jobs
     main: DiscordMessageJob
-  FinishSuspensionJob:
-    class: src/jobs
-    main: FinishSuspensionJob
-    arguments: ['@DiscordMessageJob', '@GroupService', '@UserService']
   HealthCheckJob:
     class: src/jobs
     main: HealthCheckJob
@@ -104,10 +96,6 @@ services:
     class: src/services
     main: StatusService
     arguments: ['@RobloxManager']
-  SuspensionService:
-    class: src/services
-    main: SuspensionService
-    arguments: ['@DiscordMessageJob', '@FinishSuspensionJob', '@GroupService', '@UserService']
   TrainingService:
     class: src/services
     main: TrainingService

@@ -4,11 +4,10 @@ const { param, body, header, query } = require('express-validator')
 const { decodeScopeQueryParam, decodeSortQueryParam } = require('../../util').requestUtil
 
 class GroupController {
-  constructor (banService, exileService, groupService, suspensionService, trainingService) {
+  constructor (banService, exileService, groupService, trainingService) {
     this._banService = banService
     this._exileService = exileService
     this._groupService = groupService
-    this._suspensionService = suspensionService
     this._trainingService = trainingService
   }
 
@@ -65,6 +64,11 @@ class GroupController {
       .get({ raw: true }))
   }
 
+  async extendBan (req, res) {
+    res.json((await this._banService.extendBan(req.params.groupId, req.params.userId, req.body))
+      .get({ raw: true }))
+  }
+
   async putBan (req, res) {
     res.json((await this._banService.changeBan(req.params.groupId, req.params.userId, req.body))
       .get({ plain: true }))
@@ -89,37 +93,6 @@ class GroupController {
   async deleteExile (req, res) {
     res.json((await this._exileService.unexile(req.params.groupId, req.params.userId, req.body))
       .get({ raw: true }))
-  }
-
-  // SuspensionService
-  async getSuspensions (req, res) {
-    res.json((await this._suspensionService.getSuspensions(req.params.groupId, req.query.scope, req.query.sort))
-      .map(suspension => suspension.get({ plain: true })))
-  }
-
-  async getSuspension (req, res) {
-    res.json((await this._suspensionService.getSuspension(req.params.groupId, req.params.userId, req.query.scope))
-      .get({ plain: true }))
-  }
-
-  async postSuspension (req, res) {
-    res.json((await this._suspensionService.suspend(req.params.groupId, req.body.userId, req.body))
-      .get({ raw: true }))
-  }
-
-  async cancelSuspension (req, res) {
-    res.json((await this._suspensionService.unsuspend(req.params.groupId, req.params.userId, req.body))
-      .get({ raw: true }))
-  }
-
-  async extendSuspension (req, res) {
-    res.json((await this._suspensionService.extendSuspension(req.params.groupId, req.params.userId, req.body))
-      .get({ raw: true }))
-  }
-
-  async putSuspension (req, res) {
-    res.json((await this._suspensionService.changeSuspension(req.params.groupId, req.params.userId, req.body))
-      .get({ plain: true }))
   }
 
   // TrainingService
@@ -238,9 +211,10 @@ class GroupController {
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
-          body('userId').exists().isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
-          body('reason').exists().isString()
+          body('duration').optional().isInt().toInt(),
+          body('reason').exists().isString(),
+          body('userId').exists().isInt().toInt()
         ]
       case 'cancelBan':
         return [
@@ -248,6 +222,15 @@ class GroupController {
           param('groupId').isInt().toInt(),
           param('userId').isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
+          body('reason').exists().isString()
+        ]
+      case 'extendBan':
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt(),
+          param('userId').isInt().toInt(),
+          body('authorId').exists().isInt().toInt(),
+          body('duration').exists().isInt().toInt(),
           body('reason').exists().isString()
         ]
 
@@ -288,61 +271,6 @@ class GroupController {
           param('userId').isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
           body('reason').exists().isString()
-        ]
-
-        // SuspensionService
-      case 'getSuspensions':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          query('scope').customSanitizer(decodeScopeQueryParam),
-          query('sort').customSanitizer(decodeSortQueryParam)
-        ]
-      case 'getSuspension':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          query('scope').customSanitizer(decodeScopeQueryParam)
-        ]
-
-      case 'postSuspension':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          body('userId').exists().isInt().toInt(),
-          body('authorId').exists().isInt().toInt(),
-          body('reason').exists().isString(),
-          body('duration').exists().isInt().toInt(),
-          body('roleBack').exists().isBoolean().toBoolean()
-        ]
-      case 'cancelSuspension':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          body('authorId').exists().isInt().toInt(),
-          body('reason').exists().isString()
-        ]
-      case 'extendSuspension':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          body('authorId').exists().isInt().toInt(),
-          body('duration').exists().isInt().toInt(),
-          body('reason').exists().isString()
-        ]
-
-      case 'putSuspension':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          body('editorId').exists().isInt().toInt(),
-          body('changes.authorId').optional().isInt().toInt(),
-          body('changes.reason').optional().isString(),
-          body('changes.roleBack').optional().isBoolean().toBoolean()
         ]
 
         // TrainingService
