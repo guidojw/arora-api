@@ -65,7 +65,7 @@ module.exports = {
 
         const banCancellations = getCancellations(insertedBans, suspensions, suspensionCancellations, 'ban')
         const banExtensions = getExtensions(insertedBans, suspensions, suspensionExtensions, 'ban')
-        if (banCancellations.length > 0 ) {
+        if (banCancellations.length > 0) {
           await queryInterface.bulkInsert('ban_cancellations', banCancellations, { transaction: t })
         }
         if (banExtensions.length > 0) {
