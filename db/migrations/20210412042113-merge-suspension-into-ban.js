@@ -68,7 +68,7 @@ module.exports = {
         queryInterface.bulkInsert('ban_extensions', banExtensions, { transaction: t })
       ])
 
-      await Promise.all([
+      return Promise.all([
         queryInterface.dropTable('suspension_cancellations', { transaction: t }),
         queryInterface.dropTable('suspension_extensions', { transaction: t }),
         queryInterface.dropTable('suspensions', { transaction: t })
