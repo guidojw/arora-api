@@ -1,11 +1,10 @@
 'use strict'
 
-const { Exile, Suspension } = require('../models')
+const { Exile } = require('../models')
 
 class AcceptJoinRequestsJob {
-  constructor (discordMessageJob, groupService, healthCheckJob, robloxManager) {
+  constructor (discordMessageJob, healthCheckJob, robloxManager) {
     this._discordMessageJob = discordMessageJob
-    this._groupService = groupService
     this._healthCheckJob = healthCheckJob
     this._robloxManager = robloxManager
   }
@@ -26,11 +25,6 @@ class AcceptJoinRequestsJob {
         } else {
           await group.acceptJoinRequest(userId)
           this._discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
-
-          if (await Suspension.findOne({ where: { groupId, userId } })) {
-            await this._groupService.setMemberRole(groupId, userId, 2)
-            this._discordMessageJob.run(`Promoted **${request.requester.username}** from **Customer** to **Suspended**`)
-          }
         }
       }
 

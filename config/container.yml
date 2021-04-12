@@ -22,7 +22,7 @@ services:
   AcceptJoinRequestsJob:
     class: src/jobs
     main: AcceptJoinRequestsJob
-    arguments: ['@DiscordMessageJob', '@GroupService', '@HealthCheckJob', '@RobloxManager']
+    arguments: ['@DiscordMessageJob', '@HealthCheckJob', '@RobloxManager']
   AnnounceTrainingsJob:
     class: src/jobs
     main: AnnounceTrainingsJob
