@@ -8,7 +8,7 @@ services:
   GroupController:
     class: src/controllers/v1
     main: GroupController
-    arguments: ['@BanService', '@ExileService', '@GroupService', '@SuspensionService', '@TrainingService']
+    arguments: ['@BanService', '@ExileService', '@GroupService', '@TrainingService']
   StatusController:
     class: src/controllers/v1
     main: StatusController
@@ -104,10 +104,6 @@ services:
     class: src/services
     main: StatusService
     arguments: ['@RobloxManager']
-  SuspensionService:
-    class: src/services
-    main: SuspensionService
-    arguments: ['@DiscordMessageJob', '@FinishSuspensionJob', '@GroupService', '@UserService']
   TrainingService:
     class: src/services
     main: TrainingService

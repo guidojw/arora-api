@@ -97,6 +97,13 @@ class GroupsRouter {
       authenticate,
       groupController.cancelBan.bind(groupController)
     )
+    router.post(
+      '/:groupId/bans/:userId/extend',
+      groupController.validate('extendBan'),
+      handleValidationResult,
+      authenticate,
+      groupController.extendBan.bind(groupController)
+    )
 
     // ExileService
     router.route('/:groupId/exiles')
@@ -126,50 +133,6 @@ class GroupsRouter {
         authenticate,
         groupController.deleteExile.bind(groupController)
       )
-
-    // SuspensionService
-    router.route('/:groupId/suspensions')
-      .get(
-        groupController.validate('getSuspensions'),
-        handleValidationResult,
-        authenticate,
-        groupController.getSuspensions.bind(groupController)
-      )
-      .post(
-        groupController.validate('postSuspension'),
-        handleValidationResult,
-        authenticate,
-        groupController.postSuspension.bind(groupController)
-      )
-
-    router.route('/:groupId/suspensions/:userId')
-      .get(
-        groupController.validate('getSuspension'),
-        handleValidationResult,
-        authenticate,
-        groupController.getSuspension.bind(groupController)
-      )
-      .put(
-        groupController.validate('putSuspension'),
-        handleValidationResult,
-        authenticate,
-        groupController.putSuspension.bind(groupController)
-      )
-
-    router.post(
-      '/:groupId/suspensions/:userId/cancel',
-      groupController.validate('cancelSuspension'),
-      handleValidationResult,
-      authenticate,
-      groupController.cancelSuspension.bind(groupController)
-    )
-    router.post(
-      '/:groupId/suspensions/:userId/extend',
-      groupController.validate('extendSuspension'),
-      handleValidationResult,
-      authenticate,
-      groupController.extendSuspension.bind(groupController)
-    )
 
     // TrainingService
     router.route('/:groupId/trainings')
