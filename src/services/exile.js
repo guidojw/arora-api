@@ -31,7 +31,7 @@ class ExileService {
     }
     const rank = await this._groupService.getRank(groupId, userId)
     if (applicationConfig.unexilableRanks.some(range => inRange(rank, range))) {
-      throw new ForbiddenError('Cannot exile members on this rank.')
+      throw new ForbiddenError('Cannot exile members on this role.')
     }
 
     try {
