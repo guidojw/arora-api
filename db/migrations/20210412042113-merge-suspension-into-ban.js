@@ -85,10 +85,7 @@ module.exports = {
             primaryKey: true,
             autoIncrement: true
           },
-          author_id: {
-            type: Sequelize.BIGINT,
-            allowNull: false
-          },
+          author_id: Sequelize.BIGINT,
           date: {
             type: Sequelize.DATE,
             allowNull: false
@@ -113,10 +110,7 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false
           },
-          user_id: {
-            type: Sequelize.BIGINT,
-            allowNull: false
-          }
+          user_id: Sequelize.BIGINT
         }, { transaction: t }),
         queryInterface.createTable('suspension_cancellations', {
           id: {
@@ -124,10 +118,7 @@ module.exports = {
             primaryKey: true,
             autoIncrement: true
           },
-          author_id: {
-            type: Sequelize.BIGINT,
-            allowNull: false
-          },
+          author_id: Sequelize.BIGINT,
           reason: {
             type: Sequelize.STRING,
             allowNull: false
@@ -148,10 +139,7 @@ module.exports = {
             primaryKey: true,
             autoIncrement: true
           },
-          author_id: {
-            type: Sequelize.BIGINT,
-            allowNull: false
-          },
+          author_id: Sequelize.BIGINT,
           duration: {
             type: Sequelize.INTEGER,
             allowNull: false
