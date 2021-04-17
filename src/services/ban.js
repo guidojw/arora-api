@@ -1,14 +1,17 @@
 'use strict'
 
+const pluralize = require('pluralize')
+
 const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
-const { inRange } = require('../helpers').dataHelper
-const { Ban, BanCancellation } = require('../models')
+const { inRange } = require('../util').util
+const { Ban, BanCancellation, BanExtension } = require('../models')
 
 const applicationConfig = require('../../config/application')
 
 class BanService {
-  constructor (discordMessageJob, userService) {
+  constructor (discordMessageJob, groupService, userService) {
     this._discordMessageJob = discordMessageJob
+    this._groupService = groupService
     this._userService = userService
   }
 
@@ -24,28 +27,37 @@ class BanService {
     return ban
   }
 
-  async ban (groupId, userId, { authorId, reason }) {
+  async ban (groupId, userId, { authorId, duration, reason }) {
     if (await Ban.findOne({ where: { groupId, userId } })) {
       throw new ConflictError('User is already banned.')
     }
-    const rank = await this._userService.getRank(userId, groupId)
-    if (applicationConfig.unbannableRanks.some(range => inRange(rank, range))) {
-      throw new ForbiddenError('User\'s rank is unbannable.')
+    const role = await this._groupService.getRole(groupId, userId)
+    if (applicationConfig.unbannableRanks.some(range => inRange(role.rank, range))) {
+      throw new ForbiddenError('User\'s role is unbannable.')
+    }
+
+    const days = duration / (24 * 60 * 60 * 1000)
+    if (days < 1) {
+      throw new ForbiddenError('Insufficient amount of days.')
+    }
+    if (days > 7) {
+      throw new ForbiddenError('Too many days.')
     }
 
     const ban = await Ban.create({
-      groupId,
       authorId,
-      userId,
-      rank,
-      reason
+      duration: duration ?? null,
+      groupId,
+      reason,
+      roleId: role.id,
+      userId
     })
 
-    const [username, authorName] = await Promise.all([
-      this._userService.getUsername(ban.userId),
-      this._userService.getUsername(ban.authorId)
+    const [authorName, username] = await Promise.all([
+      this._userService.getUsername(ban.authorId),
+      this._userService.getUsername(ban.userId)
     ])
-    this._discordMessageJob.run(`**${authorName}** banned **${username}** with reason "*${ban.reason}*"`)
+    this._discordMessageJob.run(`**${authorName}** banned **${username}**${!isNaN(days) ? ` for **${pluralize('day', days, true)}**` : ''} with reason "*${ban.reason}*"`)
 
     return ban
   }
@@ -54,29 +66,63 @@ class BanService {
     const ban = await this.getBan(groupId, userId)
     const cancellation = await BanCancellation.create({ banId: ban.id, authorId, reason })
 
-    const [username, authorName] = await Promise.all([
-      this._userService.getUsername(ban.userId),
-      this._userService.getUsername(cancellation.authorId)
+    const [authorName, username] = await Promise.all([
+      this._userService.getUsername(cancellation.authorId),
+      this._userService.getUsername(ban.userId)
     ])
     this._discordMessageJob.run(`**${authorName}** unbanned **${username}** with reason "*${cancellation.reason}*"`)
 
     return cancellation
   }
 
+  async extendBan (groupId, userId, { authorId, duration, reason }) {
+    const ban = await this.getBan(groupId, userId)
+    if (ban.duration === null) {
+      throw new ForbiddenError('Ban is permanent.')
+    }
+
+    let newDuration = ban.duration
+    newDuration += ban.extensions.reduce((result, extension) => result + extension.duration, 0)
+    newDuration += duration
+    const days = newDuration / (24 * 60 * 60 * 1000)
+    if (days < 1) {
+      throw new ForbiddenError('Insufficient amount of days.')
+    }
+    if (days > 7) {
+      throw new ForbiddenError('Too many days.')
+    }
+
+    const extension = await BanExtension.create({
+      authorId,
+      banId: ban.id,
+      duration,
+      reason
+    })
+
+    const [authorName, username] = await Promise.all([
+      this._userService.getUsername(extension.authorId),
+      this._userService.getUsername(ban.userId)
+    ])
+    const extensionDays = extension.duration / (24 * 60 * 60 * 1000)
+    this._discordMessageJob.run(`**${authorName}** extended **${username}**'s ban with **${pluralize('day', extensionDays, true)}**`)
+
+    return extension
+  }
+
   async changeBan (groupId, userId, { changes, editorId }) {
     let ban = await this.getBan(groupId, userId)
-    ban = await ban.update(changes, { editorId })
+    ban = await ban.update(changes)
 
-    const [username, editorName] = await Promise.all([
-      this._userService.getUsername(ban.userId),
-      this._userService.getUsername(editorId)
+    const [editorName, username] = await Promise.all([
+      this._userService.getUsername(editorId),
+      this._userService.getUsername(ban.userId)
     ])
-    if (changes.reason) {
-      this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s ban to *"${ban.reason}"*`)
-    }
     if (changes.authorId) {
       const authorName = await this._userService.getUsername(ban.authorId)
       this._discordMessageJob.run(`**${editorName}** changed the author of **${username}**'s ban to **${authorName}**`)
+    }
+    if (changes.reason) {
+      this._discordMessageJob.run(`**${editorName}** changed the reason of **${username}**'s ban to *"${ban.reason}"*`)
     }
 
     return ban

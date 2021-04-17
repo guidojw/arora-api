@@ -4,7 +4,7 @@ const cron = require('node-schedule')
 
 const { Op } = require('sequelize')
 const { ConflictError, NotFoundError } = require('../errors')
-const { getDate, getTime, getTimeZoneAbbreviation } = require('../helpers').timeHelper
+const { getDate, getTime, getTimeZoneAbbreviation } = require('../util').timeUtil
 const { Training, TrainingCancellation, TrainingType } = require('../models')
 
 class TrainingService {
@@ -19,7 +19,7 @@ class TrainingService {
   }
 
   async getTraining (groupId, trainingId, scope) {
-    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, trainingId } })
+    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, id: trainingId } })
     if (!training) {
       throw new NotFoundError('Training not found.')
     }

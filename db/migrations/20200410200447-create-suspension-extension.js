@@ -16,10 +16,7 @@ module.exports = {
       },
       reason: {
         type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true
-        }
+        allowNull: false
       },
       duration: {
         type: Sequelize.INTEGER,
@@ -36,6 +33,7 @@ module.exports = {
       }
     })
   },
+
   down: (queryInterface /* , Sequelize */) => {
     return queryInterface.dropTable('suspension_extensions')
   }

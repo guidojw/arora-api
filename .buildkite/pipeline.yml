@@ -8,12 +8,19 @@ steps:
       - docker-compose#v3.7.0:
           build: app
           config: docker-compose.buildkite.yml
-          image-repository: docker.guidojw.nl/nsadmin/nsadmin-api
+          image-repository: docker.guidojw.nl/arora/arora-api
 
   - wait
 
-  - label: ":eslint: Lint"
+  - label: ":yarn: :eslint: Lint"
     command: yarn lint
+    plugins:
+      - docker-compose#v3.7.0:
+          run: app
+          config: docker-compose.buildkite.yml
+
+  - label: ":yarn: Test"
+    command: yarn test
     plugins:
       - docker-compose#v3.7.0:
           run: app
@@ -29,8 +36,8 @@ steps:
           username: buildkite
           password-env: DOCKER_PASSWORD
       - docker-compose#v3.7.0:
-          push: app-production:docker.guidojw.nl/nsadmin/nsadmin-api:staging
-          image-name: docker.guidojw.nl/nsadmin/nsadmin-api:staging
+          push: app-production:docker.guidojw.nl/arora/arora-api:staging
+          image-name: docker.guidojw.nl/arora/arora-api:staging
           config: docker-compose.buildkite.yml
 
   - label: ":docker: Build+Push `:production` image"
@@ -41,8 +48,8 @@ steps:
           username: buildkite
           password-env: DOCKER_PASSWORD
       - docker-compose#v3.7.0:
-          push: app-production:docker.guidojw.nl/nsadmin/nsadmin-api:latest
-          image-name: docker.guidojw.nl/nsadmin/nsadmin-api:latest
+          push: app-production:docker.guidojw.nl/arora/arora-api:latest
+          image-name: docker.guidojw.nl/arora/arora-api:latest
           config: docker-compose.buildkite.yml
 
   - block: Deploy this stage

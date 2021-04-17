@@ -16,10 +16,7 @@ module.exports = {
       },
       reason: {
         type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: true
-        }
+        allowNull: false
       },
       date: {
         type: Sequelize.DATE,
@@ -50,6 +47,7 @@ module.exports = {
       }
     })
   },
+
   down: (queryInterface /* , Sequelize */) => {
     return queryInterface.dropTable('suspensions')
   }

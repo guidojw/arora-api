@@ -2,7 +2,7 @@ version: '3'
 
 services:
   app:
-    image: docker.guidojw.nl/nsadmin/nsadmin-api:latest
+    image: docker.guidojw.nl/arora/arora-api:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -15,9 +15,9 @@ services:
       - ./public.key:/opt/app/public.key
     labels:
       - traefik.enable=true
-      - traefik.http.routers.nsadmin-api-production.rule=Host(`$HOST`) && PathPrefix(`/api`)
-      - traefik.http.routers.nsadmin-api-production.middlewares=nsadmin-api-strip@file
-      - traefik.http.routers.nsadmin-api-production.tls.certresolver=default
+      - traefik.http.routers.arora-api-production.rule=Host(`$HOST`) && PathPrefix(`/api`)
+      - traefik.http.routers.arora-api-production.middlewares=api-strip@file
+      - traefik.http.routers.arora-api-production.tls.certresolver=default
     command: /bin/bash ./bin/wait-for-it.sh db:5432 -- yarn start
 
   db:
