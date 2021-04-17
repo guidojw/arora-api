@@ -18,8 +18,8 @@ class TrainingService {
     return Training.scope(scope ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
   }
 
-  async getTraining (groupId, trainingId, scope) {
-    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, id: trainingId } })
+  async getTraining (groupId, id, scope) {
+    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, id } })
     if (!training) {
       throw new NotFoundError('Training not found.')
     }
@@ -51,8 +51,8 @@ class TrainingService {
     return training
   }
 
-  async changeTraining (groupId, trainingId, { changes, editorId }) {
-    let training = await this.getTraining(groupId, trainingId)
+  async changeTraining (groupId, id, { changes, editorId }) {
+    let training = await this.getTraining(groupId, id)
     training = await training.update(changes)
 
     if (typeof changes.authorId !== 'undefined' || typeof changes.typeId !== 'undefined' || typeof changes.date !==
@@ -90,8 +90,8 @@ class TrainingService {
     return training
   }
 
-  async cancelTraining (groupId, trainingId, { authorId, reason }) {
-    const training = await this.getTraining(groupId, trainingId)
+  async cancelTraining (groupId, id, { authorId, reason }) {
+    const training = await this.getTraining(groupId, id)
     const cancellation = await TrainingCancellation.create({ trainingId: training.id, authorId, reason })
 
     this._announceTrainingsJob.run(groupId)
@@ -118,8 +118,8 @@ class TrainingService {
     return TrainingType.findAll()
   }
 
-  async changeTrainingType (groupId, typeId, { changes }) {
-    const trainingType = await TrainingType.findOne({ where: { groupId, typeId } })
+  async changeTrainingType (groupId, id, { changes }) {
+    const trainingType = await TrainingType.findOne({ where: { groupId, id } })
     if (!trainingType) {
       throw new NotFoundError('Training type not found.')
     }
@@ -127,8 +127,8 @@ class TrainingService {
     return trainingType.update(changes)
   }
 
-  async deleteTrainingType (groupId, typeId) {
-    const trainingType = await TrainingType.findOne({ where: { groupId, typeId } })
+  async deleteTrainingType (groupId, id) {
+    const trainingType = await TrainingType.findOne({ where: { groupId, id } })
     if (!trainingType) {
       throw new NotFoundError('Training type not found.')
     }
