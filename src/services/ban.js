@@ -2,7 +2,8 @@
 
 const pluralize = require('pluralize')
 
-const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
+const { ConflictError, ForbiddenError, NotFoundError, UnprocessableError } = require('../errors')
+const { hasScopes } = require('../util').requestUtil
 const { inRange } = require('../util').util
 const { Ban, BanCancellation, BanExtension } = require('../models')
 
@@ -15,12 +16,18 @@ class BanService {
     this._userService = userService
   }
 
-  getBans (groupId, scope, sort) {
-    return Ban.scope(scope ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
+  getBans (groupId, scopes, sort) {
+    if (!hasScopes(Ban, scopes)) {
+      throw new UnprocessableError('Invalid scope.')
+    }
+    return Ban.scope(scopes ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
   }
 
-  async getBan (groupId, userId, scope) {
-    const ban = await Ban.scope(scope ?? 'defaultScope').findOne({ where: { groupId, userId } })
+  async getBan (groupId, userId, scopes) {
+    if (!hasScopes(Ban, scopes)) {
+      throw new UnprocessableError('Invalid scope.')
+    }
+    const ban = await Ban.scope(scopes ?? 'defaultScope').findOne({ where: { groupId, userId } })
     if (!ban) {
       throw new NotFoundError('Ban not found.')
     }
@@ -38,10 +45,10 @@ class BanService {
 
     const days = duration / (24 * 60 * 60 * 1000)
     if (days < 1) {
-      throw new ForbiddenError('Insufficient amount of days.')
+      throw new UnprocessableError('Insufficient amount of days.')
     }
     if (days > 7) {
-      throw new ForbiddenError('Too many days.')
+      throw new UnprocessableError('Too many days.')
     }
 
     const ban = await Ban.create({
@@ -78,7 +85,7 @@ class BanService {
   async extendBan (groupId, userId, { authorId, duration, reason }) {
     const ban = await this.getBan(groupId, userId)
     if (ban.duration === null) {
-      throw new ForbiddenError('Ban is permanent.')
+      throw new UnprocessableError('Ban is permanent.')
     }
 
     let newDuration = ban.duration
@@ -86,10 +93,10 @@ class BanService {
     newDuration += duration
     const days = newDuration / (24 * 60 * 60 * 1000)
     if (days < 1) {
-      throw new ForbiddenError('Insufficient amount of days.')
+      throw new UnprocessableError('Insufficient amount of days.')
     }
     if (days > 7) {
-      throw new ForbiddenError('Too many days.')
+      throw new UnprocessableError('Too many days.')
     }
 
     const extension = await BanExtension.create({
