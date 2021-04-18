@@ -9,11 +9,18 @@ class StatusRouter {
     const router = express.Router()
 
     router.get(
-      '/:groupId',
+      '/',
       statusController.validate('getStatus'),
       handleValidationResult,
       authenticate,
       statusController.getStatus.bind(statusController)
+    )
+    router.get(
+      '/:groupId',
+      statusController.validate('getGroupClientStatus'),
+      handleValidationResult,
+      authenticate,
+      statusController.getGroupClientStatus.bind(statusController)
     )
 
     return router

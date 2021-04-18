@@ -7,7 +7,13 @@ class StatusService {
     this._robloxManager = robloxManager
   }
 
-  async getStatus (groupId) {
+  getStatus () {
+    return {
+      state: 'running'
+    }
+  }
+
+  async getGroupClientStatus (groupId) {
     const client = this._robloxManager.getClient(groupId)
     if (!client) {
       throw new NotFoundError('Client not found.')
