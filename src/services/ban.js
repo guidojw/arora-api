@@ -3,6 +3,7 @@
 const pluralize = require('pluralize')
 
 const { ConflictError, ForbiddenError, NotFoundError, UnprocessableError } = require('../errors')
+const { hasScopes } = require('../util').requestUtil
 const { inRange } = require('../util').util
 const { Ban, BanCancellation, BanExtension } = require('../models')
 
@@ -15,12 +16,18 @@ class BanService {
     this._userService = userService
   }
 
-  getBans (groupId, scope, sort) {
-    return Ban.scope(scope ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
+  getBans (groupId, scopes, sort) {
+    if (!hasScopes(Ban, scopes)) {
+      throw new UnprocessableError('Invalid scope.')
+    }
+    return Ban.scope(scopes ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
   }
 
-  async getBan (groupId, userId, scope) {
-    const ban = await Ban.scope(scope ?? 'defaultScope').findOne({ where: { groupId, userId } })
+  async getBan (groupId, userId, scopes) {
+    if (!hasScopes(Ban, scopes)) {
+      throw new UnprocessableError('Invalid scope.')
+    }
+    const ban = await Ban.scope(scopes ?? 'defaultScope').findOne({ where: { groupId, userId } })
     if (!ban) {
       throw new NotFoundError('Ban not found.')
     }
