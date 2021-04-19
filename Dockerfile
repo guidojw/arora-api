@@ -1,4 +1,4 @@
-FROM node:14.16.1
+FROM node:14.16.0
 
 ARG NODE_ENV
 ENV NODE_ENV=$NODE_ENV
@@ -8,7 +8,6 @@ ENV BUILD_HASH=$BUILD_HASH
 # Install dependencies
 WORKDIR /opt/app
 COPY package.json yarn.lock ./
-RUN yarn cache clean
 RUN yarn install --frozen-lockfile
 
 # Bundle app source
