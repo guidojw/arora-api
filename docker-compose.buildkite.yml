@@ -9,8 +9,9 @@ services:
 
   app-production: &production
     build: .
-    environment:
-      - BUILD_HASH=${BUILDKITE_COMMIT}
+      context: .
+      args:
+        - BUILD_HASH=${BUILDKITE_COMMIT}
 
   app-staging:
     <<: *production
