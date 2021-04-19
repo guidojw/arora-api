@@ -1,6 +1,6 @@
 'use strict'
 
-const { ForbiddenError, NotFoundError } = require('../errors')
+const { ForbiddenError, UnprocessableError } = require('../errors')
 const { inRange } = require('../util').util
 
 const applicationConfig = require('../../config/application')
@@ -70,7 +70,7 @@ class GroupService {
       const roles = await this.getRoles(groupId)
       role = roles.roles.find(otherRole => otherRole.rank === role)
       if (!role) {
-        throw new NotFoundError('Role not found.')
+        throw new UnprocessableError('Invalid role.')
       }
     }
     const client = this._robloxManager.getClient(groupId)
@@ -85,7 +85,7 @@ class GroupService {
   async changeMemberRole (groupId, userId, { role, authorId }) {
     const oldRole = await this.getRole(groupId, userId)
     if ([0, 255].includes(oldRole.rank)) {
-      throw new ForbiddenError('Cannot change role of members on this role.')
+      throw new UnprocessableError('Cannot change role of users on this role.')
     }
 
     const newRole = await this.setMemberRole(groupId, userId, role)
@@ -104,8 +104,10 @@ class GroupService {
 
   async promoteMember (groupId, userId, authorId) {
     const rank = await this.getRank(groupId, userId)
-    if ([0, 255].includes(rank) || applicationConfig.unpromotableRanks.some(range => inRange(rank, range))) {
-      throw new ForbiddenError('Cannot promote members on this role.')
+    if ([0, 255].includes(rank)) {
+      throw new UnprocessableError('Cannot promote users on this role.')
+    } else if (applicationConfig.unpromotableRanks.some(range => inRange(rank, range))) {
+      throw new ForbiddenError('User\'s role is unpromotable.')
     }
     const roles = await this.getRoles(groupId)
     const role = roles.roles
@@ -113,15 +115,17 @@ class GroupService {
       .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
     if (!role || role.rank === 255) {
-      throw new ForbiddenError('Member is already the highest obtainable role.')
+      throw new UnprocessableError('User is already the highest obtainable role.')
     }
     return this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
   async demoteMember (groupId, userId, authorId) {
     const rank = await this.getRank(groupId, userId)
-    if ([0, 255].includes(rank) || applicationConfig.undemotableRanks.some(range => inRange(rank, range))) {
-      throw new ForbiddenError('Cannot demote members on this role.')
+    if ([0, 255].includes(rank)) {
+      throw new UnprocessableError('Cannot promote users on this role.')
+    } else if (applicationConfig.undemotableRanks.some(range => inRange(rank, range))) {
+      throw new ForbiddenError('User\'s role is undemotable.')
     }
     const roles = await this.getRoles(groupId)
     const role = roles.roles
@@ -129,7 +133,7 @@ class GroupService {
       .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
       .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
     if (!role || role.rank === 0) {
-      throw new ForbiddenError('Member is already the lowest obtainable role.')
+      throw new UnprocessableError('User is already the lowest obtainable role.')
     }
     return this.changeMemberRole(groupId, userId, { role, authorId })
   }

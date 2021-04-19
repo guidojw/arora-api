@@ -28,7 +28,16 @@ function decodeSortQueryParam (param = '') {
     : undefined
 }
 
+function hasScopes (model, scopes) {
+  if (typeof scopes === 'undefined') {
+    return true
+  }
+  const modelScopes = ['defaultScope', ...Object.keys(model.options.scopes)]
+  return scopes.every(scope => modelScopes.includes(scope))
+}
+
 module.exports = {
   decodeScopeQueryParam,
-  decodeSortQueryParam
+  decodeSortQueryParam,
+  hasScopes
 }

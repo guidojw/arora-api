@@ -3,7 +3,8 @@
 const cron = require('node-schedule')
 
 const { Op } = require('sequelize')
-const { ConflictError, NotFoundError } = require('../errors')
+const { ConflictError, NotFoundError, UnprocessableError } = require('../errors')
+const { hasScopes } = require('../util').requestUtil
 const { getDate, getTime, getTimeZoneAbbreviation } = require('../util').timeUtil
 const { Training, TrainingCancellation, TrainingType } = require('../models')
 
@@ -14,12 +15,18 @@ class TrainingService {
     this._userService = userService
   }
 
-  getTrainings (groupId, scope, sort) {
-    return Training.scope(scope ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
+  getTrainings (groupId, scopes, sort) {
+    if (!hasScopes(Training, scopes)) {
+      throw new UnprocessableError('Invalid scope.')
+    }
+    return Training.scope(scopes ?? 'defaultScope').findAll({ where: { groupId }, order: sort })
   }
 
-  async getTraining (groupId, id, scope) {
-    const training = await Training.scope(scope ?? 'defaultScope').findOne({ where: { groupId, id } })
+  async getTraining (groupId, id, scopes) {
+    if (!hasScopes(Training, scopes)) {
+      throw new UnprocessableError('Invalid scope.')
+    }
+    const training = await Training.scope(scopes ?? 'defaultScope').findOne({ where: { groupId, id } })
     if (!training) {
       throw new NotFoundError('Training not found.')
     }

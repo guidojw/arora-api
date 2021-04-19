@@ -9,7 +9,11 @@ const cronConfig = require('../../config/cron')
 
 async function init (app) {
   if (process.env.SENTRY_DSN) {
-    Sentry.init({ dsn: process.env.SENTRY_DSN })
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV,
+      release: process.env.BUILD_HASH
+    })
   }
 
   const container = containerLoader()
