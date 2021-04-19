@@ -15,7 +15,7 @@ function getTime (date) {
 
 function getTimeZoneAbbreviation (date) {
   return date.toLocaleTimeString('en-us', { hour12: false, hour: '2-digit', minute: '2-digit', timeZoneName: 'long' })
-    .replace(/^(2[0-3]|[0-1]?\d):[0-5]\d\s/, '')
+    .replace(/([a-z]+(\s[a-z]+)*)$/i, '')
     .split(' ')
     .filter(word => word !== 'Standard')
     .map(word => word.charAt(0))
