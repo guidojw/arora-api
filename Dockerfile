@@ -8,6 +8,7 @@ ENV BUILD_HASH=$BUILD_HASH
 # Install dependencies
 WORKDIR /opt/app
 COPY package.json yarn.lock ./
+RUN yarn cache clean
 RUN yarn install --frozen-lockfile
 
 # Bundle app source
