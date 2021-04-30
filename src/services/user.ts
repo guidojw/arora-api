@@ -1,13 +1,14 @@
-'use strict'
+import { GetUserById, GetUsersByUserIds } from 'bloxy/src/client/apis/UsersAPI'
+import { NotFoundError } from '../errors'
 
-const { NotFoundError } = require('../errors')
+export default class UserService {
+  _robloxManager: any
 
-class UserService {
-  constructor (robloxManager) {
+  constructor (robloxManager: any) {
     this._robloxManager = robloxManager
   }
 
-  async getUserIdFromUsername (username) {
+  async getUserIdFromUsername (username: string): Promise<number> {
     const client = this._robloxManager.getClient()
     const user = await client.getUserIdFromUsername(username)
 
@@ -19,7 +20,7 @@ class UserService {
     return user.id
   }
 
-  async hasBadge (userId, badgeId) {
+  async hasBadge (userId: number, badgeId: number): Promise<boolean> {
     const client = this._robloxManager.getClient()
     return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
       userId,
@@ -28,19 +29,17 @@ class UserService {
     })).data.length === 1
   }
 
-  async getUsers (userIds) {
+  async getUsers (userIds: number[]): Promise<GetUsersByUserIds['data']> {
     const client = this._robloxManager.getClient()
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
   }
 
-  async getUsername (userId) {
+  async getUsername (userId: number): Promise<string> {
     return (await this.getUser(userId)).name
   }
 
-  getUser (userId) {
+  async getUser (userId: number): Promise<GetUserById> {
     const client = this._robloxManager.getClient()
     return client.apis.usersAPI.getUserById({ userId })
   }
 }
-
-module.exports = UserService

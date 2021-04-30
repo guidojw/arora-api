@@ -1,77 +1,85 @@
-'use strict'
+import { ForbiddenError, UnprocessableError } from '../errors'
+import { GetGroup, GetGroupRoles, UpdateGroupStatus } from 'bloxy/src/client/apis/GroupsAPI'
+import { RobloxManager } from '../managers'
+import UserService from './user'
+import applicationConfig from '../configs/application'
+import { util } from '../util'
 
-const { ForbiddenError, UnprocessableError } = require('../errors')
-const { inRange } = require('../util').util
+export type GroupStatus = Exclude<UpdateGroupStatus, null>
+export type GroupRole = GetGroupRoles['roles'][0]
+export interface ChangeMemberRoleResult { oldRole: GroupRole, newRole: GroupRole }
 
-const applicationConfig = require('../configs/application')
+export default class GroupService {
+  _discordMessageJob: any
+  _robloxManager: RobloxManager
+  _userService: UserService
+  _webSocketManager: any
 
-class GroupService {
-  constructor (discordMessageJob, robloxManager, userService, webSocketManager) {
+  constructor (discordMessageJob: any, robloxManager: RobloxManager, userService: UserService, webSocketManager: any) {
     this._discordMessageJob = discordMessageJob
     this._robloxManager = robloxManager
     this._userService = userService
     this._webSocketManager = webSocketManager
   }
 
-  async getShout (groupId) {
+  async getShout (groupId: number): Promise<GetGroup['shout']> {
     const group = await this.getGroup(groupId)
     return group.shout
   }
 
-  getGroup (groupId) {
+  async getGroup (groupId: number): Promise<GetGroup> {
     const client = this._robloxManager.getClient(groupId)
-    return client.apis.groupsAPI.getGroup({ groupId })
+    return await client.apis.groupsAPI.getGroup({ groupId })
   }
 
-  async getRank (groupId, userId) {
+  async getRank (groupId: number, userId: number): Promise<number> {
     const client = this._robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
     const group = groups.data.find(group => group.group.id === groupId)
-    return group ? group.role.rank : 0
+    return typeof group !== 'undefined' ? group.role.rank : 0
   }
 
-  async getRole (groupId, userId) {
+  async getRole (groupId: number, userId: number): Promise<GroupRole> {
     const client = this._robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
     const group = groups.data.find(group => group.group.id === groupId)
     let role = group?.role
-    if (!group) {
+    if (typeof group === 'undefined') {
       const roles = await this.getRoles(groupId)
       role = roles.roles.find(role => role.rank === 0)
     }
-    return role
+    return role as GroupRole
   }
 
-  getRoles (groupId) {
+  async getRoles (groupId: number): Promise<GetGroupRoles> {
     const client = this._robloxManager.getClient(groupId)
-    return client.apis.groupsAPI.getGroupRoles({ groupId })
+    return await client.apis.groupsAPI.getGroupRoles({ groupId })
   }
 
-  async shout (groupId, message, authorId) {
+  async shout (groupId: number, message: string, authorId: number): Promise<GroupStatus> {
     const client = this._robloxManager.getClient(groupId)
-    const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message })
+    const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as GroupStatus
 
-    if (authorId) {
-      const authorName = await this._userService.getUsername(authorId)
-      if (shout.body === '') {
-        this._discordMessageJob.run(`**${authorName}** cleared the shout`)
-      } else {
-        this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
-      }
+    const authorName = await this._userService.getUsername(authorId)
+    if (shout.body === '') {
+      this._discordMessageJob.run(`**${authorName}** cleared the shout`)
+    } else {
+      this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
     }
 
     return shout
   }
 
-  async setMemberRole (groupId, userId, role) {
+  async setMemberRole (groupId: number, userId: number, role: GroupRole | number): Promise<GroupRole> {
     if (typeof role === 'number') {
       const roles = await this.getRoles(groupId)
-      role = roles.roles.find(otherRole => otherRole.rank === role)
-      if (!role) {
+      const roleResolvable = roles.roles.find(otherRole => otherRole.rank === role)
+      if (typeof roleResolvable === 'undefined') {
         throw new UnprocessableError('Invalid role.')
       }
+      role = roleResolvable
     }
     const client = this._robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
@@ -82,7 +90,8 @@ class GroupService {
     return role
   }
 
-  async changeMemberRole (groupId, userId, { role, authorId }) {
+  async changeMemberRole (groupId: number, userId: number, { role, authorId }: { role: GroupRole | number
+    authorId?: number }): Promise<ChangeMemberRoleResult> {
     const oldRole = await this.getRole(groupId, userId)
     if ([0, 255].includes(oldRole.rank)) {
       throw new UnprocessableError('Cannot change role of users on this role.')
@@ -102,43 +111,43 @@ class GroupService {
     return { oldRole, newRole }
   }
 
-  async promoteMember (groupId, userId, authorId) {
+  async promoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRoleResult> {
     const rank = await this.getRank(groupId, userId)
     if ([0, 255].includes(rank)) {
       throw new UnprocessableError('Cannot promote users on this role.')
-    } else if (applicationConfig.unpromotableRanks.some(range => inRange(rank, range))) {
+    } else if (applicationConfig.unpromotableRanks.some(range => util.inRange(rank, range))) {
       throw new ForbiddenError('User\'s role is unpromotable.')
     }
     const roles = await this.getRoles(groupId)
     const role = roles.roles
       .sort((roleA, roleB) => roleA.rank - roleB.rank)
       .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
-      .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
-    if (!role || role.rank === 255) {
+      .find(role => !applicationConfig.skippedRanks.some(range => util.inRange(role.rank, range)))
+    if (typeof role === 'undefined' || role.rank === 255) {
       throw new UnprocessableError('User is already the highest obtainable role.')
     }
     return this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
-  async demoteMember (groupId, userId, authorId) {
+  async demoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRoleResult> {
     const rank = await this.getRank(groupId, userId)
     if ([0, 255].includes(rank)) {
       throw new UnprocessableError('Cannot promote users on this role.')
-    } else if (applicationConfig.undemotableRanks.some(range => inRange(rank, range))) {
+    } else if (applicationConfig.undemotableRanks.some(range => util.inRange(rank, range))) {
       throw new ForbiddenError('User\'s role is undemotable.')
     }
     const roles = await this.getRoles(groupId)
     const role = roles.roles
       .sort((roleA, roleB) => roleB.rank - roleA.rank)
       .slice(roles.roles.findIndex(role => role.rank === rank) + 1)
-      .find(role => !applicationConfig.skippedRanks.some(range => inRange(role.rank, range)))
-    if (!role || role.rank === 0) {
+      .find(role => !applicationConfig.skippedRanks.some(range => util.inRange(role.rank, range)))
+    if (typeof role === 'undefined' || role.rank === 0) {
       throw new UnprocessableError('User is already the lowest obtainable role.')
     }
     return this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
-  async kickMember (groupId, userId) {
+  async kickMember (groupId: number, userId: number): Promise<void> {
     const client = this._robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     await group.kickMember(userId)
@@ -146,5 +155,3 @@ class GroupService {
     this._webSocketManager.broadcast('rankChange', { groupId, userId, rank: 0 })
   }
 }
-
-module.exports = GroupService
