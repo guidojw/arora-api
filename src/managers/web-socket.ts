@@ -1,13 +1,17 @@
-'use strict'
+import WebSocket from 'ws'
+
+export type AroraWebSocket = WebSocket & { isAlive: boolean }
 
 const PING_INTERVAL = 30 * 1000
 
-class WebSocketManager {
+export default class WebSocketManager {
+  connections: AroraWebSocket[]
+
   constructor () {
     this.connections = []
   }
 
-  init () {
+  init (): void {
     setInterval(() => {
       for (const connection of this.connections) {
         if (!connection.isAlive) {
@@ -20,8 +24,9 @@ class WebSocketManager {
     }, PING_INTERVAL)
   }
 
-  addConnection (connection) {
+  addConnection (conn: WebSocket): void {
     console.log('New connection!')
+    const connection = conn as AroraWebSocket
     connection.isAlive = true
 
     connection.on('error', console.error)
@@ -36,15 +41,13 @@ class WebSocketManager {
     this.connections.push(connection)
   }
 
-  removeConnection (connection) {
+  removeConnection (connection: AroraWebSocket): void {
     this.connections.splice(this.connections.indexOf(connection), 1)
   }
 
-  broadcast (event, data) {
+  broadcast (event: string, data: object): void {
     for (const connection of this.connections) {
       connection.send(JSON.stringify({ event, data }))
     }
   }
 }
-
-module.exports = WebSocketManager
