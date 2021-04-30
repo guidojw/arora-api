@@ -1,14 +1,12 @@
-'use strict'
+import { ContainerBuilder } from 'node-dependency-injection'
+import cron from 'node-schedule'
+import cronConfig from '../configs/cron'
 
-const cron = require('node-schedule')
-
-const cronConfig = require('../../config/cron')
-
-function init (container) {
+export default function init (container: ContainerBuilder): void {
   for (const jobConfig of Object.values(cronConfig)) {
     const job = container.get(jobConfig.job)
 
-    if (jobConfig.args) {
+    if (typeof jobConfig.args !== 'undefined') {
       const [...args] = jobConfig.args
       cron.scheduleJob(jobConfig.expression, job.run.bind(job, ...args))
     } else {
@@ -16,5 +14,3 @@ function init (container) {
     }
   }
 }
-
-module.exports = init

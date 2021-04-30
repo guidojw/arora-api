@@ -7,7 +7,7 @@ const { hasScopes } = require('../util').requestUtil
 const { inRange } = require('../util').util
 const { Ban, BanCancellation, BanExtension } = require('../models')
 
-const applicationConfig = require('../../config/application')
+const applicationConfig = require('../configs/application')
 
 class BanService {
   constructor (discordMessageJob, groupService, userService) {

@@ -5,7 +5,7 @@ const debug = require('debug')('arora-api:server')
 const http = require('http')
 const WebSocket = require('ws')
 
-const app = require('../app')
+const app = require('../dist/app').default
 const container = app.get('container')
 const authMiddleware = container.get('AuthMiddleware')
 const webSocketManager = container.get('WebSocketManager')

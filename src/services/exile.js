@@ -4,7 +4,7 @@ const { ConflictError, ForbiddenError, NotFoundError } = require('../errors')
 const { inRange } = require('../util').util
 const { Exile } = require('../models')
 
-const applicationConfig = require('../../config/application')
+const applicationConfig = require('../configs/application')
 
 class ExileService {
   constructor (discordMessageJob, groupService, userService) {

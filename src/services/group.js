@@ -3,7 +3,7 @@
 const { ForbiddenError, UnprocessableError } = require('../errors')
 const { inRange } = require('../util').util
 
-const applicationConfig = require('../../config/application')
+const applicationConfig = require('../configs/application')
 
 class GroupService {
   constructor (discordMessageJob, robloxManager, userService, webSocketManager) {

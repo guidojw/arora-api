@@ -1,6 +1,4 @@
-'use strict'
-
-module.exports = {
+export default {
   acceptJoinRequestsJob: {
     expression: '*/30 * * * *', // https://crontab.guru/#*/30_*_*_*_*
     job: 'AcceptJoinRequestsJob',

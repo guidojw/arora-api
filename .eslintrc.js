@@ -2,15 +2,15 @@
 
 module.exports = {
   env: {
-    commonjs: true,
     es6: true,
+    mocha: true,
     node: true
   },
-  extends: [
-    'standard'
-  ],
+  extends: 'standard-with-typescript',
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2020,
+    project: './tsconfig.json',
+    sourceType: 'module'
   },
   rules: {
     'max-len': [
@@ -19,6 +19,7 @@ module.exports = {
       {
         ignoreTemplateLiterals: true
       }
-    ]
+    ],
+    'sort-imports': 'error'
   }
 }
