@@ -31,6 +31,7 @@ export default class CatalogController implements interfaces.Controller {
           query('SortType').optional().isString(),
           query('PageNumber').optional().isInt().toInt()
         ]
+
       default:
         return []
     }

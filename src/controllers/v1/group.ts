@@ -215,8 +215,8 @@ export default class GroupController implements interfaces.Controller {
 
   @httpGet('/:groupId/trainings/types', ...GroupController.validate('getTrainingTypes'), TYPES.ErrorMiddleware, TYPES
     .AuthMiddleware)
-  async getTrainingTypes (@requestParam('groupId') groupId: number): Promise<any> {
-    return await this._trainingService.getTrainingTypes(groupId)
+  async getTrainingTypes (): Promise<any> {
+    return await this._trainingService.getTrainingTypes()
   }
 
   @httpPost('/:groupId/trainings', ...GroupController.validate('postTraining'), TYPES.ErrorMiddleware, TYPES
