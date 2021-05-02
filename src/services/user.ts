@@ -1,12 +1,12 @@
 import { GetUserById, GetUsersByUserIds } from 'bloxy/src/client/apis/UsersAPI'
+import { inject, injectable } from 'inversify'
 import { NotFoundError } from '../errors'
+import { RobloxManager } from '../managers'
+import TYPES from '../util/types'
 
+@injectable()
 export default class UserService {
-  _robloxManager: any
-
-  constructor (robloxManager: any) {
-    this._robloxManager = robloxManager
-  }
+  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
 
   async getUserIdFromUsername (username: string): Promise<number> {
     const client = this._robloxManager.getClient()
@@ -40,6 +40,6 @@ export default class UserService {
 
   async getUser (userId: number): Promise<GetUserById> {
     const client = this._robloxManager.getClient()
-    return client.apis.usersAPI.getUserById({ userId })
+    return await client.apis.usersAPI.getUserById({ userId })
   }
 }

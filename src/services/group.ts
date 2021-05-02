@@ -1,6 +1,9 @@
 import { ForbiddenError, UnprocessableError } from '../errors'
 import { GetGroup, GetGroupRoles, UpdateGroupStatus } from 'bloxy/src/client/apis/GroupsAPI'
-import { RobloxManager } from '../managers'
+import { RobloxManager, WebSocketManager } from '../managers'
+import { inject, injectable } from 'inversify'
+import { DiscordMessageJob } from '../jobs'
+import TYPES from '../util/types'
 import UserService from './user'
 import applicationConfig from '../configs/application'
 import { util } from '../util'
@@ -9,18 +12,12 @@ export type GroupStatus = Exclude<UpdateGroupStatus, null>
 export type GroupRole = GetGroupRoles['roles'][0]
 export interface ChangeMemberRoleResult { oldRole: GroupRole, newRole: GroupRole }
 
+@injectable()
 export default class GroupService {
-  _discordMessageJob: any
-  _robloxManager: RobloxManager
-  _userService: UserService
-  _webSocketManager: any
-
-  constructor (discordMessageJob: any, robloxManager: RobloxManager, userService: UserService, webSocketManager: any) {
-    this._discordMessageJob = discordMessageJob
-    this._robloxManager = robloxManager
-    this._userService = userService
-    this._webSocketManager = webSocketManager
-  }
+  @inject(TYPES.DiscordMessageJob) private readonly _discordMessageJob!: DiscordMessageJob
+  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
+  @inject(TYPES.UserService) private readonly _userService!: UserService
+  @inject(TYPES.WebSocketManager) private readonly _webSocketManager!: WebSocketManager
 
   async getShout (groupId: number): Promise<GetGroup['shout']> {
     const group = await this.getGroup(groupId)
@@ -64,9 +61,9 @@ export default class GroupService {
 
     const authorName = await this._userService.getUsername(authorId)
     if (shout.body === '') {
-      this._discordMessageJob.run(`**${authorName}** cleared the shout`)
+      await this._discordMessageJob.run(`**${authorName}** cleared the shout`)
     } else {
-      this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
+      await this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
     }
 
     return shout
@@ -102,9 +99,9 @@ export default class GroupService {
     if (oldRole.id !== newRole.id) {
       if (typeof authorId !== 'undefined') {
         const authorName = await this._userService.getUsername(authorId)
-        this._discordMessageJob.run(`**${authorName}** changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
+        await this._discordMessageJob.run(`**${authorName}** changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
       } else {
-        this._discordMessageJob.run(`Changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
+        await this._discordMessageJob.run(`Changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
       }
     }
 

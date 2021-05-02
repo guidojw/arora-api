@@ -1,6 +1,6 @@
 import { AnnounceTrainingsJob, DiscordMessageJob, HealthCheckJob } from '../jobs'
 import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
-import { AuthService, CatalogService } from '../services'
+import { AuthService, CatalogService, StatusService, TrainingService, UserService } from '../services'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { Container } from 'inversify'
 import TYPES from '../util/types'
@@ -20,6 +20,9 @@ export default function init (): Container {
 
   container.bind<AuthService>(TYPES.AuthService).to(AuthService)
   container.bind<CatalogService>(TYPES.CatalogService).to(CatalogService)
+  container.bind<StatusService>(TYPES.StatusService).to(StatusService)
+  container.bind<TrainingService>(TYPES.TrainingService).to(TrainingService)
+  container.bind<UserService>(TYPES.UserService).to(UserService)
 
   return container
 }

@@ -1,16 +1,16 @@
+import { inject, injectable } from 'inversify'
 import { NotFoundError } from '../errors'
+import { RobloxManager } from '../managers'
+import TYPES from '../util/types'
 
 export enum StatusState {
   Running = 'RUNNING'
 }
 export interface Status { state: StatusState }
 
+@injectable()
 export default class StatusService {
-  _robloxManager: any
-
-  constructor (robloxManager: any) {
-    this._robloxManager = robloxManager
-  }
+  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
 
   getStatus (): Status {
     return {

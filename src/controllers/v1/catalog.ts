@@ -5,7 +5,7 @@ import { Request } from 'express'
 import TYPES from '../../util/types'
 import { inject } from 'inversify'
 
-@controller('/catalog')
+@controller('/v1/catalog')
 export default class CatalogController implements interfaces.Controller {
   @inject(TYPES.CatalogService) private readonly _catalogService!: CatalogService
 

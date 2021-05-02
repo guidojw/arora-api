@@ -10,7 +10,13 @@ const TYPES = {
   ErrorMiddleware: Symbol.for('ErrorMiddleware'),
 
   AuthService: Symbol.for('AuthService'),
-  CatalogService: Symbol.for('CatalogService')
+  BanService: Symbol.for('BanService'),
+  CatalogService: Symbol.for('CatalogService'),
+  ExileService: Symbol.for('ExileService'),
+  GroupService: Symbol.for('GroupService'),
+  StatusService: Symbol.for('StatusService'),
+  TrainingService: Symbol.for('TrainingService'),
+  UserService: Symbol.for('UserService')
 }
 
 export default TYPES
