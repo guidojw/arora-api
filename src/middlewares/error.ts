@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
+import { BaseMiddleware } from 'inversify-express-utils'
+import { injectable } from 'inversify'
 import { validationResult } from 'express-validator'
 
 export type Errors = Array<{ message: string }>
 
-export default class ErrorMiddleware {
-  async handleValidationResult (req: Request, res: Response, next: NextFunction): Promise<void> {
+@injectable()
+export default class ErrorMiddleware extends BaseMiddleware {
+  async handler (req: Request, res: Response, next: NextFunction): Promise<void> {
     const errors = await validationResult(req)
     if (errors.isEmpty()) {
       return next()

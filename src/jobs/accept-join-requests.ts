@@ -1,23 +1,21 @@
+import { inject, injectable } from 'inversify'
+import BaseJob from './base'
 import { CursorPage } from 'bloxy/src/structures/Asset'
 import DiscordMessageJob from './discord-message'
 import Exile from '../models'
 import { GroupJoinRequest } from 'bloxy/src/structures/Group'
 import HealthCheckJob from './health-check'
 import { RobloxManager } from '../managers'
+import TYPES from '../util/types'
 
 export type JoinRequest = Omit<GroupJoinRequest, 'user'> & { user: Omit<GroupJoinRequest['user'], 'name'> & {
   name: string }}
 
-export default class AcceptJoinRequestsJob {
-  _discordMessageJob: DiscordMessageJob
-  _healthCheckJob: HealthCheckJob
-  _robloxManager: RobloxManager
-
-  constructor (discordMessageJob: DiscordMessageJob, healthCheckJob: HealthCheckJob, robloxManager: RobloxManager) {
-    this._discordMessageJob = discordMessageJob
-    this._healthCheckJob = healthCheckJob
-    this._robloxManager = robloxManager
-  }
+@injectable()
+export default class AcceptJoinRequestsJob implements BaseJob {
+  @inject(TYPES.DiscordMessageJob) private readonly _discordMessageJob!: DiscordMessageJob
+  @inject(TYPES.HealthCheckJob) private readonly _healthCheckJob!: HealthCheckJob
+  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
 
   async run (groupId: number): Promise<any> {
     const client = this._robloxManager.getClient(groupId)

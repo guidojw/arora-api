@@ -1,5 +1,6 @@
 export { default as AcceptJoinRequestsJob } from './accept-join-requests'
 export { default as AnnounceTrainingsJob } from './announce-trainings'
+export { default as BaseJob } from './base'
 export { default as DiscordMessageJob } from './discord-message'
 export { default as HealthCheckJob } from './health-check'
 export { default as PayoutTrainDevelopersJob } from './payout-train-developers'

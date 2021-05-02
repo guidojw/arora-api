@@ -1,13 +1,15 @@
-import { BaseError, NotFoundError } from '../errors'
 import express, { Application, NextFunction, Request, Response } from 'express'
-import { ContainerBuilder } from 'node-dependency-injection'
+import { Container } from 'inversify'
+import ErrorMiddleware from '../middlewares/error'
+import { NotFoundError } from '../errors'
 import Sentry from '@sentry/node'
+import TYPES from '../util/types'
 import helmet from 'helmet'
 import hpp from 'hpp'
 import logger from 'morgan'
 
-export default function init (app: Application, container: ContainerBuilder): void {
-  const errorMiddleware = container.get('ErrorMiddleware')
+export default function init (app: Application, container: Container): void {
+  const errorMiddleware = container.get<ErrorMiddleware>(TYPES.ErrorMiddleware)
 
   if (typeof process.env.SENTRY_DSN !== 'undefined') {
     app.use(Sentry.Handlers.requestHandler())
@@ -19,11 +21,6 @@ export default function init (app: Application, container: ContainerBuilder): vo
   app.use(helmet())
   app.use(hpp())
 
-  app.use('/v1/groups', [container.get('GroupsRouter')])
-  app.use('/v1/users', [container.get('UsersRouter')])
-  app.use('/v1/catalog', [container.get('CatalogRouter')])
-  app.use('/v1/status', [container.get('StatusRouter')])
-
   app.use(() => {
     throw new NotFoundError()
   })
@@ -33,6 +30,6 @@ export default function init (app: Application, container: ContainerBuilder): vo
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    errorMiddleware.sendError(res, err instanceof BaseError ? err.statusCode : 500, err.message)
+    errorMiddleware.sendError(res, err.statusCode ?? 500, err.message ?? 'Internal Server Error')
   })
 }

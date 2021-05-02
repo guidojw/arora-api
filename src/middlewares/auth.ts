@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
+import { inject, injectable } from 'inversify'
 import { AuthService } from '../services'
+import { BaseMiddleware } from 'inversify-express-utils'
+import TYPES from '../util/types'
 import { UnauthorizedError } from '../errors'
 
-export default class AuthMiddleware {
-  _authService: AuthService
+@injectable()
+export default class AuthMiddleware extends BaseMiddleware {
+  @inject(TYPES.AuthService) private readonly _authService!: AuthService
 
-  constructor (authService: AuthService) {
-    this._authService = authService
-  }
-
-  authenticate (req: Request, _res: Response, next: NextFunction): void {
+  handler (req: Request, _res: Response, next: NextFunction): void {
     const token = req.header('authorization')?.replace('Bearer ', '') ?? undefined
 
     this.authenticateToken(token)

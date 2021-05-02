@@ -1,4 +1,4 @@
-export type Range = [number | undefined, number] | [number, number | undefined] | number
+export type Range = [number | undefined, number] | [number, number?] | number
 
 export function inRange (value: number, range: Range): boolean {
   return typeof range === 'number'

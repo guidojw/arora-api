@@ -1,10 +1,13 @@
+import BaseManager from './base'
 import WebSocket from 'ws'
+import { injectable } from 'inversify'
 
 export type AroraWebSocket = WebSocket & { isAlive: boolean }
 
 const PING_INTERVAL = 30 * 1000
 
-export default class WebSocketManager {
+@injectable()
+export default class WebSocketManager implements BaseManager {
   connections: AroraWebSocket[]
 
   constructor () {
@@ -45,7 +48,7 @@ export default class WebSocketManager {
     this.connections.splice(this.connections.indexOf(connection), 1)
   }
 
-  broadcast (event: string, data: object): void {
+  broadcast (event: string, data?: any): void {
     for (const connection of this.connections) {
       connection.send(JSON.stringify({ event, data }))
     }

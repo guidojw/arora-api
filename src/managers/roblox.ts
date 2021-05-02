@@ -1,8 +1,11 @@
 import { RESTRequestOptions, RESTRequester, RESTResponseDataType } from 'bloxy/src/interfaces/RESTInterfaces'
+import BaseManager from './base'
 import { Client } from 'bloxy/src'
 import { HTTPError } from 'got'
+import { injectable } from 'inversify'
 
-export default class RobloxManager {
+@injectable()
+export default class RobloxManager implements BaseManager {
   authenticatedClients: Record<number, Client>
   unauthenticatedClient: Client
 
@@ -42,8 +45,10 @@ export default class RobloxManager {
     }
   }
 
-  getClient (groupId: number): Client {
-    return !isNaN(groupId) ? this.authenticatedClients[groupId] : this.unauthenticatedClient
+  getClient (groupId?: number): Client {
+    return typeof groupId !== 'undefined'
+      ? this.authenticatedClients[groupId] ?? this.unauthenticatedClient
+      : this.unauthenticatedClient
   }
 }
 
@@ -58,7 +63,7 @@ async function requester (this: RESTRequester, options: RESTRequestOptions): Pro
 
   try {
     // this refers to Bloxy's original requester.
-    return await this(options) // eslint-disable-line @typescript-eslint/return-await
+    return await this(options)
   } catch (err: any) {
     if (err instanceof HTTPError) {
       if (typeof err.response !== 'undefined' && err.response.statusCode === 403 && (err.response.statusMessage as
@@ -70,5 +75,3 @@ async function requester (this: RESTRequester, options: RESTRequestOptions): Pro
     throw err
   }
 }
-
-module.exports = RobloxManager

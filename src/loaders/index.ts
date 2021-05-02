@@ -1,5 +1,8 @@
 import { Application } from 'express'
+import { BaseJob } from '../jobs'
+import { BaseManager } from '../managers'
 import Sentry from '@sentry/node'
+import TYPES from '../util/types'
 import containerLoader from './container'
 import cronConfig from '../configs/cron'
 import cronLoader from './cron'
@@ -17,13 +20,13 @@ export async function init (app: Application): Promise<void> {
   const container = containerLoader()
   app.set('container', container)
 
-  await container.get('RobloxManager').init()
-  container.get('WebSocketManager').init()
+  await container.get<BaseManager>(TYPES.RobloxManager).init()
+  container.get<BaseManager>(TYPES.WebSocketManager).init()
 
   expressLoader(app, container)
   cronLoader(container)
 
-  if (Object.prototype.hasOwnProperty.call(cronConfig, 'announceTrainingsJob')) {
-    await container.get('AnnounceTrainingsJob').run()
+  if (typeof cronConfig.announceTrainingsJob !== 'undefined') {
+    await container.get<BaseJob>(TYPES.AnnounceTrainingsJob).run()
   }
 }

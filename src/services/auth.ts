@@ -1,9 +1,11 @@
 import * as fs from 'fs'
 import * as jwt from 'jsonwebtoken'
+import { injectable } from 'inversify'
 
 const publicKey = fs.readFileSync('public.key', 'utf8')
 // const privateKey = fs.readFileSync('private.key', 'utf8')
 
+@injectable()
 export default class AuthService {
   authenticate (token: string): boolean {
     try {
