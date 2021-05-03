@@ -13,7 +13,7 @@
   "author": "Guido de Jong",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^6.3.1",
+    "@sentry/node": "^6.3.5",
     "axios": "^0.21.1",
     "bloxy": "guidojw/bloxy#58be6cb",
     "debug": "^4.3.1",
