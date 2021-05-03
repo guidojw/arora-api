@@ -1,4 +1,4 @@
-const TYPES = {
+export const TYPES = {
   AnnounceTrainingsJob: Symbol.for('AnnounceTrainingsJob'),
   DiscordMessageJob: Symbol.for('DiscordMessageJob'),
   HealthCheckJob: Symbol.for('HealthCheckJob'),
@@ -18,5 +18,3 @@ const TYPES = {
   TrainingService: Symbol.for('TrainingService'),
   UserService: Symbol.for('UserService')
 }
-
-export default TYPES

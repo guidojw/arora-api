@@ -1,4 +1,6 @@
-export default {
+export interface CronConfig { expression: string, job: string, args?: [any] }
+
+const cronConfig: { [key: string]: CronConfig } = {
   acceptJoinRequestsJob: {
     expression: '*/30 * * * *', // https://crontab.guru/#*/30_*_*_*_*
     job: 'AcceptJoinRequestsJob',
@@ -20,3 +22,5 @@ export default {
     args: [1018818]
   }
 }
+
+export default cronConfig

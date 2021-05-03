@@ -1,8 +1,9 @@
 import { BanService, ExileService, GroupService, TrainingService } from '../../services'
-import { ChangeMemberRoleResult, GroupStatus } from '../../services/group'
-import { GetGroup, GetGroupRoles } from 'bloxy/src/client/apis/GroupsAPI'
+import { ChangeMemberRole, GetGroupStatus, UpdateGroupStatus } from '../../services/group'
+import { GetGroup, GetGroupRoles } from 'bloxy/dist/client/apis/GroupsAPI'
 import { ScopeQuery, SortQuery } from '../../util/request'
 import { ValidationChain, body, header, param, query } from 'express-validator'
+import { constants, requestUtil } from '../../util'
 import {
   controller,
   httpGet,
@@ -11,15 +12,14 @@ import {
   interfaces,
   queryParam,
   requestBody,
-  requestParam,
+  requestParam
 } from 'inversify-express-utils'
-import TYPES from '../../util/types'
 import { inject } from 'inversify'
-import { requestUtil } from '../../util'
 
+const { TYPES } = constants
 const { decodeScopeQueryParam, decodeSortQueryParam } = requestUtil
 
-@controller('/v1/group')
+@controller('/v1/groups')
 export default class GroupController implements interfaces.Controller {
   @inject(TYPES.BanService) private readonly _banService!: BanService
   @inject(TYPES.ExileService) private readonly _exileService!: ExileService
@@ -27,12 +27,22 @@ export default class GroupController implements interfaces.Controller {
   @inject(TYPES.TrainingService) private readonly _trainingService!: TrainingService
 
   // GroupService
-  @httpGet('/:groupId/shout', ...GroupController.validate('getShout'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  async getShout (@requestParam('groupId') groupId: number): Promise<GetGroup['shout']> {
-    return await this._groupService.getShout(groupId)
+  @httpGet(
+    '/:groupId/status',
+    ...GroupController.validate('getGroupStatus'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
+  async getGroupStatus (@requestParam('groupId') groupId: number): Promise<GetGroupStatus> {
+    return await this._groupService.getGroupStatus(groupId)
   }
 
-  @httpGet('/:groupId/roles', ...GroupController.validate('getRoles'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpGet(
+    '/:groupId/roles',
+    ...GroupController.validate('getRoles'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getRoles (@requestParam('groupId') groupId: number): Promise<GetGroupRoles> {
     return await this._groupService.getRoles(groupId)
   }
@@ -42,41 +52,58 @@ export default class GroupController implements interfaces.Controller {
     return await this._groupService.getGroup(groupId)
   }
 
-  @httpPost('/:groupId/shout', ...GroupController.validate('postShout'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  async postShout (
+  @httpPut(
+    '/:groupId/status',
+    ...GroupController.validate('updateGroupStatus'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
+  async updateGroupStatus (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, message: string }
-  ): Promise<GroupStatus> {
-    return await this._groupService.shout(groupId, body.message, body.authorId)
+  ): Promise<UpdateGroupStatus> {
+    return await this._groupService.updateGroupStatus(groupId, body.message, body.authorId)
   }
 
-  @httpPost('/:groupId/users/:userId/promote', ...GroupController.validate('promoteMember'), TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/users/:userId/promote',
+    ...GroupController.validate('promoteMember'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async promoteMember (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number }
-  ): Promise<ChangeMemberRoleResult> {
+  ): Promise<ChangeMemberRole> {
     return await this._groupService.promoteMember(groupId, userId, body.authorId)
   }
 
-  @httpPost('/:groupId/users/:userId/demote', ...GroupController.validate('demoteMember'), TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/users/:userId/demote',
+    ...GroupController.validate('demoteMember'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async demoteMember (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number }
-  ): Promise<ChangeMemberRoleResult> {
+  ): Promise<ChangeMemberRole> {
     return await this._groupService.demoteMember(groupId, userId, body.authorId)
   }
 
-  @httpPut('/:groupId/users/:userId', ...GroupController.validate('changeMemberRole'), TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware)
+  @httpPut(
+    '/:groupId/users/:userId',
+    ...GroupController.validate('changeMemberRole'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async changeMemberRole (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, rank: number }
-  ): Promise<ChangeMemberRoleResult> {
+  ): Promise<ChangeMemberRole> {
     return await this._groupService.changeMemberRole(groupId, userId, {
       role: body.rank,
       authorId: body.authorId
@@ -84,7 +111,12 @@ export default class GroupController implements interfaces.Controller {
   }
 
   // BanService
-  @httpGet('/:groupId/bans', ...GroupController.validate('getBans'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpGet(
+    '/:groupId/bans',
+    ...GroupController.validate('getBans'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getBans (
     @requestParam('groupId') groupId: number,
       @queryParam('scope') scope: ScopeQuery,
@@ -93,7 +125,12 @@ export default class GroupController implements interfaces.Controller {
     return await this._banService.getBans(groupId, scope, sort)
   }
 
-  @httpGet('/:groupId/bans/:userId', ...GroupController.validate('getBan'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpGet(
+    '/:groupId/bans/:userId',
+    ...GroupController.validate('getBan'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getBan (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
@@ -102,7 +139,12 @@ export default class GroupController implements interfaces.Controller {
     return await this._banService.getBan(groupId, userId, scope)
   }
 
-  @httpPost('/:groupId/bans', ...GroupController.validate('postBan'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/bans',
+    ...GroupController.validate('postBan'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async postBan (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, duration?: number, reason: string, userId: number }
@@ -114,8 +156,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPost('/:groupId/bans/:userId/cancel', ...GroupController.validate('cancelBan'), TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/bans/:userId/cancel',
+    ...GroupController.validate('cancelBan'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async cancelBan (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
@@ -127,8 +173,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPost('/:groupId/bans/:userId/extend', ...GroupController.validate('extendBan'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpPost(
+    '/:groupId/bans/:userId/extend',
+    ...GroupController.validate('extendBan'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async extendBan (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
@@ -141,7 +191,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPut('/:groupId/bans/:userId', ...GroupController.validate('putBan'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpPut(
+    '/:groupId/bans/:userId',
+    ...GroupController.validate('putBan'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async putBan (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
@@ -154,13 +209,22 @@ export default class GroupController implements interfaces.Controller {
   }
 
   // ExileService
-  @httpGet('/:groupId/exiles', ...GroupController.validate('getExiles'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpGet(
+    '/:groupId/exiles',
+    ...GroupController.validate('getExiles'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getExiles (@requestParam('groupId') groupId: number): Promise<any> {
     return await this._exileService.getExiles(groupId)
   }
 
-  @httpGet('/:groupId/exiles/:userId', ...GroupController.validate('getExile'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpGet(
+    '/:groupId/exiles/:userId',
+    ...GroupController.validate('getExile'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getExile (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number
@@ -168,7 +232,12 @@ export default class GroupController implements interfaces.Controller {
     return await this._exileService.getExile(groupId, userId)
   }
 
-  @httpPost('/:groupId/exiles', ...GroupController.validate('postExile'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/exiles',
+    ...GroupController.validate('postExile'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async postExile (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, reason: string, userId: number }
@@ -179,8 +248,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPost('/:groupId/exiles/:userId', ...GroupController.validate('deleteExile'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpPost(
+    '/:groupId/exiles/:userId',
+    ...GroupController.validate('deleteExile'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async deleteExile (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
@@ -193,8 +266,12 @@ export default class GroupController implements interfaces.Controller {
   }
 
   // TrainingService
-  @httpGet('/:groupId/trainings', ...GroupController.validate('getTrainings'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpGet(
+    '/:groupId/trainings',
+    ...GroupController.validate('getTrainings'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getTrainings (
     @requestParam('groupId') groupId: number,
       @queryParam('scope') scope: ScopeQuery,
@@ -203,8 +280,12 @@ export default class GroupController implements interfaces.Controller {
     return await this._trainingService.getTrainings(groupId, scope, sort)
   }
 
-  @httpGet('/:groupId/trainings/:trainingId', ...GroupController.validate('getTraining'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpGet(
+    '/:groupId/trainings/:trainingId',
+    ...GroupController.validate('getTraining'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getTraining (
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
@@ -213,14 +294,22 @@ export default class GroupController implements interfaces.Controller {
     return await this._trainingService.getTraining(groupId, trainingId, scope)
   }
 
-  @httpGet('/:groupId/trainings/types', ...GroupController.validate('getTrainingTypes'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpGet(
+    '/:groupId/trainings/types',
+    ...GroupController.validate('getTrainingTypes'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getTrainingTypes (): Promise<any> {
     return await this._trainingService.getTrainingTypes()
   }
 
-  @httpPost('/:groupId/trainings', ...GroupController.validate('postTraining'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpPost(
+    '/:groupId/trainings',
+    ...GroupController.validate('postTraining'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async postTraining (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, typeId: number, date: number, notes?: string }
@@ -233,8 +322,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPost('/:groupId/trainings/:trainingId/cancel', ...GroupController.validate('cancelTraining'), TYPES
-    .ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/trainings/:trainingId/cancel',
+    ...GroupController.validate('cancelTraining'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async cancelTraining (
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
@@ -246,8 +339,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPost('/:groupId/trainings/types', ...GroupController.validate('postTrainingType'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpPost(
+    '/:groupId/trainings/types',
+    ...GroupController.validate('postTrainingType'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async postTrainingType (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { abbreviation: string, name: string }
@@ -258,8 +355,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPut('/:groupId/trainings/:trainingId', ...GroupController.validate('putTraining'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpPut(
+    '/:groupId/trainings/:trainingId',
+    ...GroupController.validate('putTraining'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async putTraining (
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
@@ -274,8 +375,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPut('/:groupId/trainings/types/:typeId', ...GroupController.validate('putTrainingType'), TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware)
+  @httpPut(
+    '/:groupId/trainings/types/:typeId',
+    ...GroupController.validate('putTrainingType'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async putTrainingType (
     @requestParam('groupId') groupId: number,
       @requestParam('typeId') typeId: number,
@@ -286,8 +391,12 @@ export default class GroupController implements interfaces.Controller {
     })
   }
 
-  @httpPost('/:groupId/trainings/types/:typeId', ...GroupController.validate('deleteTrainingType'), TYPES
-    .ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpPost(
+    '/:groupId/trainings/types/:typeId',
+    ...GroupController.validate('deleteTrainingType'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async deleteTrainingType (
     @requestParam('groupId') groupId: number,
       @requestParam('typeId') typeId: number
@@ -298,7 +407,7 @@ export default class GroupController implements interfaces.Controller {
   static validate (method: string): ValidationChain[] {
     switch (method) {
       // GroupService
-      case 'getShout':
+      case 'getGroupStatus':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt()
@@ -314,7 +423,7 @@ export default class GroupController implements interfaces.Controller {
           param('groupId').isInt().toInt()
         ]
 
-      case 'postShout':
+      case 'updateGroupStatus':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),

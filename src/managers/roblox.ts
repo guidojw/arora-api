@@ -1,6 +1,6 @@
-import { RESTRequestOptions, RESTRequester, RESTResponseDataType } from 'bloxy/src/interfaces/RESTInterfaces'
+import { RESTRequestOptions, RESTRequester, RESTResponseDataType } from 'bloxy/dist/interfaces/RESTInterfaces'
 import BaseManager from './base'
-import { Client } from 'bloxy/src'
+import { Client } from 'bloxy/dist'
 import { HTTPError } from 'got'
 import { injectable } from 'inversify'
 
@@ -71,7 +71,6 @@ async function requester (this: RESTRequester, options: RESTRequestOptions): Pro
         return err.response
       }
     }
-
     throw err
   }
 }

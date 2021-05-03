@@ -1,41 +1,62 @@
-import { GetUserById, GetUsersByUserIds } from 'bloxy/src/client/apis/UsersAPI'
 import { GroupService, UserService } from '../../services'
 import { ValidationChain, body, header, param } from 'express-validator'
 import { controller, httpGet, interfaces, requestBody, requestParam } from 'inversify-express-utils'
-import { GroupRole } from '../../services/group'
-import TYPES from '../../util/types'
+import { GetGroupRole } from '../../services/group'
+import { GetUserById } from 'bloxy/dist/client/apis/UsersAPI'
+import { GetUsers } from '../../services/user'
+import { constants } from '../../util'
 import { inject } from 'inversify'
+
+const { TYPES } = constants
 
 @controller('/v1/users')
 export default class UserController implements interfaces.Controller {
   @inject(TYPES.GroupService) private readonly _groupService!: GroupService
   @inject(TYPES.UserService) private readonly _userService!: UserService
 
-  @httpGet('/:username/user-id', ...UserController.validate('getUserIdFromUsername'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpGet(
+    '/:username/user-id',
+    ...UserController.validate('getUserIdFromUsername'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getUserIdFromUsername (@requestParam('username') username: string): Promise<number> {
     return await this._userService.getUserIdFromUsername(username)
   }
 
-  @httpGet('/:userId/has-badge/:badgeId', ...UserController.validate('hasBadge'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
+  @httpGet(
+    '/:userId/has-badge/:badgeId',
+    ...UserController.validate('hasBadge'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async hasBadge (@requestParam('userId') userId: number, @requestParam('badgeId') badgeId: number): Promise<boolean> {
     return await this._userService.hasBadge(userId, badgeId)
   }
 
-  @httpGet('/', ...UserController.validate('getUsers'), TYPES.ErrorMiddleware, TYPES
-    .AuthMiddleware)
-  async getUsers (@requestBody() body: { userIds: number[] }): Promise<GetUsersByUserIds['data']> {
+  @httpGet('/', ...UserController.validate('getUsers'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  async getUsers (@requestBody() body: { userIds: number[] }): Promise<GetUsers> {
     return await this._userService.getUsers(body.userIds)
   }
 
-  @httpGet('/:userId/rank/:groupId', ...UserController.validate('getRank'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  @httpGet(
+    '/:userId/rank/:groupId',
+    ...UserController.validate('getRank'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
   async getRank (@requestParam('groupId') groupId: number, @requestParam('userId') userId: number): Promise<number> {
     return await this._groupService.getRank(groupId, userId)
   }
 
-  @httpGet('/:userId/role/:groupId', ...UserController.validate('getRole'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  async getRole (@requestParam('groupId') groupId: number, @requestParam('userId') userId: number): Promise<GroupRole> {
+  @httpGet(
+    '/:userId/role/:groupId',
+    ...UserController.validate('getRole'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
+  async getRole (@requestParam('groupId') groupId: number, @requestParam('userId')
+    userId: number): Promise<GetGroupRole> {
     return await this._groupService.getRole(groupId, userId)
   }
 

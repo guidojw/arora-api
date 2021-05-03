@@ -10,5 +10,3 @@ const app = express()
 loaders.init(app) // eslint-disable-line @typescript-eslint/no-floating-promises
 
 export default app
-
-process.on('uncaughtException', console.error)

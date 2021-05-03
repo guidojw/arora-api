@@ -4,10 +4,12 @@ import { Container } from 'inversify'
 import ErrorMiddleware from '../middlewares/error'
 import { NotFoundError } from '../errors'
 import Sentry from '@sentry/node'
-import TYPES from '../util/types'
+import { constants } from '../util'
 import helmet from 'helmet'
 import hpp from 'hpp'
 import logger from 'morgan'
+
+const { TYPES } = constants
 
 export default function init (app: Application, container: Container): void {
   const errorMiddleware = container.get<ErrorMiddleware>(TYPES.ErrorMiddleware)

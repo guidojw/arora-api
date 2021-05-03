@@ -1,5 +1,6 @@
+import * as constants from './constants'
 import * as requestUtil from './request'
 import * as timeUtil from './time'
 import * as util from './util'
 
-export { requestUtil, timeUtil, util }
+export { constants, requestUtil, timeUtil, util }

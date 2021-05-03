@@ -2,11 +2,13 @@ import { Application } from 'express'
 import { BaseJob } from '../jobs'
 import { BaseManager } from '../managers'
 import Sentry from '@sentry/node'
-import TYPES from '../util/types'
+import { constants } from '../util'
 import containerLoader from './container'
 import cronConfig from '../configs/cron'
 import cronLoader from './cron'
 import expressLoader from './express'
+
+const { TYPES } = constants
 
 export async function init (app: Application): Promise<void> {
   if (typeof process.env.SENTRY_DSN !== 'undefined') {

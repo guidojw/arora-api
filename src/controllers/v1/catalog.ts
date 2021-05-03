@@ -2,8 +2,10 @@ import { ValidationChain, header, query } from 'express-validator'
 import { controller, httpGet, interfaces } from 'inversify-express-utils'
 import { CatalogService } from '../../services'
 import { Request } from 'express'
-import TYPES from '../../util/types'
+import { constants } from '../../util'
 import { inject } from 'inversify'
+
+const { TYPES } = constants
 
 @controller('/v1/catalog')
 export default class CatalogController implements interfaces.Controller {

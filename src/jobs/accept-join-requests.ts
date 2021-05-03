@@ -1,12 +1,14 @@
 import { inject, injectable } from 'inversify'
 import BaseJob from './base'
-import { CursorPage } from 'bloxy/src/structures/Asset'
+import { CursorPage } from 'bloxy/dist/structures/Asset'
 import DiscordMessageJob from './discord-message'
 import Exile from '../models'
-import { GroupJoinRequest } from 'bloxy/src/structures/Group'
+import { GroupJoinRequest } from 'bloxy/dist/structures/Group'
 import HealthCheckJob from './health-check'
 import { RobloxManager } from '../managers'
-import TYPES from '../util/types'
+import { constants } from '../util'
+
+const { TYPES } = constants
 
 export type JoinRequest = Omit<GroupJoinRequest, 'user'> & { user: Omit<GroupJoinRequest['user'], 'name'> & {
   name: string }}
@@ -40,6 +42,6 @@ export default class AcceptJoinRequestsJob implements BaseJob {
       cursor = requests.cursors.next
     } while (cursor !== null)
 
-    return await this._healthCheckJob.run('acceptJoinRequestsJob')
+    await this._healthCheckJob.run('acceptJoinRequestsJob')
   }
 }

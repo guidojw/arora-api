@@ -12,7 +12,9 @@ import {
 } from '../services'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { Container } from 'inversify'
-import TYPES from '../util/types'
+import { constants } from '../util'
+
+const { TYPES } = constants
 
 export default function init (): Container {
   const container = new Container()

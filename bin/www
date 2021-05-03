@@ -5,10 +5,12 @@ const debug = require('debug')('arora-api:server')
 const http = require('http')
 const WebSocket = require('ws')
 
+const { TYPES } = require('../dist/util').constants
+
 const app = require('../dist/app').default
 const container = app.get('container')
-const authMiddleware = container.get('AuthMiddleware')
-const webSocketManager = container.get('WebSocketManager')
+const authMiddleware = container.get(TYPES.AuthMiddleware)
+const webSocketManager = container.get(TYPES.WebSocketManager)
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)

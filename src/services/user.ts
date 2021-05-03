@@ -1,8 +1,12 @@
-import { GetUserById, GetUsersByUserIds } from 'bloxy/src/client/apis/UsersAPI'
+import { GetUserById, GetUsersByUserIds } from 'bloxy/dist/client/apis/UsersAPI'
 import { inject, injectable } from 'inversify'
 import { NotFoundError } from '../errors'
 import { RobloxManager } from '../managers'
-import TYPES from '../util/types'
+import { constants } from '../util'
+
+const { TYPES } = constants
+
+export type GetUsers = GetUsersByUserIds['data']
 
 @injectable()
 export default class UserService {
@@ -29,7 +33,7 @@ export default class UserService {
     })).data.length === 1
   }
 
-  async getUsers (userIds: number[]): Promise<GetUsersByUserIds['data']> {
+  async getUsers (userIds: number[]): Promise<GetUsers> {
     const client = this._robloxManager.getClient()
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
   }
