@@ -3,14 +3,11 @@
 require('dotenv').config()
 require('pg').types.setTypeParser(20, BigInt)
 
-module.exports = {
+const baseConfig = {
   type: 'postgres',
-  host: 'localhost',
   port: 5432,
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  database: 'arora_api_development2',
-  logging: true,
   entities: [
     'src/entities/**/*.ts'
   ],
@@ -26,3 +23,22 @@ module.exports = {
     subscribersDir: 'src/subscribers'
   }
 }
+
+module.exports = {
+  development: {
+    ...baseConfig,
+    host: '127.0.0.1',
+    database: 'arora_api_development2',
+    logging: true
+  },
+  production: {
+    ...baseConfig,
+    host: process.env.POSTGRES_HOST,
+    database: 'arora_api_production'
+  },
+  staging: {
+    ...baseConfig,
+    host: process.env.POSTGRES_HOST,
+    database: 'arora_api_staging'
+  }
+}[process.env.NODE_ENV ?? 'development']
