@@ -10,7 +10,7 @@ import expressLoader from './express'
 
 const { TYPES } = constants
 
-export async function init (app: Application): Promise<void> {
+export async function init (): Promise<Application> {
   if (typeof process.env.SENTRY_DSN !== 'undefined') {
     Sentry.init({
       dsn: process.env.SENTRY_DSN,
@@ -19,16 +19,16 @@ export async function init (app: Application): Promise<void> {
     })
   }
 
-  const container = containerLoader()
-  app.set('container', container)
-
+  const container = await containerLoader()
   await container.get<BaseManager>(TYPES.RobloxManager).init()
   container.get<BaseManager>(TYPES.WebSocketManager).init()
 
-  expressLoader(app, container)
+  const app = expressLoader(container)
   cronLoader(container)
 
   if (typeof cronConfig.announceTrainingsJob !== 'undefined') {
     await container.get<BaseJob>(TYPES.AnnounceTrainingsJob).run()
   }
+
+  return app
 }

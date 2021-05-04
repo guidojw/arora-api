@@ -1,4 +1,5 @@
 import { AnnounceTrainingsJob, DiscordMessageJob, HealthCheckJob } from '../jobs'
+import { AsyncContainerModule, Container } from 'inversify'
 import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
 import {
   AuthService,
@@ -21,59 +22,63 @@ import {
   TrainingType
 } from '../entities'
 import { BanRepository, PayoutRepository, TrainingRepository } from '../repositories'
-import { Repository, getCustomRepository, getRepository } from 'typeorm'
+import { Repository, getConnection, getCustomRepository, getRepository } from 'typeorm'
 import { RobloxManager, WebSocketManager } from '../managers'
-import { Container } from 'inversify'
 import { constants } from '../util'
 
 const { TYPES } = constants
 
-export default function init (): Container {
+export default async function init (): Promise<Container> {
   const container = new Container()
 
-  container.bind<AnnounceTrainingsJob>(TYPES.AnnounceTrainingsJob).to(AnnounceTrainingsJob)
-  container.bind<DiscordMessageJob>(TYPES.DiscordMessageJob).to(DiscordMessageJob)
-  container.bind<HealthCheckJob>(TYPES.AnnounceTrainingsJob).to(HealthCheckJob)
+  const bindings = new AsyncContainerModule(async bind => {
+    await getConnection()
 
-  container.bind<RobloxManager>(TYPES.RobloxManager).to(RobloxManager)
-  container.bind<WebSocketManager>(TYPES.WebSocketManager).to(WebSocketManager)
+    bind<AnnounceTrainingsJob>(TYPES.AnnounceTrainingsJob).to(AnnounceTrainingsJob)
+    bind<DiscordMessageJob>(TYPES.DiscordMessageJob).to(DiscordMessageJob)
+    bind<HealthCheckJob>(TYPES.AnnounceTrainingsJob).to(HealthCheckJob)
 
-  container.bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
-  container.bind<ErrorMiddleware>(TYPES.ErrorMiddleware).to(ErrorMiddleware)
+    bind<RobloxManager>(TYPES.RobloxManager).to(RobloxManager)
+    bind<WebSocketManager>(TYPES.WebSocketManager).to(WebSocketManager)
 
-  container.bind<Repository<Ban>>(TYPES.BanRepository).toDynamicValue(() => {
-    return getCustomRepository(BanRepository)
-  }).inRequestScope()
-  container.bind<Repository<BanCancellation>>(TYPES.BanCancellationRepository).toDynamicValue(() => {
-    return getRepository(BanCancellation)
-  }).inRequestScope()
-  container.bind<Repository<BanExtension>>(TYPES.BanExtensionRepository).toDynamicValue(() => {
-    return getRepository(BanExtension)
-  }).inRequestScope()
-  container.bind<Repository<Exile>>(TYPES.ExileRepository).toDynamicValue(() => {
-    return getRepository(Exile)
-  }).inRequestScope()
-  container.bind<Repository<Payout>>(TYPES.PayoutRepository).toDynamicValue(() => {
-    return getCustomRepository(PayoutRepository)
-  }).inRequestScope()
-  container.bind<Repository<Training>>(TYPES.TrainingRepository).toDynamicValue(() => {
-    return getCustomRepository(TrainingRepository)
-  }).inRequestScope()
-  container.bind<Repository<TrainingCancellation>>(TYPES.TrainingCancellationRepository).toDynamicValue(() => {
-    return getRepository(TrainingCancellation)
-  }).inRequestScope()
-  container.bind<Repository<TrainingType>>(TYPES.TrainingTypeRepository).toDynamicValue(() => {
-    return getRepository(TrainingType)
-  }).inRequestScope()
+    bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
+    bind<ErrorMiddleware>(TYPES.ErrorMiddleware).to(ErrorMiddleware)
 
-  container.bind<AuthService>(TYPES.AuthService).to(AuthService)
-  container.bind<BanService>(TYPES.BanService).to(BanService)
-  container.bind<CatalogService>(TYPES.CatalogService).to(CatalogService)
-  container.bind<ExileService>(TYPES.ExileService).to(ExileService)
-  container.bind<GroupService>(TYPES.GroupService).to(GroupService)
-  container.bind<StatusService>(TYPES.StatusService).to(StatusService)
-  container.bind<TrainingService>(TYPES.TrainingService).to(TrainingService)
-  container.bind<UserService>(TYPES.UserService).to(UserService)
+    bind<Repository<Ban>>(TYPES.BanRepository).toDynamicValue(() => {
+      return getCustomRepository(BanRepository)
+    }).inRequestScope()
+    bind<Repository<BanCancellation>>(TYPES.BanCancellationRepository).toDynamicValue(() => {
+      return getRepository(BanCancellation)
+    }).inRequestScope()
+    bind<Repository<BanExtension>>(TYPES.BanExtensionRepository).toDynamicValue(() => {
+      return getRepository(BanExtension)
+    }).inRequestScope()
+    bind<Repository<Exile>>(TYPES.ExileRepository).toDynamicValue(() => {
+      return getRepository(Exile)
+    }).inRequestScope()
+    bind<Repository<Payout>>(TYPES.PayoutRepository).toDynamicValue(() => {
+      return getCustomRepository(PayoutRepository)
+    }).inRequestScope()
+    bind<Repository<Training>>(TYPES.TrainingRepository).toDynamicValue(() => {
+      return getCustomRepository(TrainingRepository)
+    }).inRequestScope()
+    bind<Repository<TrainingCancellation>>(TYPES.TrainingCancellationRepository).toDynamicValue(() => {
+      return getRepository(TrainingCancellation)
+    }).inRequestScope()
+    bind<Repository<TrainingType>>(TYPES.TrainingTypeRepository).toDynamicValue(() => {
+      return getRepository(TrainingType)
+    }).inRequestScope()
+
+    bind<AuthService>(TYPES.AuthService).to(AuthService)
+    bind<BanService>(TYPES.BanService).to(BanService)
+    bind<CatalogService>(TYPES.CatalogService).to(CatalogService)
+    bind<ExileService>(TYPES.ExileService).to(ExileService)
+    bind<GroupService>(TYPES.GroupService).to(GroupService)
+    bind<StatusService>(TYPES.StatusService).to(StatusService)
+    bind<TrainingService>(TYPES.TrainingService).to(TrainingService)
+    bind<UserService>(TYPES.UserService).to(UserService)
+  })
+  await container.loadAsync(bindings)
 
   return container
 }

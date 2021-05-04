@@ -7,37 +7,38 @@ const WebSocket = require('ws')
 
 const { TYPES } = require('../dist/util').constants
 
-const app = require('../dist/app').default
-const container = app.get('container')
-const authMiddleware = container.get(TYPES.AuthMiddleware)
-const webSocketManager = container.get(TYPES.WebSocketManager)
+require('../dist/app').default.then(app => {
+  const container = app.get('container')
+  const authMiddleware = container.get(TYPES.AuthMiddleware)
+  const webSocketManager = container.get(TYPES.WebSocketManager)
 
-const port = normalizePort(process.env.PORT || '3000')
-app.set('port', port)
+  const port = normalizePort(process.env.PORT || '3000')
+  app.set('port', port)
 
-const server = http.createServer(app)
-const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
+  const server = http.createServer(app)
+  const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
 
-wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
+  wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
 
-server.on('error', onError)
-server.on('listening', onListening)
+  server.on('error', onError)
+  server.on('listening', onListening)
 
-server.on('upgrade', function upgrade (req, socket, head) {
+  server.on('upgrade', function upgrade (req, socket, head) {
     try {
-        authMiddleware.authenticateWebSocketConnection(req)
+      authMiddleware.authenticateWebSocketConnection(req)
     } catch (err) {
-        socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
-        socket.destroy()
-        return
+      socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
+      socket.destroy()
+      return
     }
 
     wss.handleUpgrade(req, socket, head, function done (ws) {
-        wss.emit('connection', ws, req)
+      wss.emit('connection', ws, req)
     })
-})
+  })
 
-server.listen(port)
+  server.listen(port)
+})
 
 function normalizePort (val) {
     const port = parseInt(val, 10)
