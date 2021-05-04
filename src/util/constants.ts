@@ -9,6 +9,15 @@ export const TYPES = {
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ErrorMiddleware: Symbol.for('ErrorMiddleware'),
 
+  BanRepository: Symbol.for('BanRepository'),
+  BanCancellationRepository: Symbol.for('BanRepository'),
+  BanExtensionRepository: Symbol.for('BanExtensionRepository'),
+  ExileRepository: Symbol.for('ExileRepository'),
+  PayoutRepository: Symbol.for('PayoutRepository'),
+  TrainingRepository: Symbol.for('TrainingRepository'),
+  TrainingCancellationRepository: Symbol.for('TrainingCancellationRepository'),
+  TrainingTypeRepository: Symbol.for('TrainingTypeRepository'),
+
   AuthService: Symbol.for('AuthService'),
   BanService: Symbol.for('BanService'),
   CatalogService: Symbol.for('CatalogService'),
