@@ -9,7 +9,7 @@ export default class Exile {
   @Column('bigint', { name: 'author_id' })
   authorId!: number
 
-  @Column('timestamp with time zone', { default: () => 'NOW()' })
+  @Column('timestamp with time zone', { default: () => 'now()' })
   date!: Date
 
   @Column({ name: 'group_id' })

@@ -10,10 +10,10 @@ export default class Ban {
   @Column('bigint', { name: 'author_id' })
   authorId!: number
 
-  @Column('timestamp with time zone', { default: () => 'NOW()' })
+  @Column('timestamp with time zone', { default: () => 'now()' })
   date!: Date
 
-  @Column({ nullable: true })
+  @Column('int', { nullable: true })
   duration!: number | null
 
   @Column({ name: 'group_id' })

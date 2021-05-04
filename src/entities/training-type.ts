@@ -7,7 +7,7 @@ export default class TrainingType {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column('string', { length: 8 })
+  @Column({ length: 8 })
   @IsNotEmpty()
   abbreviation!: string
 

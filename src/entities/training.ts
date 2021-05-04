@@ -10,7 +10,7 @@ export default class Training {
   @Column('bigint', { name: 'author_id' })
   authorId!: number
 
-  @Column({ nullable: true })
+  @Column('varchar', { nullable: true })
   @ValidateIf(training => training.notes !== null)
   @IsNotEmpty()
   notes!: string | null
