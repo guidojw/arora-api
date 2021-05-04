@@ -19,6 +19,6 @@ export default class Exile {
   @IsNotEmpty()
   reason!: string
 
-  @Column({ name: 'role_id' })
-  roleId!: number
+  @Column('bigint', { name: 'user_id' })
+  userId!: number
 }

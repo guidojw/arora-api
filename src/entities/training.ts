@@ -15,7 +15,7 @@ export default class Training {
   @IsNotEmpty()
   notes!: string | null
 
-  @Column()
+  @Column('timestamp with time zone')
   date!: Date
 
   @Column({ name: 'group_id' })
