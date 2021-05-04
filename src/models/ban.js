@@ -1,60 +1,6 @@
 'use strict'
 
 module.exports = (sequelize, DataTypes) => {
-  const Ban = sequelize.define('Ban', {
-    authorId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      field: 'author_id'
-    },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW
-    },
-    duration: DataTypes.INTEGER,
-    groupId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'group_id'
-    },
-    reason: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true
-      }
-    },
-    roleId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'role_id'
-    },
-    userId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      field: 'user_id'
-    }
-  }, {
-    tableName: 'bans'
-  })
-
-  Ban.associate = models => {
-    Ban.hasOne(models.BanCancellation, {
-      foreignKey: {
-        allowNull: false,
-        name: 'banId'
-      }
-    })
-    Ban.hasMany(models.BanExtension, {
-      foreignKey: {
-        allowNull: false,
-        name: 'banId'
-      },
-      as: 'extensions'
-    })
-  }
-
   Ban.loadScopes = models => {
     const endsAtLiteral = sequelize.literal(
       'date + ' +
