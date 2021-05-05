@@ -14,6 +14,10 @@ export default class TrainingType {
   @Column({ name: 'group_id' })
   groupId!: number
 
+  @Column({ length: 255 })
+  @IsNotEmpty()
+  name!: string
+
   @OneToMany(() => Training, training => training.type)
   trainings!: Training[]
 }

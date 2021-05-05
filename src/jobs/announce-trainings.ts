@@ -1,41 +1,47 @@
-'use strict'
+import { GroupService, UserService } from '../services'
+import { constants, timeUtil } from '../util'
+import { inject, injectable } from 'inversify'
+import BaseJob from './base'
+import { GetUsers } from '../services/user'
+import { Training } from '../entities'
+import { TrainingRepository } from '../repositories'
+import cron from 'node-schedule'
 
-const cron = require('node-schedule')
+const { TYPES } = constants
+const { getTime, getTimeZoneAbbreviation } = timeUtil
 
-const { Training } = require('../models')
-const { getTime, getTimeZoneAbbreviation } = require('../util').timeUtil
+@injectable()
+export default class AnnounceTrainingsJob implements BaseJob {
+  @inject(TYPES.TrainingRepository) private readonly _trainingRepository!: TrainingRepository
+  @inject(TYPES.GroupService) private readonly _groupService!: GroupService
+  @inject(TYPES.UserService) private readonly _userService!: UserService
 
-class AnnounceTrainingsJob {
-  constructor (groupService, userService) {
-    this._groupService = groupService
-    this._userService = userService
-  }
-
-  async run (groupId) {
+  async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
-      const groupIds = (await Training.findAll({
-        attributes: ['groupId'],
-        group: ['groupId', 'type.id']
-      })).map(training => training.groupId)
-      return Promise.all(groupIds.map(groupId => this.run(groupId)))
+      const groupIds = (await this._trainingRepository.scopes.default
+        .select('training.groupId')
+        .groupBy('training.groupId, training.id')
+        .getMany()
+      ).map(training => training.groupId)
+      return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
-    const trainings = await Training.findAll({ where: { groupId } })
+    const trainings = await this._trainingRepository.find({ where: { groupId } })
     for (const training of trainings) {
       const jobName = `training_${training.id}`
       const job = cron.scheduledJobs[jobName]
-      if (!job) {
+      if (typeof job === 'undefined') {
         cron.scheduleJob(
           jobName,
           new Date(training.date.getTime() + 30 * 60 * 1000),
-          this.run.bind(this, groupId)
+          this.run.bind(this, groupId) // eslint-disable-line @typescript-eslint/no-misused-promises
         )
       }
     }
 
     const now = new Date()
     const today = now.getDate()
-    const isDay = day => training => training.date.getDate() === day
+    const isDay = (day: number) => (training: Training) => training.date.getDate() === day
     const trainingsToday = trainings.filter(isDay(today))
     const trainingsTomorrow = trainings.filter(isDay(today + 1))
     const authorIds = [...new Set([
@@ -62,14 +68,14 @@ class AnnounceTrainingsJob {
     shout += addition
 
     // Compare current shout with new shout and update if they differ.
-    const oldShout = await this._groupService.getShout(groupId)
+    const oldShout = await this._groupService.getGroupStatus(groupId)
     if (shout !== oldShout.body) {
-      await this._groupService.shout(groupId, shout)
+      await this._groupService.updateGroupStatus(groupId, shout)
     }
   }
 }
 
-function getTrainingsInfo (trainings, authors) {
+function getTrainingsInfo (trainings: Training[], authors: GetUsers): string {
   const groupedTrainings = groupTrainingsByType(trainings)
   const types = Object.keys(groupedTrainings)
   let result = ''
@@ -86,7 +92,7 @@ function getTrainingsInfo (trainings, authors) {
         const timeString = getTime(training.date)
         const author = authors.find(author => author.id === training.authorId)
 
-        result += ` ${timeString} (host: ${author.name ?? 'unknown'})`
+        result += ` ${timeString} (host: ${author?.name ?? 'unknown'})`
         if (j < typeTrainings.length - 2) {
           result += ','
         } else if (j === typeTrainings.length - 2) {
@@ -104,15 +110,13 @@ function getTrainingsInfo (trainings, authors) {
   return result
 }
 
-function groupTrainingsByType (trainings) {
-  const result = {}
+function groupTrainingsByType (trainings: Training[]): Record<string, Training[]> {
+  const result: Record<string, Training[]> = {}
   for (const training of trainings) {
-    if (!result[training.type.abbreviation]) {
+    if (typeof result[training.type.abbreviation] === 'undefined') {
       result[training.type.abbreviation] = []
     }
     result[training.type.abbreviation].push(training)
   }
   return result
 }
-
-module.exports = AnnounceTrainingsJob

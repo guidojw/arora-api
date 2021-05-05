@@ -22,7 +22,7 @@ import {
   TrainingType
 } from '../entities'
 import { BanRepository, PayoutRepository, TrainingRepository } from '../repositories'
-import { Repository, getConnection, getCustomRepository, getRepository } from 'typeorm'
+import { Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { constants } from '../util'
 
@@ -32,7 +32,7 @@ export default async function init (): Promise<Container> {
   const container = new Container()
 
   const bindings = new AsyncContainerModule(async bind => {
-    await getConnection()
+    await createConnection()
 
     bind<AnnounceTrainingsJob>(TYPES.AnnounceTrainingsJob).to(AnnounceTrainingsJob)
     bind<DiscordMessageJob>(TYPES.DiscordMessageJob).to(DiscordMessageJob)

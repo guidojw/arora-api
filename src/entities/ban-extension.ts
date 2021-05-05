@@ -16,7 +16,7 @@ export default class BanExtension {
   @Column()
   duration!: number
 
-  @Column()
+  @Column({ length: 255 })
   @IsNotEmpty()
   reason!: string
 

@@ -15,7 +15,7 @@ const baseConfig = {
     'src/migrations/**/*.ts'
   ],
   subscribers: [
-    'src/subscriber/**/*.ts'
+    'src/subscribers/**/*.ts'
   ],
   cli: {
     entitiesDir: 'src/entities',

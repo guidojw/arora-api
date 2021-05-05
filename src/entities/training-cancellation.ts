@@ -13,7 +13,7 @@ export default class TrainingCancellation {
   @Column({ name: 'training_id' })
   trainingId!: number
 
-  @Column()
+  @Column({ length: 255 })
   @IsNotEmpty()
   reason!: string
 

@@ -10,8 +10,8 @@ export default class Training {
   @Column('bigint', { name: 'author_id' })
   authorId!: number
 
-  @Column('varchar', { nullable: true })
-  @ValidateIf(training => training.notes !== null)
+  @Column('varchar', { nullable: true, length: 255 })
+  @ValidateIf(training => training.notes != null)
   @IsNotEmpty()
   notes!: string | null
 
@@ -20,6 +20,9 @@ export default class Training {
 
   @Column({ name: 'group_id' })
   groupId!: number
+
+  @Column({ name: 'type_id' })
+  typeId!: number
 
   @ManyToOne(() => TrainingType, trainingType => trainingType.trainings, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'type_id' })

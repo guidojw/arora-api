@@ -10,7 +10,7 @@ export default class Ban {
   @Column('bigint', { name: 'author_id' })
   authorId!: number
 
-  @Column('timestamp with time zone', { default: () => 'now()' })
+  @Column('timestamp with time zone', { default: () => 'NOW()' })
   date!: Date
 
   @Column('int', { nullable: true })
@@ -19,7 +19,7 @@ export default class Ban {
   @Column({ name: 'group_id' })
   groupId!: number
 
-  @Column()
+  @Column({ length: 255 })
   @IsNotEmpty()
   reason!: string
 

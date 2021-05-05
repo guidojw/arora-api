@@ -126,7 +126,7 @@ export class createBanExilePayoutTrainingTrainingType1620169219541 implements Mi
         type: 'int'
       }, {
         name: 'until',
-        type: 'date'
+        type: 'timestamp with time zone'
       }]
     }))
 
@@ -143,6 +143,9 @@ export class createBanExilePayoutTrainingTrainingType1620169219541 implements Mi
       }, {
         name: 'group_id',
         type: 'int'
+      }, {
+        name: 'name',
+        type: 'varchar(255)'
       }]
     }))
 
@@ -168,7 +171,8 @@ export class createBanExilePayoutTrainingTrainingType1620169219541 implements Mi
         type: 'int'
       }, {
         name: 'type_id',
-        type: 'int'
+        type: 'int',
+        isNullable: true
       }]
     }))
     await queryRunner.createForeignKey('trainings', new TableForeignKey({

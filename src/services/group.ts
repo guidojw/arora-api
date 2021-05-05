@@ -57,15 +57,17 @@ export default class GroupService {
     return await client.apis.groupsAPI.getGroupRoles({ groupId })
   }
 
-  async updateGroupStatus (groupId: number, message: string, authorId: number): Promise<UpdateGroupStatus> {
+  async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
     const client = this._robloxManager.getClient(groupId)
     const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as GetGroupStatus
 
-    const authorName = await this._userService.getUsername(authorId)
-    if (shout.body === '') {
-      await this._discordMessageJob.run(`**${authorName}** cleared the shout`)
-    } else {
-      await this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
+    if (typeof authorId !== 'undefined') {
+      const authorName = await this._userService.getUsername(authorId)
+      if (shout.body === '') {
+        await this._discordMessageJob.run(`**${authorName}** cleared the shout`)
+      } else {
+        await this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
+      }
     }
 
     return shout

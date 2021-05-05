@@ -13,7 +13,7 @@ export default class BanCancellation {
   @Column({ name: 'ban_id' })
   banId!: number
 
-  @Column()
+  @Column({ length: 255 })
   @IsNotEmpty()
   reason!: string
 
