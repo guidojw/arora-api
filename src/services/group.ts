@@ -9,7 +9,7 @@ import applicationConfig from '../configs/application'
 
 const { TYPES } = constants
 
-export type GetGroupStatus = GetGroup['shout']
+export type GetGroupStatus = GetGroup['shout'] | null
 export type GetGroupRole = GetGroupRoles['roles'][0]
 export type UpdateGroupStatus = Exclude<BloxyUpdateGroupStatus, null>
 export interface ChangeMemberRole { oldRole: GetGroupRole, newRole: GetGroupRole }
@@ -59,7 +59,7 @@ export default class GroupService {
 
   async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
     const client = this._robloxManager.getClient(groupId)
-    const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as GetGroupStatus
+    const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as UpdateGroupStatus
 
     if (typeof authorId !== 'undefined') {
       const authorName = await this._userService.getUsername(authorId)

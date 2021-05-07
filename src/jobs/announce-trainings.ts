@@ -19,10 +19,10 @@ export default class AnnounceTrainingsJob implements BaseJob {
   async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
       const groupIds = (await this._trainingRepository.scopes.default
-        .select('training.groupId')
-        .groupBy('training.groupId, training.id')
-        .getMany()
-      ).map(training => training.groupId)
+        .select('DISTINCT training.groupId')
+        .groupBy('training.groupId')
+        .getRawMany()
+      ).map(training => training.group_id) as number[]
       return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
@@ -69,8 +69,8 @@ export default class AnnounceTrainingsJob implements BaseJob {
 
     // Compare current shout with new shout and update if they differ.
     const oldShout = await this._groupService.getGroupStatus(groupId)
-    if (shout !== oldShout.body) {
-      await this._groupService.updateGroupStatus(groupId, shout)
+    if (shout !== oldShout?.body) {
+      // await this._groupService.updateGroupStatus(groupId, shout)
     }
   }
 }
@@ -113,6 +113,9 @@ function getTrainingsInfo (trainings: Training[], authors: GetUsers): string {
 function groupTrainingsByType (trainings: Training[]): Record<string, Training[]> {
   const result: Record<string, Training[]> = {}
   for (const training of trainings) {
+    if (training.type == null) {
+      continue
+    }
     if (typeof result[training.type.abbreviation] === 'undefined') {
       result[training.type.abbreviation] = []
     }

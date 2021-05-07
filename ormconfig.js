@@ -1,7 +1,7 @@
 'use strict'
 
 require('dotenv').config()
-require('pg').types.setTypeParser(20, BigInt)
+require('pg').defaults.parseInt8 = true // By default PG returns bigint columns as strings.
 
 const baseConfig = {
   type: 'postgres',
@@ -9,13 +9,13 @@ const baseConfig = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   entities: [
-    'src/entities/**/*.ts'
+    'dist/entities/**/*.js'
   ],
   migrations: [
-    'src/migrations/**/*.ts'
+    'dist/migrations/**/*.js'
   ],
   subscribers: [
-    'src/subscribers/**/*.ts'
+    'dist/subscribers/**/*.js'
   ],
   cli: {
     entitiesDir: 'src/entities',

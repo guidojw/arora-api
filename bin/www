@@ -1,27 +1,27 @@
 #!/usr/bin/env node
 'use strict'
 
+const WebSocket = require('ws')
 const debug = require('debug')('arora-api:server')
 const http = require('http')
-const WebSocket = require('ws')
 
 const { TYPES } = require('../dist/util').constants
 
+let port, server
 require('../dist/app').default.then(app => {
   const container = app.get('container')
   const authMiddleware = container.get(TYPES.AuthMiddleware)
   const webSocketManager = container.get(TYPES.WebSocketManager)
 
-  const port = normalizePort(process.env.PORT || '3000')
+  port = normalizePort(process.env.PORT || '3000')
   app.set('port', port)
 
-  const server = http.createServer(app)
-  const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
-
-  wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
-
+  server = http.createServer(app)
   server.on('error', onError)
   server.on('listening', onListening)
+
+  const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
+  wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
 
   server.on('upgrade', function upgrade (req, socket, head) {
     try {
@@ -41,38 +41,36 @@ require('../dist/app').default.then(app => {
 })
 
 function normalizePort (val) {
-    const port = parseInt(val, 10)
-    if (isNaN(port)) {
-        return val
-    }
-    if (port >= 0) {
-        return port
-    }
-    return false
+  const port = parseInt(val, 10)
+  if (isNaN(port)) {
+    return val
+  }
+  if (port >= 0) {
+    return port
+  }
+  return false
 }
 
 function onError (error) {
-    if (error.syscall !== 'listen') {
-        throw error
-    }
+  if (error.syscall !== 'listen') {
+    throw error
+  }
 
-    const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port
-    switch (error.code) {
-        case 'EACCES':
-            console.error(bind + ' requires elevated privileges')
-            process.exit(1)
-            break
-        case 'EADDRINUSE':
-            console.error(bind + ' is already in use')
-            process.exit(1)
-            break
-        default:
-            throw error
-    }
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges')
+      process.exit(1)
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use')
+      process.exit(1)
+    default:
+      throw error
+  }
 }
 
 function onListening () {
-    const addr = server.address()
-    const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
-    debug('Listening on ' + bind)
+  const addr = server.address()
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
+  debug('Listening on ' + bind)
 }

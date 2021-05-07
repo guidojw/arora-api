@@ -26,7 +26,8 @@ export async function init (): Promise<Application> {
   const app = expressLoader(container)
   cronLoader(container)
 
-  if (typeof cronConfig.announceTrainingsJob !== 'undefined') {
+  if (typeof cronConfig.announceTrainingsJob !== 'undefined' && (process.env.NODE_ENV ?? 'development') !==
+    'development') {
     await container.get<BaseJob>(TYPES.AnnounceTrainingsJob).run()
   }
 

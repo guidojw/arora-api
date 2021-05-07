@@ -1,9 +1,9 @@
-import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm'
+import { EntityRepository, Repository } from 'typeorm'
 import { Ban } from '../entities'
 import { BaseScopes } from './base'
 
 export class BanScopes extends BaseScopes<Ban> {
-  get default (): SelectQueryBuilder<Ban> {
+  get default (): BanScopes {
     return this
   }
 
@@ -14,7 +14,7 @@ export class BanScopes extends BaseScopes<Ban> {
 
 @EntityRepository(Ban)
 export default class BanRepository extends Repository<Ban> {
-  get scoped (): BanScopes {
+  get scopes (): BanScopes {
     return new BanScopes(this.createQueryBuilder('ban'))
   }
 }

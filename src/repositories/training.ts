@@ -1,9 +1,9 @@
-import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm'
+import { EntityRepository, Repository } from 'typeorm'
 import { BaseScopes } from './base'
 import { Training } from '../entities'
 
 export class TrainingScopes extends BaseScopes<Training> {
-  get default (): SelectQueryBuilder<Training> {
+  get default (): TrainingScopes {
     return this
       .leftJoinAndSelect('training.type', 'type')
       .leftJoinAndSelect('training_cancellations', 'cancellation', 'cancellation.trainingId = training.id')

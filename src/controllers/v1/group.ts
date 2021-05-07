@@ -105,7 +105,10 @@ export default class GroupController implements interfaces.Controller {
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, rank: number }
   ): Promise<ChangeMemberRole> {
-    return await this._groupService.changeMemberRole(groupId, userId, body)
+    return await this._groupService.changeMemberRole(groupId, userId, {
+      authorId: body.authorId,
+      role: body.rank
+    })
   }
 
   // BanService
@@ -187,7 +190,7 @@ export default class GroupController implements interfaces.Controller {
   async putBan (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
-      @requestBody() body: { changes: { authorId?: number, reason?: number }, editorId: number }
+      @requestBody() body: { changes: { authorId?: number, reason?: string }, editorId: number }
   ): Promise<Ban> {
     return await this._banService.changeBan(groupId, userId, body)
   }
@@ -332,8 +335,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
       @requestBody() body: {
-        editorId: number
         changes: { typeId?: number, date?: number, notes?: string, authorId?: number }
+        editorId: number
       }
   ): Promise<Training> {
     return await this._trainingService.changeTraining(groupId, trainingId, body)
@@ -348,7 +351,10 @@ export default class GroupController implements interfaces.Controller {
   async putTrainingType (
     @requestParam('groupId') groupId: number,
       @requestParam('typeId') typeId: number,
-      @requestBody() body: { changes: { abbreviation: string, name: string } }
+      @requestBody() body: {
+        changes: { abbreviation?: string, name?: string }
+        editorId: number
+      }
   ): Promise<TrainingType> {
     return await this._trainingService.changeTrainingType(groupId, typeId, body)
   }
@@ -561,6 +567,7 @@ export default class GroupController implements interfaces.Controller {
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           param('typeId').isInt().toInt(),
+          body('editorId').exists().isInt().toInt(),
           body('changes.name').optional().isString(),
           body('changes.abbreviation').optional().isString()
         ]

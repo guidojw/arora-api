@@ -11,7 +11,7 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     return scopes.every(scope => scope === 'default' || this.scopes.includes(scope))
   }
 
-  apply (scopes?: string[]): SelectQueryBuilder<T> {
+  apply (scopes?: string[]): BaseScopes<T> {
     if (typeof scopes === 'undefined') {
       return this.default
     }
@@ -20,9 +20,10 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
       if (scope !== 'default' && !BaseScopes.scopes.includes(scope)) {
         throw new Error(`Invalid scope "${scope}" called`)
       }
-      return Object.getPrototypeOf.call(qb, scope)
+      // @ts-expect-error
+      return qb[scope]
     }, this)
   }
 
-  abstract get default (): SelectQueryBuilder<T>
+  abstract get default (): BaseScopes<T>
 }
