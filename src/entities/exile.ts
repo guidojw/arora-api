@@ -4,7 +4,7 @@ import { IsNotEmpty } from 'class-validator'
 @Entity({ name: 'exiles' })
 export default class Exile {
   @PrimaryGeneratedColumn()
-  id!: number
+  readonly id!: number
 
   @Column('bigint', { name: 'author_id' })
   authorId!: number

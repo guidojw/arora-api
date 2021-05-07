@@ -1,4 +1,4 @@
-export interface CronConfig { expression: string, job: string, args?: [any] }
+export interface CronConfig { expression: string, job: string, args?: any[] }
 
 const cronConfig: { [key: string]: CronConfig } = {
   acceptJoinRequestsJob: {

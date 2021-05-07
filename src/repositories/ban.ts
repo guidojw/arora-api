@@ -1,7 +1,12 @@
 import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
+import { BaseScopes } from './base'
 
-class BanScopes extends SelectQueryBuilder<Ban> {
+export class BanScopes extends BaseScopes<Ban> {
+  get default (): SelectQueryBuilder<Ban> {
+    return this
+  }
+
   // get finished (): SelectQueryBuilder<Ban> {
   //   return this.andWhere()
   // }

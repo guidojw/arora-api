@@ -79,7 +79,7 @@ export default class PayoutTrainDevelopersJob {
     } while (typeof cursor !== 'undefined')
 
     const trainTransactions = transactions.filter(transaction => {
-      return products.find(product => product.id === (transaction.details as any).id)
+      return products.find(product => product.id === (transaction.details as { id: number }).id)
     })
 
     // Get developer specific sales information from the train transactions.

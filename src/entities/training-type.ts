@@ -5,7 +5,7 @@ import Training from './training'
 @Entity({ name: 'training_types' })
 export default class TrainingType {
   @PrimaryGeneratedColumn()
-  id!: number
+  readonly id!: number
 
   @Column({ length: 8 })
   @IsNotEmpty()

@@ -68,7 +68,7 @@ async function requester (this: RESTRequester, options: RESTRequestOptions): Pro
     if (err instanceof HTTPError) {
       if (typeof err.response !== 'undefined' && err.response.statusCode === 403 && (err.response.statusMessage as
         string).includes('Token Validation Failed')) {
-        return err.response
+        return err.response as RESTResponseDataType
       }
     }
     throw err

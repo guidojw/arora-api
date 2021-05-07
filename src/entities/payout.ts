@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 @Entity({ name: 'payouts' })
 export default class Payout {
   @PrimaryGeneratedColumn()
-  id!: number
+  readonly id!: number
 
   @Column('timestamp with time zone')
   until!: Date

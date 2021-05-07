@@ -1,12 +1,13 @@
 import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm'
+import { BaseScopes } from './base'
 import { Training } from '../entities'
 
-class TrainingScopes extends SelectQueryBuilder<Training> {
+export class TrainingScopes extends BaseScopes<Training> {
   get default (): SelectQueryBuilder<Training> {
     return this
       .leftJoinAndSelect('training.type', 'type')
       .leftJoinAndSelect('training_cancellations', 'cancellation', 'cancellation.trainingId = training.id')
-      .where('cancellation.id IS NULL')
+      .andWhere('cancellation.id IS NULL')
       .andWhere('training.date > NOW() - INTERVAL \'15 minutes\'')
   }
 }

@@ -5,7 +5,7 @@ import { IsNotEmpty } from 'class-validator'
 @Entity({ name: 'bans' })
 export default class Ban {
   @PrimaryGeneratedColumn()
-  id!: number
+  readonly id!: number
 
   @Column('bigint', { name: 'author_id' })
   authorId!: number
@@ -14,7 +14,7 @@ export default class Ban {
   date!: Date
 
   @Column('int', { nullable: true })
-  duration!: number | null
+  duration?: number | null
 
   @Column({ name: 'group_id' })
   groupId!: number

@@ -1,10 +1,7 @@
-import { Model } from 'sequelize'
-
-export type ScopeQuery = string[] | undefined
 export type SortQueryTuple = [string, 'ASC' | 'DESC']
-export type SortQuery = SortQueryTuple[] | undefined
+export type SortQuery = SortQueryTuple[]
 
-export function decodeScopeQueryParam (param = ''): ScopeQuery {
+export function decodeScopeQueryParam (param = ''): string[] | undefined {
   const result = param
     .split(',')
     .filter(value => value !== '')
@@ -14,7 +11,7 @@ export function decodeScopeQueryParam (param = ''): ScopeQuery {
     : undefined
 }
 
-export function decodeSortQueryParam (param = ''): SortQuery {
+export function decodeSortQueryParam (param = ''): SortQuery | undefined {
   const result = param
     .split(',')
     .filter(value => value !== '')
@@ -29,12 +26,4 @@ export function decodeSortQueryParam (param = ''): SortQuery {
   return result.length > 0
     ? result
     : undefined
-}
-
-export function hasScopes (model: typeof Model, scopes: ScopeQuery): boolean {
-  if (typeof scopes === 'undefined') {
-    return true
-  }
-  const modelScopes = ['defaultScope', ...Object.keys(model.options.scopes ?? [])]
-  return scopes.every(scope => modelScopes.includes(scope))
 }

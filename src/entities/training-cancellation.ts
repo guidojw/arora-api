@@ -5,7 +5,7 @@ import Training from './training'
 @Entity({ name: 'training_cancellations' })
 export default class TrainingCancellation {
   @PrimaryGeneratedColumn()
-  id!: number
+  readonly id!: number
 
   @Column('bigint', { name: 'author_id' })
   authorId!: number
