@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface /* , Sequelize */) => {
-    return queryInterface.sequelize.transaction(async t => {
+    return queryInterface.sequelize.transaction(t => {
       return Promise.all([
         changeUserIdColumn(queryInterface, 'exiles', 'author_id', true, t),
         changeUserIdColumn(queryInterface, 'exiles', 'user_id', true, t)
@@ -11,7 +11,7 @@ module.exports = {
   },
 
   down: (queryInterface /* , Sequelize */) => {
-    return queryInterface.sequelize.transaction(async t => {
+    return queryInterface.sequelize.transaction(t => {
       return Promise.all([
         changeUserIdColumn(queryInterface, 'exiles', 'author_id', false, t),
         changeUserIdColumn(queryInterface, 'exiles', 'user_id', false, t)
