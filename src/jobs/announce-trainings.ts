@@ -1,11 +1,11 @@
 import { GroupService, UserService } from '../services'
 import { constants, timeUtil } from '../util'
+import cron, { JobCallback } from 'node-schedule'
 import { inject, injectable } from 'inversify'
 import BaseJob from './base'
 import { GetUsers } from '../services/user'
 import { Training } from '../entities'
 import { TrainingRepository } from '../repositories'
-import cron from 'node-schedule'
 
 const { TYPES } = constants
 const { getTime, getTimeZoneAbbreviation } = timeUtil
@@ -34,7 +34,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
         cron.scheduleJob(
           jobName,
           new Date(training.date.getTime() + 30 * 60 * 1000),
-          this.run.bind(this, groupId) // eslint-disable-line @typescript-eslint/no-misused-promises
+          this.run.bind(this, groupId) as JobCallback
         )
       }
     }
@@ -70,7 +70,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
     // Compare current shout with new shout and update if they differ.
     const oldShout = await this._groupService.getGroupStatus(groupId)
     if (shout !== oldShout?.body) {
-      // await this._groupService.updateGroupStatus(groupId, shout)
+      await this._groupService.updateGroupStatus(groupId, shout)
     }
   }
 }

@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm'
 
-export class createBanExilePayoutTrainingTrainingType1620169219541 implements MigrationInterface {
+export class createBanBanCancellationBanExtensionExilePayoutTrainingTrainingCancellationTrainingType1620169219541
+implements MigrationInterface {
   async up (queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(new Table({
       name: 'bans',
