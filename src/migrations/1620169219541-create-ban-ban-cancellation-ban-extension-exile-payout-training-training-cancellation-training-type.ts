@@ -1,8 +1,29 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm'
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm'
 
 export class createBanBanCancellationBanExtensionExilePayoutTrainingTrainingCancellationTrainingType1620169219541
 implements MigrationInterface {
   async up (queryRunner: QueryRunner): Promise<void> {
+    const sequelizeMigrationTable = await queryRunner.getTable('sequelize_meta')
+    if (typeof sequelizeMigrationTable !== 'undefined') {
+      // Apart from below patches, the schema is already up-to-date because Sequelize was used before, so delete
+      // the Sequelize migrations table and skip all other migrations.
+      // If the database is migrated from nothing, this if statement will not run.
+      await queryRunner.dropTable('sequelize_meta')
+
+      // One of the last old Sequelize migrations accidentally changed exiles.author_id and user_id back to integer,
+      // this changes them back.
+      await queryRunner.changeColumn('exiles', 'author_id', new TableColumn({
+        name: 'author_id',
+        type: 'bigint'
+      }))
+      await queryRunner.changeColumn('exiles', 'user_id', new TableColumn({
+        name: 'user_id',
+        type: 'bigint'
+      }))
+
+      return
+    }
+
     await queryRunner.createTable(new Table({
       name: 'bans',
       columns: [{
