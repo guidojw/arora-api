@@ -28,7 +28,7 @@ module.exports = {
   development: {
     ...baseConfig,
     host: '127.0.0.1',
-    database: 'arora_api_development2',
+    database: 'arora_api_development',
     logging: true
   },
   production: {
