@@ -44,7 +44,7 @@ export default class BanService {
 
     const ban = await this._banRepository.scopes.apply(scopes)
       .andWhere('ban.groupId = :groupId', { groupId })
-      .andWhere('userId = :userId', { userId })
+      .andWhere('ban.userId = :userId', { userId })
       .getOne()
 
     if (typeof ban === 'undefined') {
@@ -79,7 +79,7 @@ export default class BanService {
 
     const ban = await this._banRepository.save({
       authorId,
-      duration: duration,
+      duration,
       groupId,
       reason,
       roleId: role.id,
@@ -90,7 +90,7 @@ export default class BanService {
       this._userService.getUsername(ban.authorId),
       this._userService.getUsername(ban.userId)
     ])
-    await this._discordMessageJob.run(`**${authorName}** banned **${username}**${typeof days !== 'undefined' ? ` for **${pluralize('day', days, true) as string}**` : ''} with reason "*${ban.reason}*"`)
+    await this._discordMessageJob.run(`**${authorName}** banned **${username}**${typeof days !== 'undefined' ? ` for **${pluralize('day', days, true)}**` : ''} with reason "*${ban.reason}*"`)
 
     return ban
   }
@@ -145,7 +145,7 @@ export default class BanService {
       this._userService.getUsername(ban.userId)
     ])
     const extensionDays = extension.duration / (24 * 60 * 60 * 1000)
-    await this._discordMessageJob.run(`**${authorName}** extended **${username}**'s ban with **${pluralize('day', extensionDays, true) as string}**`)
+    await this._discordMessageJob.run(`**${authorName}** extended **${username}**'s ban with **${pluralize('day', extensionDays, true)}**`)
 
     return extension
   }
