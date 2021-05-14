@@ -21,8 +21,8 @@ export default class AnnounceTrainingsJob implements BaseJob {
       const groupIds = (await this._trainingRepository.scopes.default
         .select('DISTINCT training.groupId')
         .addGroupBy('training.groupId')
-        .getRawMany()
-      ).map(training => training.group_id) as number[]
+        .getMany()
+      ).map(training => training.groupId)
       return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 

@@ -105,7 +105,7 @@ export default class PayoutTrainDevelopersJob {
     }
 
     for (const transaction of trainTransactions) {
-      const product = products.find(product => product.id === (transaction.details as any).id)
+      const product = products.find(product => product.id === (transaction.details as { id: number }).id)
       if (typeof product === 'undefined') {
         return
       }

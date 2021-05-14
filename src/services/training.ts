@@ -44,7 +44,7 @@ export default class TrainingService {
 
     const training = await this._trainingRepository.scopes.apply(scopes)
       .andWhere('training.groupId = :groupId', { groupId })
-      .andWhere('id = :id', { id })
+      .andWhere('training.id = :id', { id })
       .getOne()
 
     if (typeof training === 'undefined') {

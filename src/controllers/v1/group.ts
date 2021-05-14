@@ -262,6 +262,16 @@ export default class GroupController implements interfaces.Controller {
   }
 
   @httpGet(
+    '/:groupId/trainings/types',
+    ...GroupController.validate('getTrainingTypes'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
+  async getTrainingTypes (@requestParam('groupId') groupId: number): Promise<TrainingType[]> {
+    return await this._trainingService.getTrainingTypes(groupId)
+  }
+
+  @httpGet(
     '/:groupId/trainings/:trainingId',
     ...GroupController.validate('getTraining'),
     TYPES.ErrorMiddleware,
@@ -273,16 +283,6 @@ export default class GroupController implements interfaces.Controller {
       @queryParam('scope') scope: string[]
   ): Promise<Training> {
     return await this._trainingService.getTraining(groupId, trainingId, scope)
-  }
-
-  @httpGet(
-    '/:groupId/trainings/types',
-    ...GroupController.validate('getTrainingTypes'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  async getTrainingTypes (@requestParam('groupId') groupId: number): Promise<TrainingType[]> {
-    return await this._trainingService.getTrainingTypes(groupId)
   }
 
   @httpPost(

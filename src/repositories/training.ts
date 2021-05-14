@@ -7,11 +7,24 @@ export default class TrainingRepository extends BaseRepository<Training> {
   get scopes (): TrainingScopes {
     return new TrainingScopes(this, this.createQueryBuilder('training'))
   }
+
+  transform (record: any): Training {
+    record.type = record.type_id == null
+      ? record.type_id
+      : {
+          id: record.type_id,
+          abbreviation: record.type_abbreviation,
+          group_id: record.type_group_id,
+          name: record.type_name
+        }
+    return super.transform(record)
+  }
 }
 
 export class TrainingScopes extends BaseScopes<Training> {
   get default (): this {
     return this
+      .select('training.*')
       .leftJoinAndSelect('training.type', 'type')
       .leftJoinAndSelect('training_cancellations', 'cancellation', 'cancellation.trainingId = training.id')
       .andWhere('cancellation.id IS NULL')
