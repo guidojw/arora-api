@@ -4,14 +4,17 @@ services:
   app:
     build:
       context: .
-      args:
-        - NODE_ENV=test
 
-  app-production: &production
+  app-production:
     build:
       context: .
       args:
+        - NODE_ENV=production
         - BUILD_HASH=${BUILDKITE_COMMIT}
 
   app-staging:
-    <<: *production
+    build:
+      context: .
+      args:
+        - NODE_ENV=staging
+        - BUILD_HASH=${BUILDKITE_COMMIT}

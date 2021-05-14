@@ -6,7 +6,6 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - NODE_ENV=production
       - POSTGRES_HOST=db
     volumes:
       - /opt/app/node_modules
