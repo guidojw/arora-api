@@ -14,21 +14,21 @@ const { getDate, getTime, getTimeZoneAbbreviation } = timeUtil
 
 @injectable()
 export default class TrainingService {
-  @inject(TYPES.AnnounceTrainingsJob) private readonly _announceTrainingsJob!: AnnounceTrainingsJob
-  @inject(TYPES.DiscordMessageJob) private readonly _discordMessageJob!: DiscordMessageJob
-  @inject(TYPES.TrainingRepository) private readonly _trainingRepository!: TrainingRepository
-  @inject(TYPES.TrainingCancellationRepository) private readonly _trainingCancellationRepository!:
+  @inject(TYPES.AnnounceTrainingsJob) private readonly announceTrainingsJob!: AnnounceTrainingsJob
+  @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
+  @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
+  @inject(TYPES.TrainingCancellationRepository) private readonly trainingCancellationRepository!:
   Repository<TrainingCancellation>
 
-  @inject(TYPES.TrainingTypeRepository) private readonly _trainingTypeRepository!: Repository<TrainingType>
-  @inject(TYPES.UserService) private readonly _userService!: UserService
+  @inject(TYPES.TrainingTypeRepository) private readonly trainingTypeRepository!: Repository<TrainingType>
+  @inject(TYPES.UserService) private readonly userService!: UserService
 
   async getTrainings (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Training[]> {
     if (!TrainingScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
 
-    const qb = this._trainingRepository.scopes.apply(scopes)
+    const qb = this.trainingRepository.scopes.apply(scopes)
       .andWhere('training.groupId = :groupId', { groupId })
     if (typeof sort !== 'undefined') {
       sort.forEach(s => qb.addOrderBy(...s))
@@ -42,7 +42,7 @@ export default class TrainingService {
       throw new UnprocessableError('Invalid scopes.')
     }
 
-    const training = await this._trainingRepository.scopes.apply(scopes)
+    const training = await this.trainingRepository.scopes.apply(scopes)
       .andWhere('training.groupId = :groupId', { groupId })
       .andWhere('training.id = :id', { id })
       .getOne()
@@ -58,7 +58,7 @@ export default class TrainingService {
     { typeId, authorId, date, notes }: { typeId: number, authorId: number, date: number, notes?: string | null }
   ): Promise<Training> {
     const trainingType = await this.getTrainingType(groupId, typeId)
-    const training = await this._trainingRepository.save({
+    const training = await this.trainingRepository.save({
       groupId,
       authorId,
       typeId,
@@ -67,17 +67,17 @@ export default class TrainingService {
     })
     training.type = trainingType
 
-    await this._announceTrainingsJob.run(groupId)
+    await this.announceTrainingsJob.run(groupId)
     cron.scheduleJob(
       `training_${training.id}`,
       new Date(training.date.getTime() + 30 * 60 * 1000),
-      this._announceTrainingsJob.run.bind(this._announceTrainingsJob, groupId) as JobCallback
+      this.announceTrainingsJob.run.bind(this.announceTrainingsJob, groupId) as JobCallback
     )
 
     const dateString = getDate(training.date)
     const timeString = getTime(training.date)
-    const authorName = await this._userService.getUsername(training.authorId)
-    await this._discordMessageJob.run(`**${authorName}** scheduled a **${training.type.abbreviation}** training at **${dateString} ${timeString} ${getTimeZoneAbbreviation(training.date)}**${training.notes != null ? ' with note "*' + training.notes + '*"' : ''}`)
+    const authorName = await this.userService.getUsername(training.authorId)
+    await this.discordMessageJob.run(`**${authorName}** scheduled a **${training.type.abbreviation}** training at **${dateString} ${timeString} ${getTimeZoneAbbreviation(training.date)}**${training.notes != null ? ' with note "*' + training.notes + '*"' : ''}`)
 
     return training
   }
@@ -96,7 +96,7 @@ export default class TrainingService {
     if (typeof changes.authorId !== 'undefined') {
       training.authorId = changes.authorId
 
-      const authorName = await this._userService.getUsername(training.authorId)
+      const authorName = await this.userService.getUsername(training.authorId)
       changeMessages.push(`changed training **${training.id}**'s host to **${authorName}**`)
     }
     if (typeof changes.notes !== 'undefined') {
@@ -121,14 +121,14 @@ export default class TrainingService {
     }
 
     if (changeMessages.length > 0) {
-      await this._trainingRepository.save(training)
+      await this.trainingRepository.save(training)
 
-      const editorName = await this._userService.getUsername(editorId)
-      await this._discordMessageJob.run(`**${editorName}**${changeMessages.length > 1 ? `\n- ${changeMessages.join('\n- ')}` : ` ${changeMessages[0]}`}`)
+      const editorName = await this.userService.getUsername(editorId)
+      await this.discordMessageJob.run(`**${editorName}**${changeMessages.length > 1 ? `\n- ${changeMessages.join('\n- ')}` : ` ${changeMessages[0]}`}`)
 
       if (typeof changes.authorId !== 'undefined' || typeof changes.typeId !== 'undefined' || typeof changes.date !==
         'undefined') {
-        await this._announceTrainingsJob.run(groupId)
+        await this.announceTrainingsJob.run(groupId)
         const jobName = `training_${training.id}`
         const job = cron.scheduledJobs[jobName]
         if (typeof job !== 'undefined') {
@@ -137,7 +137,7 @@ export default class TrainingService {
         cron.scheduleJob(
           jobName,
           training.date,
-          this._announceTrainingsJob.run.bind(this._announceTrainingsJob, groupId) as JobCallback
+          this.announceTrainingsJob.run.bind(this.announceTrainingsJob, groupId) as JobCallback
         )
       }
     }
@@ -151,26 +151,26 @@ export default class TrainingService {
     { authorId, reason }: { authorId: number, reason: string }
   ): Promise<TrainingCancellation> {
     const training = await this.getTraining(groupId, id)
-    const cancellation = await this._trainingCancellationRepository.save({ trainingId: training.id, authorId, reason })
+    const cancellation = await this.trainingCancellationRepository.save({ trainingId: training.id, authorId, reason })
 
-    await this._announceTrainingsJob.run(groupId)
+    await this.announceTrainingsJob.run(groupId)
     const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]
     if (typeof job !== 'undefined') {
       job.cancel()
     }
 
-    const authorName = await this._userService.getUsername(cancellation.authorId)
-    await this._discordMessageJob.run(`**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)
+    const authorName = await this.userService.getUsername(cancellation.authorId)
+    await this.discordMessageJob.run(`**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)
 
     return cancellation
   }
 
   async getTrainingTypes (groupId: number): Promise<TrainingType[]> {
-    return await this._trainingTypeRepository.find({ where: { groupId } })
+    return await this.trainingTypeRepository.find({ where: { groupId } })
   }
 
   async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
-    const trainingType = await this._trainingTypeRepository.findOne({ where: { groupId, id } })
+    const trainingType = await this.trainingTypeRepository.findOne({ where: { groupId, id } })
     if (typeof trainingType === 'undefined') {
       throw new NotFoundError('Training type not found.')
     }
@@ -181,13 +181,13 @@ export default class TrainingService {
     groupId: number,
     { name, abbreviation }: { abbreviation: string, name: string }
   ): Promise<TrainingType> {
-    if (typeof await this._trainingTypeRepository.findOne({
+    if (typeof await this.trainingTypeRepository.findOne({
       where: { groupId, abbreviation: ILike(abbreviation.toLowerCase()) }
     }) !== 'undefined') {
       throw new ConflictError('A training type with that name already exists.')
     }
 
-    return await this._trainingTypeRepository.save({ groupId, name, abbreviation })
+    return await this.trainingTypeRepository.save({ groupId, name, abbreviation })
   }
 
   async changeTrainingType (
@@ -214,17 +214,17 @@ export default class TrainingService {
     }
 
     if (changeMessages.length > 0) {
-      await this._trainingTypeRepository.save(trainingType)
+      await this.trainingTypeRepository.save(trainingType)
 
-      const editorName = await this._userService.getUsername(editorId)
-      await this._discordMessageJob.run(`**${editorName}**${changeMessages.length > 1 ? `\n- ${changeMessages.join('\n- ')}` : ` ${changeMessages[0]}`}`)
+      const editorName = await this.userService.getUsername(editorId)
+      await this.discordMessageJob.run(`**${editorName}**${changeMessages.length > 1 ? `\n- ${changeMessages.join('\n- ')}` : ` ${changeMessages[0]}`}`)
     }
 
     return trainingType
   }
 
   async deleteTrainingType (groupId: number, id: number): Promise<void> {
-    const result = await this._trainingTypeRepository.delete({ groupId, id })
+    const result = await this.trainingTypeRepository.delete({ groupId, id })
     if (result.affected === 0) {
       throw new NotFoundError('Training type not found.')
     }

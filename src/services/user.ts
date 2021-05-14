@@ -10,10 +10,10 @@ export type GetUsers = GetUsersByUserIds['data']
 
 @injectable()
 export default class UserService {
-  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
+  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
 
   async getUserIdFromUsername (username: string): Promise<number> {
-    const client = this._robloxManager.getClient()
+    const client = this.robloxManager.getClient()
     const user = await client.getUserIdFromUsername(username)
 
     // This Roblox endpoint doesn't throw HTTP 404 if a user doesn't exist..
@@ -25,7 +25,7 @@ export default class UserService {
   }
 
   async hasBadge (userId: number, badgeId: number): Promise<boolean> {
-    const client = this._robloxManager.getClient()
+    const client = this.robloxManager.getClient()
     return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
       userId,
       itemType: 'Badge',
@@ -34,7 +34,7 @@ export default class UserService {
   }
 
   async getUsers (userIds: number[]): Promise<GetUsers> {
-    const client = this._robloxManager.getClient()
+    const client = this.robloxManager.getClient()
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
   }
 
@@ -43,7 +43,7 @@ export default class UserService {
   }
 
   async getUser (userId: number): Promise<GetUserById> {
-    const client = this._robloxManager.getClient()
+    const client = this.robloxManager.getClient()
     return await client.apis.usersAPI.getUserById({ userId })
   }
 }

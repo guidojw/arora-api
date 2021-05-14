@@ -9,7 +9,7 @@ const { TYPES } = constants
 
 @controller('/v1/catalog')
 export default class CatalogController implements interfaces.Controller {
-  @inject(TYPES.CatalogService) private readonly _catalogService!: CatalogService
+  @inject(TYPES.CatalogService) private readonly catalogService!: CatalogService
 
   @httpGet('/', ...CatalogController.validate('getItems'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
   async getItems (req: Request): Promise<object[]> {
@@ -17,7 +17,7 @@ export default class CatalogController implements interfaces.Controller {
     const queryString = queryStart > 0
       ? req.originalUrl.slice(queryStart + 1)
       : ''
-    return await this._catalogService.getItems(queryString)
+    return await this.catalogService.getItems(queryString)
   }
 
   static validate (method: string): ValidationChain[] {

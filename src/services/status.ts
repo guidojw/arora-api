@@ -12,7 +12,7 @@ export interface GetStatus { state: StatusState }
 
 @injectable()
 export default class StatusService {
-  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
+  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
 
   getStatus (): GetStatus {
     return {
@@ -21,7 +21,7 @@ export default class StatusService {
   }
 
   async getGroupClientStatus (groupId: number): Promise<boolean> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     if (typeof client === 'undefined') {
       throw new NotFoundError('Client not found.')
     }

@@ -16,10 +16,10 @@ export interface ChangeMemberRole { oldRole: GetGroupRole, newRole: GetGroupRole
 
 @injectable()
 export default class GroupService {
-  @inject(TYPES.DiscordMessageJob) private readonly _discordMessageJob!: DiscordMessageJob
-  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
-  @inject(TYPES.UserService) private readonly _userService!: UserService
-  @inject(TYPES.WebSocketManager) private readonly _webSocketManager!: WebSocketManager
+  @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
+  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
+  @inject(TYPES.UserService) private readonly userService!: UserService
+  @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
   async getGroupStatus (groupId: number): Promise<GetGroupStatus> {
     const group = await this.getGroup(groupId)
@@ -27,12 +27,12 @@ export default class GroupService {
   }
 
   async getGroup (groupId: number): Promise<GetGroup> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     return await client.apis.groupsAPI.getGroup({ groupId })
   }
 
   async getRank (groupId: number, userId: number): Promise<number> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
     const group = groups.data.find(group => group.group.id === groupId)
@@ -40,7 +40,7 @@ export default class GroupService {
   }
 
   async getRole (groupId: number, userId: number): Promise<GetGroupRole> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
     const group = groups.data.find(group => group.group.id === groupId)
@@ -53,20 +53,20 @@ export default class GroupService {
   }
 
   async getRoles (groupId: number): Promise<GetGroupRoles> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     return await client.apis.groupsAPI.getGroupRoles({ groupId })
   }
 
   async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as UpdateGroupStatus
 
     if (typeof authorId !== 'undefined') {
-      const authorName = await this._userService.getUsername(authorId)
+      const authorName = await this.userService.getUsername(authorId)
       if (shout.body === '') {
-        await this._discordMessageJob.run(`**${authorName}** cleared the shout`)
+        await this.discordMessageJob.run(`**${authorName}** cleared the shout`)
       } else {
-        await this._discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
+        await this.discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
       }
     }
 
@@ -82,11 +82,11 @@ export default class GroupService {
       }
       role = roleResolvable
     }
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     await group.updateMember(userId, role.id)
 
-    this._webSocketManager.broadcast('rankChange', { groupId, rank: role.rank, userId })
+    this.webSocketManager.broadcast('rankChange', { groupId, rank: role.rank, userId })
 
     return role
   }
@@ -99,13 +99,13 @@ export default class GroupService {
     }
 
     const newRole = await this.setMemberRole(groupId, userId, role)
-    const username = await this._userService.getUsername(userId)
+    const username = await this.userService.getUsername(userId)
     if (oldRole.id !== newRole.id) {
       if (typeof authorId !== 'undefined') {
-        const authorName = await this._userService.getUsername(authorId)
-        await this._discordMessageJob.run(`**${authorName}** changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
+        const authorName = await this.userService.getUsername(authorId)
+        await this.discordMessageJob.run(`**${authorName}** changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
       } else {
-        await this._discordMessageJob.run(`Changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
+        await this.discordMessageJob.run(`Changed **${username}**'s role from **${oldRole.name}** to **${newRole.name}**`)
       }
     }
 
@@ -149,10 +149,10 @@ export default class GroupService {
   }
 
   async kickMember (groupId: number, userId: number): Promise<void> {
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     await group.kickMember(userId)
 
-    this._webSocketManager.broadcast('rankChange', { groupId, userId, rank: 0 })
+    this.webSocketManager.broadcast('rankChange', { groupId, userId, rank: 0 })
   }
 }

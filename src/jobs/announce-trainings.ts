@@ -12,13 +12,13 @@ const { getTime, getTimeZoneAbbreviation } = timeUtil
 
 @injectable()
 export default class AnnounceTrainingsJob implements BaseJob {
-  @inject(TYPES.TrainingRepository) private readonly _trainingRepository!: TrainingRepository
-  @inject(TYPES.GroupService) private readonly _groupService!: GroupService
-  @inject(TYPES.UserService) private readonly _userService!: UserService
+  @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
+  @inject(TYPES.GroupService) private readonly groupService!: GroupService
+  @inject(TYPES.UserService) private readonly userService!: UserService
 
   async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
-      const groupIds = (await this._trainingRepository.scopes.default
+      const groupIds = (await this.trainingRepository.scopes.default
         .select('DISTINCT training.groupId')
         .addGroupBy('training.groupId')
         .getMany()
@@ -26,7 +26,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
       return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
-    const trainings = await this._trainingRepository.find({ where: { groupId } })
+    const trainings = await this.trainingRepository.find({ where: { groupId } })
     for (const training of trainings) {
       const jobName = `training_${training.id}`
       const job = cron.scheduledJobs[jobName]
@@ -49,7 +49,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
       ...trainingsTomorrow.map(training => training.authorId)
     ])]
     const authors = authorIds.length > 0
-      ? await this._userService.getUsers(authorIds)
+      ? await this.userService.getUsers(authorIds)
       : []
 
     let shout = 'Trainings today - '
@@ -68,9 +68,9 @@ export default class AnnounceTrainingsJob implements BaseJob {
     shout += addition
 
     // Compare current shout with new shout and update if they differ.
-    const oldShout = await this._groupService.getGroupStatus(groupId)
+    const oldShout = await this.groupService.getGroupStatus(groupId)
     if (shout !== oldShout?.body) {
-      await this._groupService.updateGroupStatus(groupId, shout)
+      await this.groupService.updateGroupStatus(groupId, shout)
     }
   }
 }

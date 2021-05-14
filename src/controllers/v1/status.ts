@@ -9,11 +9,11 @@ const { TYPES } = constants
 
 @controller('/v1/status')
 export default class StatusController implements interfaces.Controller {
-  @inject(TYPES.StatusService) private readonly _statusService!: StatusService
+  @inject(TYPES.StatusService) private readonly statusService!: StatusService
 
   @httpGet('/', ...StatusController.validate('getStatus'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
   getStatus (): GetStatus {
-    return this._statusService.getStatus()
+    return this.statusService.getStatus()
   }
 
   @httpGet(
@@ -23,7 +23,7 @@ export default class StatusController implements interfaces.Controller {
     TYPES.AuthMiddleware
   )
   async getGroupClientStatus (@requestParam('groupId') groupId: number): Promise<boolean> {
-    return await this._statusService.getGroupClientStatus(groupId)
+    return await this.statusService.getGroupClientStatus(groupId)
   }
 
   static validate (method: string): ValidationChain[] {

@@ -9,7 +9,7 @@ const { TYPES } = constants
 
 @injectable()
 export default class AuthMiddleware extends BaseMiddleware {
-  @inject(TYPES.AuthService) private readonly _authService!: AuthService
+  @inject(TYPES.AuthService) private readonly authService!: AuthService
 
   handler (req: Request, _res: Response, next: NextFunction): void {
     const token = req.header('authorization')?.replace('Bearer ', '') ?? undefined
@@ -25,7 +25,7 @@ export default class AuthMiddleware extends BaseMiddleware {
   }
 
   private authenticateToken (token?: string): void {
-    if (typeof token === 'undefined' || !this._authService.authenticate(token)) {
+    if (typeof token === 'undefined' || !this.authService.authenticate(token)) {
       throw new UnauthorizedError('Invalid authentication key.')
     }
   }

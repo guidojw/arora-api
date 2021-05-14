@@ -40,21 +40,21 @@ const PAY_RATE = 0.5
 
 @injectable()
 export default class PayoutTrainDevelopersJob {
-  @inject(TYPES.HealthCheckJob) private readonly _healthCheckJob!: HealthCheckJob
-  @inject(TYPES.RobloxManager) private readonly _robloxManager!: RobloxManager
-  @inject(TYPES.WebSocketManager) private readonly _webSocketManager!: WebSocketManager
-  @inject(TYPES.PayoutRepository) private readonly _payoutRepository!: PayoutRepository
+  @inject(TYPES.HealthCheckJob) private readonly healthCheckJob!: HealthCheckJob
+  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
+  @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
+  @inject(TYPES.PayoutRepository) private readonly payoutRepository!: PayoutRepository
 
   async run (groupId: number): Promise<void> {
     // Get last payout and its last transaction.
-    const lastPayout = await this._payoutRepository.getLast(groupId)
+    const lastPayout = await this.payoutRepository.getLast(groupId)
     if (typeof lastPayout === 'undefined') {
       throw new Error('Could not get last transaction!')
     }
     const lastTransactionDate = lastPayout.until
 
     // Get train transactions.
-    const client = this._robloxManager.getClient(groupId)
+    const client = this.robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     const transactions: GetGroupTransactions['data'] = []
     let cursor
@@ -128,13 +128,13 @@ export default class PayoutTrainDevelopersJob {
       const payout = new Payout()
       payout.groupId = groupId
       payout.until = new Date(trainTransactions[0].created)
-      await this._payoutRepository.save(payout)
+      await this.payoutRepository.save(payout)
     }
 
     // Broadcast information about the payouts over the WebSocket.
-    this._webSocketManager.broadcast('trainDeveloperPayoutReport', { groupId, developersSales })
+    this.webSocketManager.broadcast('trainDeveloperPayoutReport', { groupId, developersSales })
 
     // Ping Healthchecks.io.
-    await this._healthCheckJob.run('payoutTrainDevelopersJob')
+    await this.healthCheckJob.run('payoutTrainDevelopersJob')
   }
 }

@@ -11,8 +11,8 @@ const { TYPES } = constants
 
 @controller('/v1/users')
 export default class UserController implements interfaces.Controller {
-  @inject(TYPES.GroupService) private readonly _groupService!: GroupService
-  @inject(TYPES.UserService) private readonly _userService!: UserService
+  @inject(TYPES.GroupService) private readonly groupService!: GroupService
+  @inject(TYPES.UserService) private readonly userService!: UserService
 
   @httpGet(
     '/:username/user-id',
@@ -21,7 +21,7 @@ export default class UserController implements interfaces.Controller {
     TYPES.AuthMiddleware
   )
   async getUserIdFromUsername (@requestParam('username') username: string): Promise<number> {
-    return await this._userService.getUserIdFromUsername(username)
+    return await this.userService.getUserIdFromUsername(username)
   }
 
   @httpGet(
@@ -31,12 +31,12 @@ export default class UserController implements interfaces.Controller {
     TYPES.AuthMiddleware
   )
   async hasBadge (@requestParam('userId') userId: number, @requestParam('badgeId') badgeId: number): Promise<boolean> {
-    return await this._userService.hasBadge(userId, badgeId)
+    return await this.userService.hasBadge(userId, badgeId)
   }
 
   @httpGet('/', ...UserController.validate('getUsers'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
   async getUsers (@requestBody() body: { userIds: number[] }): Promise<GetUsers> {
-    return await this._userService.getUsers(body.userIds)
+    return await this.userService.getUsers(body.userIds)
   }
 
   @httpGet(
@@ -46,7 +46,7 @@ export default class UserController implements interfaces.Controller {
     TYPES.AuthMiddleware
   )
   async getRank (@requestParam('groupId') groupId: number, @requestParam('userId') userId: number): Promise<number> {
-    return await this._groupService.getRank(groupId, userId)
+    return await this.groupService.getRank(groupId, userId)
   }
 
   @httpGet(
@@ -57,12 +57,12 @@ export default class UserController implements interfaces.Controller {
   )
   async getRole (@requestParam('groupId') groupId: number, @requestParam('userId')
     userId: number): Promise<GetGroupRole> {
-    return await this._groupService.getRole(groupId, userId)
+    return await this.groupService.getRole(groupId, userId)
   }
 
   @httpGet('/:userId', ...UserController.validate('getUser'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
   async getUser (@requestParam('userId') userId: number): Promise<GetUserById> {
-    return await this._userService.getUser(userId)
+    return await this.userService.getUser(userId)
   }
 
   static validate (method: string): ValidationChain[] {
