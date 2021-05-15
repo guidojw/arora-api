@@ -14,7 +14,9 @@ export default abstract class BaseRepository<T> extends Repository<T> {
   transformMany (records: any[]): T[] {
     return Object.values(lodash.groupBy(records, 'id'))
       .map(groupedRecords => groupedRecords.map(this.transform.bind(this)))
-      .map(([first, ...rest]) => lodash.merge(first, ...rest))
+      .map(([first, ...rest]) => lodash.mergeWith(first, ...rest, (objValue: any, srcValue: any) => (
+        Array.isArray(objValue) ? objValue.concat(srcValue) : undefined
+      )))
   }
 }
 

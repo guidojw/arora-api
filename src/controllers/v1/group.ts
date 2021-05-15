@@ -6,6 +6,7 @@ import { ValidationChain, body, header, param, query } from 'express-validator'
 import { constants, requestUtil } from '../../util'
 import {
   controller,
+  httpDelete,
   httpGet,
   httpPost,
   httpPut,
@@ -232,7 +233,7 @@ export default class GroupController implements interfaces.Controller {
     return await this.exileService.exile(groupId, body.userId, body)
   }
 
-  @httpPost(
+  @httpDelete(
     '/:groupId/exiles/:userId',
     ...GroupController.validate('deleteExile'),
     TYPES.ErrorMiddleware,
@@ -359,7 +360,7 @@ export default class GroupController implements interfaces.Controller {
     return await this.trainingService.changeTrainingType(groupId, typeId, body)
   }
 
-  @httpPost(
+  @httpDelete(
     '/:groupId/trainings/types/:typeId',
     ...GroupController.validate('deleteTrainingType'),
     TYPES.ErrorMiddleware,

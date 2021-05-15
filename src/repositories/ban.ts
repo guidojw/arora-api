@@ -13,15 +13,14 @@ export default class BanRepository extends BaseRepository<Ban> {
   }
 
   transform (record: any): Ban {
-    record.extensions = []
-    if (record.extension_id !== null) {
-      record.extensions.push({
+    if (record.extension_id != null) {
+      record.extensions = [{
         id: record.extension_id,
         author_id: record.extension_author_id,
         ban_id: record.extension_ban_id,
         duration: record.extension_duration,
         reason: record.extension_reason
-      })
+      }]
     }
     return super.transform(record)
   }
