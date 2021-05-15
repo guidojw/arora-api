@@ -11,7 +11,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 RUN yarn build-bloxy && yarn build
-RUN rm -rf src
+RUN if [ "$STAGE" = 'production' ] && [ "$STAGE" = 'staging' ]; rm -rf src
 
 RUN chmod +x ./bin/wait-for-it.sh
 
