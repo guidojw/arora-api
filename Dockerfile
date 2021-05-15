@@ -10,7 +10,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 COPY . .
-RUN yarn build
+RUN yarn build-bloxy && yarn build
 RUN rm -rf src
 
 RUN chmod +x ./bin/wait-for-it.sh
