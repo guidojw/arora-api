@@ -5,13 +5,13 @@ ENV NODE_ENV=$NODE_ENV
 ARG BUILD_HASH
 ENV BUILD_HASH=$BUILD_HASH
 
-# Install dependencies
 WORKDIR /opt/app
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile \
+  $([ "$NODE_ENV" = 'production' ] || [ "$NODE_ENV" = 'staging' ] && printf %s '--production=true')
 
-# Bundle app source
 COPY . .
+RUN yarn build-bloxy && yarn build
 
 RUN chmod +x ./bin/wait-for-it.sh
 
