@@ -17,7 +17,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@sentry/node": "^6.3.1",
+    "@sentry/node": "^6.3.5",
     "axios": "^0.21.1",
     "bloxy": "guidojw/bloxy#58be6cb",
     "class-transformer": "^0.4.0",
