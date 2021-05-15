@@ -7,8 +7,7 @@ ENV BUILD_HASH=$BUILD_HASH
 
 WORKDIR /opt/app
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile \
-  $([ "$NODE_ENV" = 'production' ] || [ "$NODE_ENV" = 'staging' ] && printf %s '--production=true')
+RUN yarn install --frozen-lockfile --production=false
 
 COPY . .
 RUN yarn build-bloxy && yarn build
