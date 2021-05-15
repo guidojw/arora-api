@@ -12,7 +12,6 @@ RUN yarn install --frozen-lockfile \
 
 COPY . .
 RUN yarn build-bloxy && yarn build
-RUN if [ "$NODE_ENV" = 'production' ] || [ "$NODE_ENV" = 'staging' ]; then rm -rf src; fi
 
 RUN chmod +x ./bin/wait-for-it.sh
 
