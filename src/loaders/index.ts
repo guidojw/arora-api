@@ -1,7 +1,7 @@
+import * as Sentry from '@sentry/node'
 import { Application } from 'express'
 import { BaseJob } from '../jobs'
 import { BaseManager } from '../managers'
-import Sentry from '@sentry/node'
 import { constants } from '../util'
 import containerLoader from './container'
 import cronConfig from '../configs/cron'
