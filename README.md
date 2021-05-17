@@ -15,13 +15,13 @@ arora-api
 2. Create a new database as your just created Postgres user, named `arora_api_<env>` with `<env>` being your 
    `NODE_ENV` environment variable. The project tries to connect to database `arora_api_development` on `127.0.0.1` 
    (see `ormconfig.js`) if `NODE_ENV` is not set.<br/>
-   To connect to a database at an external IP, use `staging` or `production` and set `POSTGRES_HOST` in `.env`
+   To connect to a database on an external IP, use `staging` or `production` and set `POSTGRES_HOST` in `.env`
    containing the address of your external database server.
 3. Install the dependencies with `yarn install` or `npm install`.<br/>
    3.5. Temporary step: after every install, run `yarn build-bloxy` or `npm run build-bloxy`.
 4. Copy `.env.example` to `.env` and update the fields to reflect your environment. `POSTGRES_HOST` and the last 
    variables starting at `SENTRY_DSN` are optional, so if you don't set these, prepend them with a #.
-5. [Generate](https://travistidwell.com/jsencrypt/demo/) a RSA key pair and add them as files named `private.key` and 
+5. [Generate](https://travistidwell.com/jsencrypt/demo/) an RSA key pair and add them as files named `private.key` and 
    `public.key` respectively to the root of this project.
 6. [Generate](https://jwt.io/) a JSON Web Token using the just generated RSA key pair. You can enter the public and 
    private keys underneath "VERIFY SIGNATURE". What you enter underneath "PAYLOAD" doesn't matter since that's not 
