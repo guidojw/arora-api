@@ -58,7 +58,11 @@ export default class BanService {
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration?: number | null, reason: string }
   ): Promise<Ban> {
-    if (typeof await this.banRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+    if (typeof await this.banRepository.scopes.default
+      .andWhere('ban.group_id = :groupId', { groupId })
+      .andWhere('ban.user_id = :userId', { userId })
+      .getOne() !== 'undefined'
+    ) {
       throw new ConflictError('User is already banned.')
     }
     const role = await this.groupService.getRole(groupId, userId)
