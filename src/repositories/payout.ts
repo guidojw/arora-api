@@ -7,10 +7,11 @@ export default class PayoutRepository extends Repository<Payout> {
     return (await this
       .createQueryBuilder('payout')
       .innerJoin(qb => (
-        qb.from('payouts', 'otherPayout')
-          .select('MAX(otherPayout.until)', 'until')
-      ), 'otherPayout', '"otherPayout".until = payout.until')
-      .andWhere('payout.groupId = :groupId', { groupId })
+        qb
+          .from('payouts', 'other_payout')
+          .select('MAX(other_payout.until)', 'until')
+      ), 'other_payout', 'other_payout.until = payout.until')
+      .andWhere('payout.group_id = :groupId', { groupId })
       .getOne()
     )
   }

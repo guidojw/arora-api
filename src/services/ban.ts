@@ -29,7 +29,7 @@ export default class BanService {
     }
 
     const qb = this.banRepository.scopes.apply(scopes)
-      .andWhere('ban.groupId = :groupId', { groupId })
+      .andWhere('ban.group_id = :groupId', { groupId })
     if (typeof sort !== 'undefined') {
       sort.forEach(s => qb.addOrderBy(...s))
     }
@@ -43,8 +43,8 @@ export default class BanService {
     }
 
     const ban = await this.banRepository.scopes.apply(scopes)
-      .andWhere('ban.groupId = :groupId', { groupId })
-      .andWhere('ban.userId = :userId', { userId })
+      .andWhere('ban.group_id = :groupId', { groupId })
+      .andWhere('ban.user_id = :userId', { userId })
       .getOne()
 
     if (typeof ban === 'undefined') {

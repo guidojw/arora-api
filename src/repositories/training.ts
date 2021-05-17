@@ -24,9 +24,9 @@ export default class TrainingRepository extends BaseRepository<Training> {
 export class TrainingScopes extends BaseScopes<Training> {
   get default (): this {
     return this
-      .select('training.*')
+      .addSelect('training.*')
       .leftJoinAndSelect('training.type', 'type')
-      .leftJoinAndSelect('training_cancellations', 'cancellation', 'cancellation.trainingId = training.id')
+      .leftJoin('training_cancellations', 'cancellation', 'cancellation.training_id = training.id')
       .andWhere('cancellation.id IS NULL')
       .andWhere('training.date > NOW() - INTERVAL \'15 minutes\'')
   }

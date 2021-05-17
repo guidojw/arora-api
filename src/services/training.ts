@@ -29,7 +29,7 @@ export default class TrainingService {
     }
 
     const qb = this.trainingRepository.scopes.apply(scopes)
-      .andWhere('training.groupId = :groupId', { groupId })
+      .andWhere('training.group_id = :groupId', { groupId })
     if (typeof sort !== 'undefined') {
       sort.forEach(s => qb.addOrderBy(...s))
     }
@@ -43,7 +43,7 @@ export default class TrainingService {
     }
 
     const training = await this.trainingRepository.scopes.apply(scopes)
-      .andWhere('training.groupId = :groupId', { groupId })
+      .andWhere('training.group_id = :groupId', { groupId })
       .andWhere('training.id = :id', { id })
       .getOne()
 

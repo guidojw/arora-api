@@ -19,8 +19,8 @@ export default class AnnounceTrainingsJob implements BaseJob {
   async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
       const groupIds = (await this.trainingRepository.scopes.default
-        .select('DISTINCT training.groupId')
-        .addGroupBy('training.groupId')
+        .select('DISTINCT training.group_id')
+        .addGroupBy('training.group_id')
         .getMany()
       ).map(training => training.groupId)
       return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
