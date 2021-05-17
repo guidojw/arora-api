@@ -18,7 +18,7 @@ const { inRange } = util
 export default class BanService {
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
   @inject(TYPES.BanRepository) private readonly banRepository!: BanRepository
-  @inject(TYPES.BanRepository) private readonly banCancellationRepository!: Repository<BanCancellation>
+  @inject(TYPES.BanCancellationRepository) private readonly banCancellationRepository!: Repository<BanCancellation>
   @inject(TYPES.BanExtensionRepository) private readonly banExtensionRepository!: Repository<BanExtension>
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
