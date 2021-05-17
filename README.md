@@ -13,16 +13,14 @@ arora-api
 ## Installation
 1. Create a Postgres user with permission to create databases.
 2. Create a new database as your just created Postgres user, named `arora_api_<env>` with `<env>` being your 
-   `NODE_ENV` environment variable. The project tries to connect to database `arora_api_development` (which is on 
-   `127.0.0.1`, see `ormconfig.js`) if `NODE_ENV` is not set.<br/>
-   To connect to a database at an external IP, use `staging` or `production` and add env variable `POSTGRES_HOST` to 
-   `.env` containing the address of your external database server.
-3. Install the dependencies with `yarn install` or `npm install`. If you just set `NODE_ENV` to `production`, make 
-   sure to run this command with flag `--production=false` as the project needs the devDependencies to compile the 
-   TypeScript source.<br/>
+   `NODE_ENV` environment variable. The project tries to connect to database `arora_api_development` on `127.0.0.1` 
+   (see `ormconfig.js`) if `NODE_ENV` is not set.<br/>
+   To connect to a database at an external IP, use `staging` or `production` and set `POSTGRES_HOST` in `.env`
+   containing the address of your external database server.
+3. Install the dependencies with `yarn install` or `npm install`.<br/>
    3.5. Temporary step: after every install, run `yarn build-bloxy` or `npm run build-bloxy`.
-4. Copy `.env.example` to `.env` and update the fields to reflect your environment. The last variables starting at 
-   `SENTRY_DSN` are optional.
+4. Copy `.env.example` to `.env` and update the fields to reflect your environment. `POSTGRES_HOST` and the last 
+   variables starting at `SENTRY_DSN` are optional, so if you don't set these, prepend them with a #.
 5. [Generate](https://travistidwell.com/jsencrypt/demo/) a RSA key pair and add them as files named `private.key` and 
    `public.key` respectively to the root of this project.
 6. [Generate](https://jwt.io/) a JSON Web Token using the just generated RSA key pair. You can enter the public and 
