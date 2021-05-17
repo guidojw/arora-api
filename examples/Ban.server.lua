@@ -16,4 +16,4 @@ local function ban(groupId, userId, authorId, duration, reason)
     return HttpService:JSONDecode(response.Body)
 end
 
--- print(ban(1018818, 156, 6882179, nil, "tempban"))
+-- print(ban(1018818, 156, 6882179, 2, "2 days tempban"))
