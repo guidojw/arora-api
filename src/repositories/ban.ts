@@ -32,23 +32,23 @@ export class BanScopes extends BaseScopes<Ban> {
   get default (): this {
     return this
       .addSelect('ban.*')
-      .addSelect('"other_ban".ends_at')
+      .addSelect('other_ban.ends_at')
       .leftJoin('ban_cancellations', 'cancellation', 'cancellation.ban_id = ban.id')
-      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', '"other_ban".id = ban.id')
+      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', 'other_ban.id = ban.id')
       .leftJoinAndSelect('ban_extensions', 'extension', 'extension.ban_id = ban.id')
       .andWhere('cancellation.id IS NULL')
       .addGroupBy('ban.id')
       .addGroupBy('extension.id')
-      .addGroupBy('"other_ban".ends_at')
+      .addGroupBy('other_ban.ends_at')
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at > NOW())')
   }
 
   get finished (): this {
     return this
       .addSelect('ban.*')
-      .addSelect('"other_ban".ends_at')
+      .addSelect('other_ban.ends_at')
       .leftJoin('ban_cancellations', 'cancellation', 'cancellation.ban_id = ban.id')
-      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', '"other_ban".id = ban.id')
+      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', 'other_ban.id = ban.id')
       .leftJoinAndSelect('ban_extensions', 'extension', 'extension.ban_id = ban.id')
       .andWhere('cancellation.id IS NULL')
       .addGroupBy('ban.id')
