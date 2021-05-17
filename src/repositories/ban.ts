@@ -34,7 +34,7 @@ export class BanScopes extends BaseScopes<Ban> {
       .addSelect('ban.*')
       .addSelect('"other_ban".ends_at')
       .leftJoin('ban_cancellations', 'cancellation', 'cancellation.ban_id = ban.id')
-      .leftJoin(BanScopes.makeExtensionsTotalDurationQueryBuilder, 'other_ban', '"other_ban".id = ban.id')
+      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', '"other_ban".id = ban.id')
       .leftJoinAndSelect('ban_extensions', 'extension', 'extension.ban_id = ban.id')
       .andWhere('cancellation.id IS NULL')
       .addGroupBy('ban.id')
@@ -48,7 +48,7 @@ export class BanScopes extends BaseScopes<Ban> {
       .addSelect('ban.*')
       .addSelect('"other_ban".ends_at')
       .leftJoin('ban_cancellations', 'cancellation', 'cancellation.ban_id = ban.id')
-      .leftJoin(BanScopes.makeExtensionsTotalDurationQueryBuilder, 'other_ban', '"other_ban".id = ban.id')
+      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', '"other_ban".id = ban.id')
       .leftJoinAndSelect('ban_extensions', 'extension', 'extension.ban_id = ban.id')
       .andWhere('cancellation.id IS NULL')
       .addGroupBy('ban.id')
@@ -57,7 +57,7 @@ export class BanScopes extends BaseScopes<Ban> {
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at <= NOW())')
   }
 
-  private static makeExtensionsTotalDurationQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
+  private static makeEndsAtQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
     // Connection is somehow undefined on this qb, and repository is a connection instance so weird fix but works?
     // @ts-expect-error
     qb.connection = qb.repository
