@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=db
+    ports:
+      - 3000:3000
+    volumes:
+      - /opt/app/node_modules
+      - ./private.key:/opt/app/private.key
+      - ./public.key:/opt/app/public.key
+      - ./dist:/opt/app/dist
+
+  db:
+    image: postgres:11.2
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
