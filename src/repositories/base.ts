@@ -1,6 +1,9 @@
 import * as lodash from 'lodash'
 import { ClassConstructor, plainToClass } from 'class-transformer'
 import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
+import { util } from '../util'
+
+const { groupBy } = util
 
 export default abstract class BaseRepository<T> extends Repository<T> {
   transform (record: any): T {
@@ -12,7 +15,7 @@ export default abstract class BaseRepository<T> extends Repository<T> {
   }
 
   transformMany (records: any[]): T[] {
-    return Object.values(lodash.groupBy(records, 'id'))
+    return groupBy(records, 'id')
       .map(groupedRecords => groupedRecords.map(this.transform.bind(this)))
       .map(([first, ...rest]) => lodash.mergeWith(first, ...rest, (objValue: any, srcValue: any) => (
         Array.isArray(objValue) ? objValue.concat(srcValue) : undefined
@@ -41,7 +44,7 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
       return this.default
     }
     return scopes.reduce((qb, scope) => {
-      if (scope !== 'default' && !BaseScopes.scopes.includes(scope)) {
+      if (scope !== 'default' && !(this.constructor as typeof BaseScopes).scopes.includes(scope)) {
         throw new Error(`Invalid scope "${scope}" called`)
       }
       // @ts-expect-error
@@ -49,23 +52,36 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     }, this)
   }
 
-  async getOne (): Promise<T | undefined> {
-    const record = await super.getRawOne()
-    if (typeof record === 'undefined') {
-      return undefined
-    }
-    return this.repository.transform(record)
-  }
-
   async getMany (): Promise<T[]> {
     return this.repository.transformMany(await super.getRawMany())
   }
 
-  // @ts-expect-error
-  leftJoinAndSelect (property: string, alias: string, condition?: string, parameters?: ObjectLiteral): this {
-    if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === property)) {
+  async getOne (): Promise<T | undefined> {
+    return this.repository.transformMany(await super.getRawMany()).shift()
+  }
+
+  leftJoin (
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    alias: string,
+    condition?: string,
+    parameters?: ObjectLiteral
+  ): this {
+    if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === entityOrProperty)) {
       return this
     }
-    return super.leftJoinAndSelect(property, alias, condition, parameters)
+    return super.leftJoin(entityOrProperty, alias, condition, parameters)
+  }
+
+  leftJoinAndSelect (
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    alias: string,
+    condition?: string,
+    parameters?: ObjectLiteral
+  ): this {
+    if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === entityOrProperty)) {
+      return this
+    }
+    // @ts-expect-error
+    return super.leftJoinAndSelect(entityOrProperty, alias, condition, parameters)
   }
 }
