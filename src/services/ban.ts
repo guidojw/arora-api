@@ -18,7 +18,7 @@ const { inRange } = util
 export default class BanService {
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
   @inject(TYPES.BanRepository) private readonly banRepository!: BanRepository
-  @inject(TYPES.BanRepository) private readonly banCancellationRepository!: Repository<BanCancellation>
+  @inject(TYPES.BanCancellationRepository) private readonly banCancellationRepository!: Repository<BanCancellation>
   @inject(TYPES.BanExtensionRepository) private readonly banExtensionRepository!: Repository<BanExtension>
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
@@ -58,7 +58,11 @@ export default class BanService {
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration?: number | null, reason: string }
   ): Promise<Ban> {
-    if (typeof await this.banRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+    if (typeof await this.banRepository.scopes.default
+      .andWhere('ban.group_id = :groupId', { groupId })
+      .andWhere('ban.user_id = :userId', { userId })
+      .getOne() !== 'undefined'
+    ) {
       throw new ConflictError('User is already banned.')
     }
     const role = await this.groupService.getRole(groupId, userId)
