@@ -1,0 +1,87 @@
+import * as lodash from 'lodash'
+import { ClassConstructor, plainToClass } from 'class-transformer'
+import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
+import { util } from '../util'
+
+const { groupBy } = util
+
+export default abstract class BaseRepository<T> extends Repository<T> {
+  transform (record: any): T {
+    return plainToClass(
+      this.target as ClassConstructor<T>,
+      record,
+      { excludeExtraneousValues: true }
+    )
+  }
+
+  transformMany (records: any[]): T[] {
+    return groupBy(records, 'id')
+      .map(groupedRecords => groupedRecords.map(this.transform.bind(this)))
+      .map(([first, ...rest]) => lodash.mergeWith(first, ...rest, (objValue: any, srcValue: any) => (
+        Array.isArray(objValue) ? objValue.concat(srcValue) : undefined
+      )))
+  }
+}
+
+export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
+  static scopes: string[] = []
+
+  constructor (private readonly repository: BaseRepository<T>, queryBuilder: SelectQueryBuilder<T>) {
+    super(queryBuilder)
+  }
+
+  abstract get default (): this
+
+  static has (scopes?: string[]): boolean {
+    if (typeof scopes === 'undefined') {
+      return true
+    }
+    return scopes.every(scope => scope === 'default' || this.scopes.includes(scope))
+  }
+
+  apply (scopes?: string[]): this {
+    if (typeof scopes === 'undefined') {
+      return this.default
+    }
+    return scopes.reduce((qb, scope) => {
+      if (scope !== 'default' && !(this.constructor as typeof BaseScopes).scopes.includes(scope)) {
+        throw new Error(`Invalid scope "${scope}" called`)
+      }
+      // @ts-expect-error
+      return qb[scope]
+    }, this)
+  }
+
+  async getMany (): Promise<T[]> {
+    return this.repository.transformMany(await super.getRawMany())
+  }
+
+  async getOne (): Promise<T | undefined> {
+    return this.repository.transformMany(await super.getRawMany()).shift()
+  }
+
+  leftJoin (
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    alias: string,
+    condition?: string,
+    parameters?: ObjectLiteral
+  ): this {
+    if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === entityOrProperty)) {
+      return this
+    }
+    return super.leftJoin(entityOrProperty, alias, condition, parameters)
+  }
+
+  leftJoinAndSelect (
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    alias: string,
+    condition?: string,
+    parameters?: ObjectLiteral
+  ): this {
+    if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === entityOrProperty)) {
+      return this
+    }
+    // @ts-expect-error
+    return super.leftJoinAndSelect(entityOrProperty, alias, condition, parameters)
+  }
+}

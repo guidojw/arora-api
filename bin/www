@@ -1,75 +1,76 @@
 #!/usr/bin/env node
 'use strict'
 
+const WebSocket = require('ws')
 const debug = require('debug')('arora-api:server')
 const http = require('http')
-const WebSocket = require('ws')
 
-const app = require('../app')
-const container = app.get('container')
-const authMiddleware = container.get('AuthMiddleware')
-const webSocketManager = container.get('WebSocketManager')
+const { TYPES } = require('../dist/util').constants
 
-const port = normalizePort(process.env.PORT || '3000')
-app.set('port', port)
+let port, server
+require('../dist/app').default.then(app => {
+  const container = app.get('container')
+  const authMiddleware = container.get(TYPES.AuthMiddleware)
+  const webSocketManager = container.get(TYPES.WebSocketManager)
 
-const server = http.createServer(app)
-const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
+  port = normalizePort(process.env.PORT || '3000')
+  app.set('port', port)
 
-wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
+  server = http.createServer(app)
+  server.on('error', onError)
+  server.on('listening', onListening)
 
-server.on('error', onError)
-server.on('listening', onListening)
+  const wss = new WebSocket.Server({ noServer: true, path: '/v1' })
+  wss.on('connection', webSocketManager.addConnection.bind(webSocketManager))
 
-server.on('upgrade', function upgrade (req, socket, head) {
+  server.on('upgrade', function upgrade (req, socket, head) {
     try {
-        authMiddleware.authenticateWebSocketConnection(req)
+      authMiddleware.authenticateWebSocketConnection(req)
     } catch (err) {
-        socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
-        socket.destroy()
-        return
+      socket.write(`HTTP/1.1 ${err.status} ${err.message}\r\n\r\n`)
+      socket.destroy()
+      return
     }
 
     wss.handleUpgrade(req, socket, head, function done (ws) {
-        wss.emit('connection', ws, req)
+      wss.emit('connection', ws, req)
     })
+  })
+
+  server.listen(port)
 })
 
-server.listen(port)
-
 function normalizePort (val) {
-    const port = parseInt(val, 10)
-    if (isNaN(port)) {
-        return val
-    }
-    if (port >= 0) {
-        return port
-    }
-    return false
+  const port = parseInt(val, 10)
+  if (isNaN(port)) {
+    return val
+  }
+  if (port >= 0) {
+    return port
+  }
+  return false
 }
 
 function onError (error) {
-    if (error.syscall !== 'listen') {
-        throw error
-    }
+  if (error.syscall !== 'listen') {
+    throw error
+  }
 
-    const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port
-    switch (error.code) {
-        case 'EACCES':
-            console.error(bind + ' requires elevated privileges')
-            process.exit(1)
-            break
-        case 'EADDRINUSE':
-            console.error(bind + ' is already in use')
-            process.exit(1)
-            break
-        default:
-            throw error
-    }
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges')
+      process.exit(1)
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use')
+      process.exit(1)
+    default:
+      throw error
+  }
 }
 
 function onListening () {
-    const addr = server.address()
-    const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
-    debug('Listening on ' + bind)
+  const addr = server.address()
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
+  debug('Listening on ' + bind)
 }
