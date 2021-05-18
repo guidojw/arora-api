@@ -2,9 +2,9 @@ import BaseRepository, { BaseScopes } from './base'
 import { EntityRepository, SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
 
-const endsAtLiteral = 'date + ' +
-  '(ban.duration||\' milliseconds\')::INTERVAL + ' +
-  '(COALESCE(SUM(extension.duration) / 1000, 0)||\' seconds\')::INTERVAL'
+const endsAtLiteral = 'ban.date + ' +
+  '(ban.duration / 1000||\' seconds\')::INTERVAL + ' +
+  '(SUM(extension.duration) / 1000||\' seconds\')::INTERVAL'
 
 @EntityRepository(Ban)
 export default class BanRepository extends BaseRepository<Ban> {
