@@ -26,7 +26,9 @@ export default class AnnounceTrainingsJob implements BaseJob {
       return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
-    const trainings = await this.trainingRepository.find({ where: { groupId } })
+    const trainings = await this.trainingRepository.scopes.default
+      .andWhere('training.group_id = :groupId', { groupId })
+      .getMany()
     for (const training of trainings) {
       const jobName = `training_${training.id}`
       const job = cron.scheduledJobs[jobName]
@@ -92,7 +94,7 @@ function getTrainingsInfo (trainings: Training[], authors: GetUsers): string {
         const timeString = getTime(training.date)
         const author = authors.find(author => author.id === training.authorId)
 
-        result += ` ${timeString} (host: ${author?.name ?? 'unknown'})`
+        result += ` ${timeString} (host: ${author?.name as string ?? 'unknown'})`
         if (j < typeTrainings.length - 2) {
           result += ','
         } else if (j === typeTrainings.length - 2) {
