@@ -1,6 +1,14 @@
+import {
+  BaseHttpController,
+  controller,
+  httpGet,
+  interfaces,
+  requestBody,
+  requestParam,
+  results
+} from 'inversify-express-utils'
 import { GroupService, UserService } from '../../services'
 import { ValidationChain, body, header, param } from 'express-validator'
-import { controller, httpGet, interfaces, requestBody, requestParam } from 'inversify-express-utils'
 import { GetGroupRole } from '../../services/group'
 import { GetUserById } from 'bloxy/dist/client/apis/UsersAPI'
 import { GetUsers } from '../../services/user'
@@ -10,7 +18,7 @@ import { inject } from 'inversify'
 const { TYPES } = constants
 
 @controller('/v1/users')
-export default class UserController implements interfaces.Controller {
+export default class UserController extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
@@ -20,8 +28,8 @@ export default class UserController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async getUserIdFromUsername (@requestParam('username') username: string): Promise<number> {
-    return await this.userService.getUserIdFromUsername(username)
+  async getUserIdFromUsername (@requestParam('username') username: string): Promise<results.JsonResult> {
+    return this.json(await this.userService.getUserIdFromUsername(username))
   }
 
   @httpGet(
@@ -45,8 +53,11 @@ export default class UserController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async getRank (@requestParam('groupId') groupId: number, @requestParam('userId') userId: number): Promise<number> {
-    return await this.groupService.getRank(groupId, userId)
+  async getRank (
+    @requestParam('groupId') groupId: number,
+      @requestParam('userId') userId: number
+  ): Promise<results.JsonResult> {
+    return this.json(await this.groupService.getRank(groupId, userId))
   }
 
   @httpGet(
