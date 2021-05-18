@@ -1,4 +1,4 @@
-import { GroupService, TrainingService, UserService } from '../services'
+import { GroupService, UserService } from '../services'
 import { constants, timeUtil } from '../util'
 import cron, { JobCallback } from 'node-schedule'
 import { inject, injectable } from 'inversify'
@@ -14,7 +14,6 @@ const { getTime, getTimeZoneAbbreviation } = timeUtil
 export default class AnnounceTrainingsJob implements BaseJob {
   @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
-  @inject(TYPES.TrainingService) private readonly trainingService!: TrainingService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
   async run (groupId?: number): Promise<any> {
@@ -27,7 +26,9 @@ export default class AnnounceTrainingsJob implements BaseJob {
       return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
-    const trainings = await this.trainingService.getTrainings(groupId)
+    const trainings = await this.trainingRepository.scopes.default
+      .andWhere('training.group_id = :groupId', { groupId })
+      .getMany()
     for (const training of trainings) {
       const jobName = `training_${training.id}`
       const job = cron.scheduledJobs[jobName]
