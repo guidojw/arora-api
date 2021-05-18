@@ -4,7 +4,7 @@ import { Ban } from '../entities'
 
 const endsAtLiteral = 'date + ' +
   '(ban.duration||\' milliseconds\')::INTERVAL + ' +
-  '(COALESCE(SUM(extension.duration), 0)||\' milliseconds\')::INTERVAL'
+  '(COALESCE(SUM(extension.duration) / 1000, 0)||\' seconds\')::INTERVAL'
 
 @EntityRepository(Ban)
 export default class BanRepository extends BaseRepository<Ban> {
