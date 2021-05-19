@@ -29,17 +29,17 @@ export class BanScopes extends BaseScopes<Ban> {
 
   get default (): this {
     return this
-      .makeBaseBuilder()
+      .makeBaseScope()
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at > NOW())')
   }
 
   get finished (): this {
     return this
-      .makeBaseBuilder()
+      .makeBaseScope()
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at <= NOW())')
   }
 
-  private makeBaseBuilder (): this {
+  private makeBaseScope (): this {
     return this
       .addSelect('ban.*')
       .addSelect('other_ban.ends_at')
