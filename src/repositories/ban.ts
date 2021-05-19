@@ -2,10 +2,6 @@ import BaseRepository, { BaseScopes } from './base'
 import { EntityRepository, SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
 
-const endsAtLiteral = 'ban.date + ' +
-  '(ban.duration / 1000||\' seconds\')::INTERVAL + ' +
-  '(SUM(extension.duration) / 1000||\' seconds\')::INTERVAL'
-
 @EntityRepository(Ban)
 export default class BanRepository extends BaseRepository<Ban> {
   get scopes (): BanScopes {
@@ -33,19 +29,17 @@ export class BanScopes extends BaseScopes<Ban> {
 
   get default (): this {
     return this
-      .addSelect('ban.*')
-      .addSelect('other_ban.ends_at')
-      .leftJoin('ban_cancellations', 'cancellation', 'cancellation.ban_id = ban.id')
-      .leftJoin(BanScopes.makeEndsAtQueryBuilder, 'other_ban', 'other_ban.id = ban.id')
-      .leftJoinAndSelect('ban_extensions', 'extension', 'extension.ban_id = ban.id')
-      .andWhere('cancellation.id IS NULL')
-      .addGroupBy('ban.id')
-      .addGroupBy('extension.id')
-      .addGroupBy('other_ban.ends_at')
+      .makeBaseScope()
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at > NOW())')
   }
 
   get finished (): this {
+    return this
+      .makeBaseScope()
+      .orHaving('(ban.duration IS NULL OR other_ban.ends_at <= NOW())')
+  }
+
+  private makeBaseScope (): this {
     return this
       .addSelect('ban.*')
       .addSelect('other_ban.ends_at')
@@ -56,7 +50,6 @@ export class BanScopes extends BaseScopes<Ban> {
       .addGroupBy('ban.id')
       .addGroupBy('extension.id')
       .addGroupBy('other_ban.ends_at')
-      .orHaving('(ban.duration IS NULL OR other_ban.ends_at <= NOW())')
   }
 
   private static makeEndsAtQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
@@ -64,10 +57,13 @@ export class BanScopes extends BaseScopes<Ban> {
     // @ts-expect-error
     qb.connection = qb.repository
     return qb
-      .select(endsAtLiteral, 'ends_at')
-      .addSelect('ban.id', 'id')
+      .select('ban.id', 'id')
+      .addSelect(
+        'ban.date + ((ban.duration + COALESCE(SUM(extension.duration), 0)) / 1000||\' seconds\')::INTERVAL',
+        'ends_at'
+      )
       .from('bans', 'ban')
-      .addFrom('ban_extensions', 'extension')
+      .leftJoin('ban_extensions', 'extension', 'extension.ban_id = ban.id')
       .groupBy('ban.id')
       .addGroupBy('ban.date')
   }
