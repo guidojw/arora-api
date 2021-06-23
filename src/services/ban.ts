@@ -23,7 +23,7 @@ export default class BanService {
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async getBans (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Ban[]> {
+  public async getBans (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Ban[]> {
     if (!BanScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
@@ -37,7 +37,7 @@ export default class BanService {
     return await qb.getMany()
   }
 
-  async getBan (groupId: number, userId: number, scopes?: string[]): Promise<Ban> {
+  public async getBan (groupId: number, userId: number, scopes?: string[]): Promise<Ban> {
     if (!BanScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
@@ -53,7 +53,7 @@ export default class BanService {
     return ban
   }
 
-  async ban (
+  public async ban (
     groupId: number,
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration?: number | null, reason: string }
@@ -99,7 +99,7 @@ export default class BanService {
     return ban
   }
 
-  async unban (
+  public async unban (
     groupId: number,
     userId: number,
     { authorId, reason }: { authorId: number, reason: string }
@@ -116,7 +116,7 @@ export default class BanService {
     return cancellation
   }
 
-  async extendBan (
+  public async extendBan (
     groupId: number,
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration: number, reason: string }
@@ -154,7 +154,7 @@ export default class BanService {
     return extension
   }
 
-  async changeBan (
+  public async changeBan (
     groupId: number,
     userId: number,
     { changes, editorId }: {

@@ -16,7 +16,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async run (groupId?: number): Promise<any> {
+  public async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
       const groupIds = (await this.trainingRepository.scopes.default
         .select('DISTINCT training.group_id')

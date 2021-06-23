@@ -4,11 +4,11 @@ import { Ban } from '../entities'
 
 @EntityRepository(Ban)
 export default class BanRepository extends BaseRepository<Ban> {
-  get scopes (): BanScopes {
+  public get scopes (): BanScopes {
     return new BanScopes(this, this.createQueryBuilder('ban'))
   }
 
-  transform (record: any): Ban {
+  public transform (record: any): Ban {
     if (typeof record.extension_id !== 'undefined') {
       record.extensions = record.extension_id === null
         ? []
@@ -25,15 +25,15 @@ export default class BanRepository extends BaseRepository<Ban> {
 }
 
 export class BanScopes extends BaseScopes<Ban> {
-  static scopes = ['finished']
+  public static readonly scopes = ['finished']
 
-  get default (): this {
+  public get default (): this {
     return this
       .makeBaseScope()
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at > NOW())')
   }
 
-  get finished (): this {
+  public get finished (): this {
     return this
       .makeBaseScope()
       .orHaving('(ban.duration IS NULL OR other_ban.ends_at <= NOW())')

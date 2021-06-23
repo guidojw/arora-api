@@ -28,7 +28,7 @@ export default class UserController extends BaseHttpController implements interf
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async getUserIdFromUsername (@requestParam('username') username: string): Promise<results.JsonResult> {
+  public async getUserIdFromUsername (@requestParam('username') username: string): Promise<results.JsonResult> {
     return this.json(await this.userService.getUserIdFromUsername(username))
   }
 
@@ -38,12 +38,12 @@ export default class UserController extends BaseHttpController implements interf
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async hasBadge (@requestParam('userId') userId: number, @requestParam('badgeId') badgeId: number): Promise<boolean> {
+  public async hasBadge (@requestParam('userId') userId: number, @requestParam('badgeId') badgeId: number): Promise<boolean> {
     return await this.userService.hasBadge(userId, badgeId)
   }
 
   @httpGet('/', ...UserController.validate('getUsers'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  async getUsers (@requestBody() body: { userIds: number[] }): Promise<GetUsers> {
+  public async getUsers (@requestBody() body: { userIds: number[] }): Promise<GetUsers> {
     return await this.userService.getUsers(body.userIds)
   }
 
@@ -53,7 +53,7 @@ export default class UserController extends BaseHttpController implements interf
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async getRank (
+  public async getRank (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number
   ): Promise<results.JsonResult> {
@@ -66,17 +66,17 @@ export default class UserController extends BaseHttpController implements interf
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async getRole (@requestParam('groupId') groupId: number, @requestParam('userId')
+  public async getRole (@requestParam('groupId') groupId: number, @requestParam('userId')
     userId: number): Promise<GetGroupRole> {
     return await this.groupService.getRole(groupId, userId)
   }
 
   @httpGet('/:userId', ...UserController.validate('getUser'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  async getUser (@requestParam('userId') userId: number): Promise<GetUserById> {
+  public async getUser (@requestParam('userId') userId: number): Promise<GetUserById> {
     return await this.userService.getUser(userId)
   }
 
-  static validate (method: string): ValidationChain[] {
+  private static validate (method: string): ValidationChain[] {
     switch (method) {
       case 'getUserIdFromUsername':
         return [

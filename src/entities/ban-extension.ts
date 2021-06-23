@@ -7,28 +7,28 @@ import { IsNotEmpty } from 'class-validator'
 export default class BanExtension {
   @Expose()
   @PrimaryGeneratedColumn()
-  readonly id!: number
+  public readonly id!: number
 
   @Expose({ name: 'author_id' })
   @Column('bigint', { name: 'author_id' })
-  authorId!: number
+  public authorId!: number
 
   @Expose({ name: 'ban_id' })
   @Column({ name: 'ban_id' })
-  banId!: number
+  public banId!: number
 
   @Expose()
   @Column()
-  duration!: number
+  public duration!: number
 
   @Expose()
   @Column({ length: 255 })
   @IsNotEmpty()
-  reason!: string
+  public reason!: string
 
   @Expose()
   @Type(() => Ban)
   @ManyToOne(() => Ban, ban => ban.extensions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ban_id' })
-  ban!: Ban
+  public ban!: Ban
 }

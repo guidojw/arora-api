@@ -7,33 +7,33 @@ import TrainingType from './training-type'
 export default class Training {
   @Expose()
   @PrimaryGeneratedColumn()
-  readonly id!: number
+  public readonly id!: number
 
   @Expose({ name: 'author_id' })
   @Column('bigint', { name: 'author_id' })
-  authorId!: number
+  public authorId!: number
 
   @Expose()
   @Column('varchar', { nullable: true, length: 255 })
   @ValidateIf(training => training.notes != null)
   @IsNotEmpty()
-  notes?: string | null
+  public notes?: string | null
 
   @Expose()
   @Column('timestamp with time zone')
-  date!: Date
+  public date!: Date
 
   @Expose({ name: 'group_id' })
   @Column({ name: 'group_id' })
-  groupId!: number
+  public groupId!: number
 
   @Expose({ name: 'type_id' })
   @Column({ name: 'type_id', nullable: true })
-  typeId?: number | null
+  public typeId?: number | null
 
   @Expose()
   @Type(() => TrainingType)
   @ManyToOne(() => TrainingType, trainingType => trainingType.trainings, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'type_id' })
-  type?: TrainingType | null
+  public type?: TrainingType | null
 }

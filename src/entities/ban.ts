@@ -7,42 +7,42 @@ import { IsNotEmpty } from 'class-validator'
 export default class Ban {
   @Expose()
   @PrimaryGeneratedColumn()
-  readonly id!: number
+  public readonly id!: number
 
   @Expose({ name: 'author_id' })
   @Column('bigint', { name: 'author_id' })
-  authorId!: number
+  public authorId!: number
 
   @Expose()
   @Column('timestamp with time zone', { default: () => 'NOW()' })
-  date!: Date
+  public date!: Date
 
   @Expose()
   @Column('int', { nullable: true })
-  duration?: number | null
+  public duration?: number | null
 
   @Expose({ name: 'ends_at' })
-  endsAt?: Date
+  public endsAt?: Date
 
   @Expose({ name: 'group_id' })
   @Column({ name: 'group_id' })
-  groupId!: number
+  public groupId!: number
 
   @Expose()
   @Column({ length: 255 })
   @IsNotEmpty()
-  reason!: string
+  public reason!: string
 
   @Expose({ name: 'role_id' })
   @Column({ name: 'role_id' })
-  roleId!: number
+  public roleId!: number
 
   @Expose({ name: 'user_id' })
   @Column('bigint', { name: 'user_id' })
-  userId!: number
+  public userId!: number
 
   @Expose()
   @Type(() => BanExtension)
   @OneToMany(() => BanExtension, extension => extension.ban)
-  extensions!: BanExtension[]
+  public extensions!: BanExtension[]
 }
