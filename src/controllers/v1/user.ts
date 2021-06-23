@@ -38,7 +38,10 @@ export default class UserController extends BaseHttpController implements interf
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async hasBadge (@requestParam('userId') userId: number, @requestParam('badgeId') badgeId: number): Promise<boolean> {
+  public async hasBadge (
+    @requestParam('userId') userId: number,
+      @requestParam('badgeId') badgeId: number
+  ): Promise<boolean> {
     return await this.userService.hasBadge(userId, badgeId)
   }
 
