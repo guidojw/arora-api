@@ -8,13 +8,9 @@ const PING_INTERVAL = 30 * 1000
 
 @injectable()
 export default class WebSocketManager implements BaseManager {
-  connections: AroraWebSocket[]
+  private readonly connections: AroraWebSocket[] = []
 
-  constructor () {
-    this.connections = []
-  }
-
-  init (): void {
+  public init (): void {
     setInterval(() => {
       for (const connection of this.connections) {
         if (!connection.isAlive) {
@@ -27,7 +23,7 @@ export default class WebSocketManager implements BaseManager {
     }, PING_INTERVAL)
   }
 
-  addConnection (conn: WebSocket): void {
+  public addConnection (conn: WebSocket): void {
     console.log('New connection!')
     const connection = conn as AroraWebSocket
     connection.isAlive = true
@@ -44,13 +40,13 @@ export default class WebSocketManager implements BaseManager {
     this.connections.push(connection)
   }
 
-  removeConnection (connection: AroraWebSocket): void {
-    this.connections.splice(this.connections.indexOf(connection), 1)
-  }
-
-  broadcast (event: string, data?: any): void {
+  public broadcast (event: string, data?: any): void {
     for (const connection of this.connections) {
       connection.send(JSON.stringify({ event, data }))
     }
+  }
+
+  private removeConnection (connection: AroraWebSocket): void {
+    this.connections.splice(this.connections.indexOf(connection), 1)
   }
 }

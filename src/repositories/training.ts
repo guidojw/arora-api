@@ -4,11 +4,11 @@ import { Training } from '../entities'
 
 @EntityRepository(Training)
 export default class TrainingRepository extends BaseRepository<Training> {
-  get scopes (): TrainingScopes {
+  public get scopes (): TrainingScopes {
     return new TrainingScopes(this, this.createQueryBuilder('training'))
   }
 
-  transform (record: any): Training {
+  public transform (record: any): Training {
     record.type = record.type_id == null
       ? record.type_id
       : {
@@ -22,7 +22,7 @@ export default class TrainingRepository extends BaseRepository<Training> {
 }
 
 export class TrainingScopes extends BaseScopes<Training> {
-  get default (): this {
+  public get default (): this {
     return this
       .addSelect('training.*')
       .leftJoinAndSelect('training.type', 'type')

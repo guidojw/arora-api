@@ -23,7 +23,7 @@ export default class TrainingService {
   @inject(TYPES.TrainingTypeRepository) private readonly trainingTypeRepository!: Repository<TrainingType>
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async getTrainings (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Training[]> {
+  public async getTrainings (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Training[]> {
     if (!TrainingScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
@@ -37,7 +37,7 @@ export default class TrainingService {
     return await qb.getMany()
   }
 
-  async getTraining (groupId: number, id: number, scopes?: string[]): Promise<Training> {
+  public async getTraining (groupId: number, id: number, scopes?: string[]): Promise<Training> {
     if (!TrainingScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scopes.')
     }
@@ -53,7 +53,7 @@ export default class TrainingService {
     return training
   }
 
-  async addTraining (
+  public async addTraining (
     groupId: number,
     { typeId, authorId, date, notes }: { typeId: number, authorId: number, date: number, notes?: string | null }
   ): Promise<Training> {
@@ -82,7 +82,7 @@ export default class TrainingService {
     return training
   }
 
-  async changeTraining (
+  public async changeTraining (
     groupId: number,
     id: number,
     { changes, editorId }: {
@@ -145,7 +145,7 @@ export default class TrainingService {
     return training
   }
 
-  async cancelTraining (
+  public async cancelTraining (
     groupId: number,
     id: number,
     { authorId, reason }: { authorId: number, reason: string }
@@ -165,11 +165,11 @@ export default class TrainingService {
     return cancellation
   }
 
-  async getTrainingTypes (groupId: number): Promise<TrainingType[]> {
+  public async getTrainingTypes (groupId: number): Promise<TrainingType[]> {
     return await this.trainingTypeRepository.find({ where: { groupId } })
   }
 
-  async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
+  public async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
     const trainingType = await this.trainingTypeRepository.findOne({ where: { groupId, id } })
     if (typeof trainingType === 'undefined') {
       throw new NotFoundError('Training type not found.')
@@ -177,7 +177,7 @@ export default class TrainingService {
     return trainingType
   }
 
-  async createTrainingType (
+  public async createTrainingType (
     groupId: number,
     { name, abbreviation }: { abbreviation: string, name: string }
   ): Promise<TrainingType> {
@@ -190,7 +190,7 @@ export default class TrainingService {
     return await this.trainingTypeRepository.save({ groupId, name, abbreviation })
   }
 
-  async changeTrainingType (
+  public async changeTrainingType (
     groupId: number,
     id: number,
     { changes, editorId }: {
@@ -223,7 +223,7 @@ export default class TrainingService {
     return trainingType
   }
 
-  async deleteTrainingType (groupId: number, id: number): Promise<void> {
+  public async deleteTrainingType (groupId: number, id: number): Promise<void> {
     const result = await this.trainingTypeRepository.delete({ groupId, id })
     if (result.affected === 0) {
       throw new NotFoundError('Training type not found.')

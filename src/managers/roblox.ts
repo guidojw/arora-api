@@ -6,12 +6,10 @@ import { injectable } from 'inversify'
 
 @injectable()
 export default class RobloxManager implements BaseManager {
-  authenticatedClients: Record<number, Client>
-  unauthenticatedClient: Client
+  private readonly authenticatedClients: Record<number, Client> = {}
+  private readonly unauthenticatedClient: Client
 
-  constructor () {
-    this.authenticatedClients = {}
-
+  public constructor () {
     // Unauthenticated client
     const client = new Client()
     // Set custom requester again, like with the authenticated clients.
@@ -19,7 +17,7 @@ export default class RobloxManager implements BaseManager {
     this.unauthenticatedClient = client
   }
 
-  async init (): Promise<void> {
+  public async init (): Promise<void> {
     // Authenticated client(s)
     try {
       // @ts-expect-error
@@ -45,7 +43,7 @@ export default class RobloxManager implements BaseManager {
     }
   }
 
-  getClient (groupId?: number): Client {
+  public getClient (groupId?: number): Client {
     return typeof groupId !== 'undefined'
       ? this.authenticatedClients[groupId] ?? this.unauthenticatedClient
       : this.unauthenticatedClient

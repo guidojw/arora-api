@@ -45,7 +45,7 @@ export default class PayoutTrainDevelopersJob {
   @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
   @inject(TYPES.PayoutRepository) private readonly payoutRepository!: PayoutRepository
 
-  async run (groupId: number): Promise<void> {
+  public async run (groupId: number): Promise<void> {
     // Get last payout and its last transaction.
     const lastPayout = await this.payoutRepository.getLast(groupId)
     if (typeof lastPayout === 'undefined') {

@@ -7,20 +7,20 @@ const privateKey = fs.readFileSync('private.key', 'utf8')
 
 @injectable()
 export default class AuthService {
-  verify (token: string): string | object {
-    return jwt.verify(token, publicKey, { algorithms: ['RS256'] })
-  }
-
-  sign (payload: string | object | Buffer): string {
-    return jwt.sign(payload, privateKey, { algorithm: 'RS256' })
-  }
-
-  authenticate (token: string): boolean {
+  public authenticate (token: string): boolean {
     try {
       this.verify(token)
       return true
     } catch {
       return false
     }
+  }
+
+  public sign (payload: string | object | Buffer): string {
+    return jwt.sign(payload, privateKey, { algorithm: 'RS256' })
+  }
+
+  private verify (token: string): string | object {
+    return jwt.verify(token, publicKey, { algorithms: ['RS256'] })
   }
 }

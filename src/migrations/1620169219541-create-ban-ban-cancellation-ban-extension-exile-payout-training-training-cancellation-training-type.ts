@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm
 
 export class createBanBanCancellationBanExtensionExilePayoutTrainingTrainingCancellationTrainingType1620169219541
 implements MigrationInterface {
-  async up (queryRunner: QueryRunner): Promise<void> {
+  public async up (queryRunner: QueryRunner): Promise<void> {
     const sequelizeMigrationTable = await queryRunner.getTable('sequelize_meta')
     if (typeof sequelizeMigrationTable !== 'undefined') {
       // The schema is already up-to-date because Sequelize was used before, so delete the Sequelize migrations
@@ -216,7 +216,7 @@ implements MigrationInterface {
     }))
   }
 
-  async down (queryRunner: QueryRunner): Promise<void> {
+  public async down (queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('training_cancellations')
     await queryRunner.dropTable('trainings')
 

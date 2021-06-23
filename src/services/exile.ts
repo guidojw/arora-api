@@ -18,11 +18,11 @@ export default class ExileService {
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async getExiles (groupId: number): Promise<Exile[]> {
+  public async getExiles (groupId: number): Promise<Exile[]> {
     return await this.exileRepository.find({ where: { groupId } })
   }
 
-  async getExile (groupId: number, userId: number): Promise<Exile> {
+  public async getExile (groupId: number, userId: number): Promise<Exile> {
     const exile = await this.exileRepository.findOne({ where: { groupId, userId } })
     if (typeof exile === 'undefined') {
       throw new NotFoundError('Exile not found.')
@@ -30,7 +30,7 @@ export default class ExileService {
     return exile
   }
 
-  async exile (
+  public async exile (
     groupId: number,
     userId: number,
     { authorId, reason }: { authorId: number, reason: string}
@@ -57,7 +57,7 @@ export default class ExileService {
     return exile
   }
 
-  async unexile (
+  public async unexile (
     groupId: number,
     userId: number,
     { authorId, reason }: { authorId: number, reason: string }
