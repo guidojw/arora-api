@@ -52,11 +52,11 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     }, this)
   }
 
-  public async override getMany (): Promise<T[]> {
+  public override async getMany (): Promise<T[]> {
     return this.repository.transformMany(await super.getRawMany())
   }
 
-  public async override getOne (): Promise<T | undefined> {
+  public override async getOne (): Promise<T | undefined> {
     return this.repository.transformMany(await super.getRawMany()).shift()
   }
 
