@@ -61,6 +61,8 @@
     /* Report error when not all code paths in function return a value. */
     "noFallthroughCasesInSwitch": true,
     /* Report errors for fallthrough cases in switch statement. */
+    "noImplicitOverride": true,
+    /* Report error when overriding a method without using the 'override' keyword. */
 
     /* Module Resolution Options */
     "moduleResolution": "node",
