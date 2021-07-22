@@ -58,13 +58,13 @@ export default class TrainingService {
     { typeId, authorId, date, notes }: { typeId: number, authorId: number, date: number, notes?: string | null }
   ): Promise<Training> {
     const trainingType = await this.getTrainingType(groupId, typeId)
-    const training = await this.trainingRepository.save({
+    const training = await this.trainingRepository.save(this.trainingRepository.create({
       groupId,
       authorId,
       typeId,
       date: new Date(date),
       notes
-    })
+    }))
     training.type = trainingType
 
     await this.announceTrainingsJob.run(groupId)
@@ -151,7 +151,11 @@ export default class TrainingService {
     { authorId, reason }: { authorId: number, reason: string }
   ): Promise<TrainingCancellation> {
     const training = await this.getTraining(groupId, id)
-    const cancellation = await this.trainingCancellationRepository.save({ trainingId: training.id, authorId, reason })
+    const cancellation = await this.trainingCancellationRepository.save(this.trainingCancellationRepository.create({
+      trainingId: training.id,
+      authorId,
+      reason
+    }))
 
     await this.announceTrainingsJob.run(groupId)
     const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]
@@ -187,7 +191,11 @@ export default class TrainingService {
       throw new ConflictError('A training type with that name already exists.')
     }
 
-    return await this.trainingTypeRepository.save({ groupId, name, abbreviation })
+    return await this.trainingTypeRepository.save(this.trainingTypeRepository.create({
+      groupId,
+      name,
+      abbreviation
+    }))
   }
 
   public async changeTrainingType (

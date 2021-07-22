@@ -81,14 +81,14 @@ export default class BanService {
       }
     }
 
-    const ban = await this.banRepository.save({
+    const ban = await this.banRepository.save(this.banRepository.create({
       authorId,
       duration,
       groupId,
       reason,
       roleId: role.id,
       userId
-    })
+    }))
 
     const [authorName, username] = await Promise.all([
       this.userService.getUsername(ban.authorId),
@@ -105,7 +105,11 @@ export default class BanService {
     { authorId, reason }: { authorId: number, reason: string }
   ): Promise<BanCancellation> {
     const ban = await this.getBan(groupId, userId)
-    const cancellation = await this.banCancellationRepository.save({ banId: ban.id, authorId, reason })
+    const cancellation = await this.banCancellationRepository.save(this.banCancellationRepository.create({
+      banId: ban.id,
+      authorId,
+      reason
+    }))
 
     const [authorName, username] = await Promise.all([
       this.userService.getUsername(cancellation.authorId),
@@ -137,12 +141,12 @@ export default class BanService {
       throw new UnprocessableError('Too many days.')
     }
 
-    const extension = await this.banExtensionRepository.save({
+    const extension = await this.banExtensionRepository.save(this.banExtensionRepository.create({
       authorId,
       banId: ban.id,
       duration,
       reason
-    })
+    }))
 
     const [authorName, username] = await Promise.all([
       this.userService.getUsername(extension.authorId),
