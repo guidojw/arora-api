@@ -11,7 +11,7 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
-    "build-bloxy": "npm explore bloxy -- npm run build -- --project ./tsconfig.json",
+    "build-bloxy": "npm explore bloxy -- npm run build",
     "lint": "eslint src",
     "start": "node bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
