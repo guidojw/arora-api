@@ -10,8 +10,8 @@
   "author": "Guido de Jong",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc --skipLibCheck",
-    "build-bloxy": "npm explore bloxy -- npm run build",
+    "build": "tsc",
+    "build-bloxy": "npm explore bloxy -- npm run build -- --project ./tsconfig.json",
     "lint": "eslint src",
     "start": "node bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
