@@ -1,6 +1,6 @@
 import '../controllers'
 import * as Sentry from '@sentry/node'
-import express, { Application, NextFunction, Request, Response } from 'express'
+import express, { Application, ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express'
 import { Container } from 'inversify'
 import ErrorMiddleware from '../middlewares/error'
 import { InversifyExpressServer } from 'inversify-express-utils'
@@ -18,13 +18,13 @@ export default function init (container: Container): Application {
       app.set('container', container)
 
       if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.requestHandler())
+        app.use(Sentry.Handlers.requestHandler() as RequestHandler)
       }
 
-      app.use(logger('dev'))
-      app.use(express.json())
-      app.use(express.urlencoded({ extended: false }))
-      app.use(helmet())
+      app.use(logger('dev') as RequestHandler)
+      app.use(express.json() as RequestHandler)
+      app.use(express.urlencoded({ extended: false }) as RequestHandler)
+      app.use(helmet() as RequestHandler)
       app.use(hpp())
     })
     .setErrorConfig(app => {
@@ -35,7 +35,7 @@ export default function init (container: Container): Application {
       })
 
       if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.errorHandler())
+        app.use(Sentry.Handlers.errorHandler() as ErrorRequestHandler)
       }
 
       app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
