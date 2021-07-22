@@ -46,7 +46,12 @@ export default class ExileService {
     try {
       await this.groupService.kickMember(groupId, userId)
     } catch {} // eslint-disable-line no-empty
-    const exile = await this.exileRepository.save({ authorId, groupId, reason, userId })
+    const exile = await this.exileRepository.save(this.exileRepository.create({
+      authorId,
+      groupId,
+      reason,
+      userId
+    }))
 
     const [username, authorName] = await Promise.all([
       this.userService.getUsername(exile.userId),

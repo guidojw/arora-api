@@ -20,7 +20,7 @@ export default class AuthService {
     return jwt.sign(payload, privateKey, { algorithm: 'RS256' })
   }
 
-  private verify (token: string): string | object {
+  public verify (token: string): string | object {
     return jwt.verify(token, publicKey, { algorithms: ['RS256'] })
   }
 }
