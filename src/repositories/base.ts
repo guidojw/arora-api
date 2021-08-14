@@ -81,7 +81,6 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === entityOrProperty)) {
       return this
     }
-    // @ts-expect-error
     return super.leftJoinAndSelect(entityOrProperty, alias, condition, parameters)
   }
 }
