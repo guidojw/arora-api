@@ -6,7 +6,7 @@ import { util } from '../util'
 const { groupBy } = util
 
 export default abstract class BaseRepository<T> extends Repository<T> {
-  transform (record: any): T {
+  public transform (record: any): T {
     return plainToClass(
       this.target as ClassConstructor<T>,
       record,
@@ -14,7 +14,7 @@ export default abstract class BaseRepository<T> extends Repository<T> {
     )
   }
 
-  transformMany (records: any[]): T[] {
+  public transformMany (records: any[]): T[] {
     return groupBy(records, 'id')
       .map(groupedRecords => groupedRecords.map(this.transform.bind(this)))
       .map(([first, ...rest]) => lodash.mergeWith(first, ...rest, (objValue: any, srcValue: any) => (
@@ -24,22 +24,22 @@ export default abstract class BaseRepository<T> extends Repository<T> {
 }
 
 export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
-  static scopes: string[] = []
+  public static readonly scopes: string[] = []
 
-  constructor (private readonly repository: BaseRepository<T>, queryBuilder: SelectQueryBuilder<T>) {
+  public constructor (private readonly repository: BaseRepository<T>, queryBuilder: SelectQueryBuilder<T>) {
     super(queryBuilder)
   }
 
-  abstract get default (): this
+  public abstract get default (): this
 
-  static has (scopes?: string[]): boolean {
+  public static has (scopes?: string[]): boolean {
     if (typeof scopes === 'undefined') {
       return true
     }
     return scopes.every(scope => scope === 'default' || this.scopes.includes(scope))
   }
 
-  apply (scopes?: string[]): this {
+  public apply (scopes?: string[]): this {
     if (typeof scopes === 'undefined') {
       return this.default
     }
@@ -52,15 +52,15 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     }, this)
   }
 
-  async getMany (): Promise<T[]> {
+  public async getMany (): Promise<T[]> {
     return this.repository.transformMany(await super.getRawMany())
   }
 
-  async getOne (): Promise<T | undefined> {
+  public async getOne (): Promise<T | undefined> {
     return this.repository.transformMany(await super.getRawMany()).shift()
   }
 
-  leftJoin (
+  public leftJoin (
     entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
     alias: string,
     condition?: string,
@@ -72,7 +72,7 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     return super.leftJoin(entityOrProperty, alias, condition, parameters)
   }
 
-  leftJoinAndSelect (
+  public leftJoinAndSelect (
     entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
     alias: string,
     condition?: string,
@@ -81,7 +81,6 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     if (this.expressionMap.joinAttributes.some(attribute => attribute.entityOrProperty === entityOrProperty)) {
       return this
     }
-    // @ts-expect-error
     return super.leftJoinAndSelect(entityOrProperty, alias, condition, parameters)
   }
 }

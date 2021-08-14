@@ -21,17 +21,17 @@ export default class GroupService {
   @inject(TYPES.UserService) private readonly userService!: UserService
   @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
-  async getGroupStatus (groupId: number): Promise<GetGroupStatus> {
+  public async getGroupStatus (groupId: number): Promise<GetGroupStatus> {
     const group = await this.getGroup(groupId)
     return group.shout
   }
 
-  async getGroup (groupId: number): Promise<GetGroup> {
+  public async getGroup (groupId: number): Promise<GetGroup> {
     const client = this.robloxManager.getClient(groupId)
     return await client.apis.groupsAPI.getGroup({ groupId })
   }
 
-  async getRank (groupId: number, userId: number): Promise<number> {
+  public async getRank (groupId: number, userId: number): Promise<number> {
     const client = this.robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
@@ -39,7 +39,7 @@ export default class GroupService {
     return typeof group !== 'undefined' ? group.role.rank : 0
   }
 
-  async getRole (groupId: number, userId: number): Promise<GetGroupRole> {
+  public async getRole (groupId: number, userId: number): Promise<GetGroupRole> {
     const client = this.robloxManager.getClient(groupId)
     const user = await client.getUser(userId)
     const groups = await user.getGroups()
@@ -52,12 +52,12 @@ export default class GroupService {
     return role as GetGroupRole
   }
 
-  async getRoles (groupId: number): Promise<GetGroupRoles> {
+  public async getRoles (groupId: number): Promise<GetGroupRoles> {
     const client = this.robloxManager.getClient(groupId)
     return await client.apis.groupsAPI.getGroupRoles({ groupId })
   }
 
-  async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
+  public async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
     const client = this.robloxManager.getClient(groupId)
     const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as UpdateGroupStatus
 
@@ -73,7 +73,7 @@ export default class GroupService {
     return shout
   }
 
-  async setMemberRole (groupId: number, userId: number, role: GetGroupRole | number): Promise<GetGroupRole> {
+  public async setMemberRole (groupId: number, userId: number, role: GetGroupRole | number): Promise<GetGroupRole> {
     if (typeof role === 'number') {
       const roles = await this.getRoles(groupId)
       const roleResolvable = roles.roles.find(otherRole => otherRole.rank === role)
@@ -91,7 +91,7 @@ export default class GroupService {
     return role
   }
 
-  async changeMemberRole (groupId: number, userId: number, { role, authorId }: { role: GetGroupRole | number
+  public async changeMemberRole (groupId: number, userId: number, { role, authorId }: { role: GetGroupRole | number
     authorId?: number }): Promise<ChangeMemberRole> {
     const oldRole = await this.getRole(groupId, userId)
     if ([0, 255].includes(oldRole.rank)) {
@@ -112,7 +112,7 @@ export default class GroupService {
     return { oldRole, newRole }
   }
 
-  async promoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRole> {
+  public async promoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRole> {
     const rank = await this.getRank(groupId, userId)
     if ([0, 255].includes(rank)) {
       throw new UnprocessableError('Cannot promote users on this role.')
@@ -127,10 +127,10 @@ export default class GroupService {
     if (typeof role === 'undefined' || role.rank === 255) {
       throw new UnprocessableError('User is already the highest obtainable role.')
     }
-    return this.changeMemberRole(groupId, userId, { role, authorId })
+    return await this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
-  async demoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRole> {
+  public async demoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRole> {
     const rank = await this.getRank(groupId, userId)
     if ([0, 255].includes(rank)) {
       throw new UnprocessableError('Cannot promote users on this role.')
@@ -145,10 +145,10 @@ export default class GroupService {
     if (typeof role === 'undefined' || role.rank === 0) {
       throw new UnprocessableError('User is already the lowest obtainable role.')
     }
-    return this.changeMemberRole(groupId, userId, { role, authorId })
+    return await this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
-  async kickMember (groupId: number, userId: number): Promise<void> {
+  public async kickMember (groupId: number, userId: number): Promise<void> {
     const client = this.robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
     await group.kickMember(userId)

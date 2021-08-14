@@ -18,7 +18,7 @@ export default class AcceptJoinRequestsJob implements BaseJob {
   @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
   @inject(TYPES.ExileRepository) private readonly exileRepository!: Repository<Exile>
 
-  async run (groupId: number): Promise<any> {
+  public async run (groupId: number): Promise<any> {
     const client = this.robloxManager.getClient(groupId)
     const group = await client.getGroup(groupId)
 

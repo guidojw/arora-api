@@ -23,7 +23,7 @@ export default class TrainingService {
   @inject(TYPES.TrainingTypeRepository) private readonly trainingTypeRepository!: Repository<TrainingType>
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async getTrainings (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Training[]> {
+  public async getTrainings (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Training[]> {
     if (!TrainingScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
@@ -37,7 +37,7 @@ export default class TrainingService {
     return await qb.getMany()
   }
 
-  async getTraining (groupId: number, id: number, scopes?: string[]): Promise<Training> {
+  public async getTraining (groupId: number, id: number, scopes?: string[]): Promise<Training> {
     if (!TrainingScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scopes.')
     }
@@ -53,18 +53,18 @@ export default class TrainingService {
     return training
   }
 
-  async addTraining (
+  public async addTraining (
     groupId: number,
     { typeId, authorId, date, notes }: { typeId: number, authorId: number, date: number, notes?: string | null }
   ): Promise<Training> {
     const trainingType = await this.getTrainingType(groupId, typeId)
-    const training = await this.trainingRepository.save({
+    const training = await this.trainingRepository.save(this.trainingRepository.create({
       groupId,
       authorId,
       typeId,
       date: new Date(date),
       notes
-    })
+    }))
     training.type = trainingType
 
     await this.announceTrainingsJob.run(groupId)
@@ -82,7 +82,7 @@ export default class TrainingService {
     return training
   }
 
-  async changeTraining (
+  public async changeTraining (
     groupId: number,
     id: number,
     { changes, editorId }: {
@@ -145,13 +145,17 @@ export default class TrainingService {
     return training
   }
 
-  async cancelTraining (
+  public async cancelTraining (
     groupId: number,
     id: number,
     { authorId, reason }: { authorId: number, reason: string }
   ): Promise<TrainingCancellation> {
     const training = await this.getTraining(groupId, id)
-    const cancellation = await this.trainingCancellationRepository.save({ trainingId: training.id, authorId, reason })
+    const cancellation = await this.trainingCancellationRepository.save(this.trainingCancellationRepository.create({
+      trainingId: training.id,
+      authorId,
+      reason
+    }))
 
     await this.announceTrainingsJob.run(groupId)
     const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]
@@ -165,11 +169,11 @@ export default class TrainingService {
     return cancellation
   }
 
-  async getTrainingTypes (groupId: number): Promise<TrainingType[]> {
+  public async getTrainingTypes (groupId: number): Promise<TrainingType[]> {
     return await this.trainingTypeRepository.find({ where: { groupId } })
   }
 
-  async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
+  public async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
     const trainingType = await this.trainingTypeRepository.findOne({ where: { groupId, id } })
     if (typeof trainingType === 'undefined') {
       throw new NotFoundError('Training type not found.')
@@ -177,7 +181,7 @@ export default class TrainingService {
     return trainingType
   }
 
-  async createTrainingType (
+  public async createTrainingType (
     groupId: number,
     { name, abbreviation }: { abbreviation: string, name: string }
   ): Promise<TrainingType> {
@@ -187,10 +191,14 @@ export default class TrainingService {
       throw new ConflictError('A training type with that name already exists.')
     }
 
-    return await this.trainingTypeRepository.save({ groupId, name, abbreviation })
+    return await this.trainingTypeRepository.save(this.trainingTypeRepository.create({
+      groupId,
+      name,
+      abbreviation
+    }))
   }
 
-  async changeTrainingType (
+  public async changeTrainingType (
     groupId: number,
     id: number,
     { changes, editorId }: {
@@ -223,7 +231,7 @@ export default class TrainingService {
     return trainingType
   }
 
-  async deleteTrainingType (groupId: number, id: number): Promise<void> {
+  public async deleteTrainingType (groupId: number, id: number): Promise<void> {
     const result = await this.trainingTypeRepository.delete({ groupId, id })
     if (result.affected === 0) {
       throw new NotFoundError('Training type not found.')

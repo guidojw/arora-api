@@ -7,24 +7,24 @@ import Training from './training'
 export default class TrainingType {
   @Expose()
   @PrimaryGeneratedColumn()
-  readonly id!: number
+  public readonly id!: number
 
   @Expose()
   @Column({ length: 8 })
   @IsNotEmpty()
-  abbreviation!: string
+  public abbreviation!: string
 
   @Expose({ name: 'group_id' })
   @Column({ name: 'group_id' })
-  groupId!: number
+  public groupId!: number
 
   @Expose()
   @Column({ length: 255 })
   @IsNotEmpty()
-  name!: string
+  public name!: string
 
   @Expose()
   @Type(() => Training)
   @OneToMany(() => Training, training => training.type)
-  trainings!: Training[]
+  public trainings!: Training[]
 }

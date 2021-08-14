@@ -12,7 +12,7 @@ export default class StatusController implements interfaces.Controller {
   @inject(TYPES.StatusService) private readonly statusService!: StatusService
 
   @httpGet('/', ...StatusController.validate('getStatus'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  getStatus (): GetStatus {
+  public getStatus (): GetStatus {
     return this.statusService.getStatus()
   }
 
@@ -22,11 +22,11 @@ export default class StatusController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  async getGroupClientStatus (@requestParam('groupId') groupId: number): Promise<boolean> {
+  public async getGroupClientStatus (@requestParam('groupId') groupId: number): Promise<boolean> {
     return await this.statusService.getGroupClientStatus(groupId)
   }
 
-  static validate (method: string): ValidationChain[] {
+  private static validate (method: string): ValidationChain[] {
     switch (method) {
       case 'getStatus':
         return [

@@ -5,19 +5,19 @@ import Training from './training'
 @Entity({ name: 'training_cancellations' })
 export default class TrainingCancellation {
   @PrimaryGeneratedColumn()
-  readonly id!: number
+  public readonly id!: number
 
   @Column('bigint', { name: 'author_id' })
-  authorId!: number
+  public authorId!: number
 
   @Column({ name: 'training_id' })
-  trainingId!: number
+  public trainingId!: number
 
   @Column({ length: 255 })
   @IsNotEmpty()
-  reason!: string
+  public reason!: string
 
   @OneToOne(() => Training, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'training_id' })
-  training!: Training
+  public training!: Training
 }

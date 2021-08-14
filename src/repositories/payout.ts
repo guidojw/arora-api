@@ -3,7 +3,7 @@ import { Payout } from '../entities'
 
 @EntityRepository(Payout)
 export default class PayoutRepository extends Repository<Payout> {
-  async getLast (groupId: number): Promise<Payout | undefined> {
+  public async getLast (groupId: number): Promise<Payout | undefined> {
     return (await this
       .createQueryBuilder('payout')
       .innerJoin(qb => (

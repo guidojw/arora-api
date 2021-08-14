@@ -16,14 +16,14 @@ export default class AnnounceTrainingsJob implements BaseJob {
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async run (groupId?: number): Promise<any> {
+  public async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
       const groupIds = (await this.trainingRepository.scopes.default
         .select('DISTINCT training.group_id')
         .addGroupBy('training.group_id')
         .getMany()
       ).map(training => training.groupId)
-      return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
+      return await Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
     const trainings = await this.trainingRepository.scopes.default

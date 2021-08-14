@@ -11,14 +11,14 @@ const { TYPES } = constants
 export default class AuthMiddleware extends BaseMiddleware {
   @inject(TYPES.AuthService) private readonly authService!: AuthService
 
-  handler (req: Request, _res: Response, next: NextFunction): void {
+  public handler (req: Request, _res: Response, next: NextFunction): void {
     const token = req.header('authorization')?.replace('Bearer ', '') ?? undefined
 
     this.authenticateToken(token)
     next()
   }
 
-  authenticateWebSocketConnection (req: Request): void {
+  public authenticateWebSocketConnection (req: Request): void {
     const token = req.headers.authorization?.replace('Bearer ', '') ?? undefined
 
     this.authenticateToken(token)
