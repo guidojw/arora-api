@@ -10,7 +10,7 @@ import {
 import { GroupService, UserService } from '../../services'
 import { ValidationChain, body, header, param } from 'express-validator'
 import { GetGroupRole } from '../../services/group'
-import { GetUserById } from 'bloxy/dist/client/apis/UsersAPI'
+import { GetUserById } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
 import { GetUsers } from '../../services/user'
 import { constants } from '../../util'
 import { inject } from 'inversify'
