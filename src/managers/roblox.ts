@@ -1,4 +1,4 @@
-import { RESTRequestOptions, RESTRequester, RESTResponseDataType } from '@guidojw/bloxy/src/interfaces/RESTInterfaces'
+import { RESTRequestOptions, RESTRequester, RESTResponseDataType } from '@guidojw/bloxy/dist/interfaces/RESTInterfaces'
 import BaseManager from './base'
 import { Client } from '@guidojw/bloxy'
 import { HTTPError } from 'got'
