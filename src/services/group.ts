@@ -1,4 +1,8 @@
-import { UpdateGroupStatus as BloxyUpdateGroupStatus, GetGroup, GetGroupRoles } from 'bloxy/dist/client/apis/GroupsAPI'
+import {
+  UpdateGroupStatus as BloxyUpdateGroupStatus,
+  GetGroup,
+  GetGroupRoles
+} from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import { ForbiddenError, UnprocessableError } from '../errors'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { constants, util } from '../util'
@@ -127,7 +131,7 @@ export default class GroupService {
     if (typeof role === 'undefined' || role.rank === 255) {
       throw new UnprocessableError('User is already the highest obtainable role.')
     }
-    return this.changeMemberRole(groupId, userId, { role, authorId })
+    return await this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
   public async demoteMember (groupId: number, userId: number, authorId?: number): Promise<ChangeMemberRole> {
@@ -145,7 +149,7 @@ export default class GroupService {
     if (typeof role === 'undefined' || role.rank === 0) {
       throw new UnprocessableError('User is already the lowest obtainable role.')
     }
-    return this.changeMemberRole(groupId, userId, { role, authorId })
+    return await this.changeMemberRole(groupId, userId, { role, authorId })
   }
 
   public async kickMember (groupId: number, userId: number): Promise<void> {

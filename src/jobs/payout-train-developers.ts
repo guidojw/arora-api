@@ -1,6 +1,6 @@
 import { RobloxManager, WebSocketManager } from '../managers'
 import { inject, injectable } from 'inversify'
-import { GetGroupTransactions } from 'bloxy/dist/client/apis/EconomyAPI'
+import { GetGroupTransactions } from '@guidojw/bloxy/dist/client/apis/EconomyAPI'
 import HealthCheckJob from './health-check'
 import { Payout } from '../entities'
 import { PayoutRepository } from '../repositories'

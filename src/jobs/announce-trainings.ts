@@ -23,7 +23,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
         .addGroupBy('training.group_id')
         .getMany()
       ).map(training => training.groupId)
-      return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
+      return await Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
     const trainings = await this.trainingRepository.scopes.default

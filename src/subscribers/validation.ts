@@ -11,6 +11,9 @@ export class ValidationSubscriber implements EntitySubscriberInterface {
   }
 
   public async beforeUpdate (event: UpdateEvent<any>): Promise<void> {
+    if (typeof event.entity === 'undefined') {
+      return
+    }
     const errors = await validate(event.entity)
     if (errors.length > 0) {
       throw new Error(errors[0].toString())
