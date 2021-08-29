@@ -52,15 +52,15 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     }, this)
   }
 
-  public async getMany (): Promise<T[]> {
+  public override async getMany (): Promise<T[]> {
     return this.repository.transformMany(await super.getRawMany())
   }
 
-  public async getOne (): Promise<T | undefined> {
+  public override async getOne (): Promise<T | undefined> {
     return this.repository.transformMany(await super.getRawMany()).shift()
   }
 
-  public leftJoin (
+  public override leftJoin (
     entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
     alias: string,
     condition?: string,
@@ -72,7 +72,7 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     return super.leftJoin(entityOrProperty, alias, condition, parameters)
   }
 
-  public leftJoinAndSelect (
+  public override leftJoinAndSelect (
     entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
     alias: string,
     condition?: string,
