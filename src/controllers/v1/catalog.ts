@@ -12,7 +12,7 @@ export default class CatalogController implements interfaces.Controller {
   @inject(TYPES.CatalogService) private readonly catalogService!: CatalogService
 
   @httpGet('/', ...CatalogController.validate('getItems'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  async getItems (req: Request): Promise<object[]> {
+  public async getItems (req: Request): Promise<object[]> {
     const queryStart = req.originalUrl.indexOf('?')
     const queryString = queryStart > 0
       ? req.originalUrl.slice(queryStart + 1)
@@ -20,7 +20,7 @@ export default class CatalogController implements interfaces.Controller {
     return await this.catalogService.getItems(queryString)
   }
 
-  static validate (method: string): ValidationChain[] {
+  private static validate (method: string): ValidationChain[] {
     switch (method) {
       case 'getItems':
         return [

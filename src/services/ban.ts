@@ -18,18 +18,18 @@ const { inRange } = util
 export default class BanService {
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
   @inject(TYPES.BanRepository) private readonly banRepository!: BanRepository
-  @inject(TYPES.BanRepository) private readonly banCancellationRepository!: Repository<BanCancellation>
+  @inject(TYPES.BanCancellationRepository) private readonly banCancellationRepository!: Repository<BanCancellation>
   @inject(TYPES.BanExtensionRepository) private readonly banExtensionRepository!: Repository<BanExtension>
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async getBans (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Ban[]> {
+  public async getBans (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Ban[]> {
     if (!BanScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
 
     const qb = this.banRepository.scopes.apply(scopes)
-      .andWhere('ban.groupId = :groupId', { groupId })
+      .andWhere('ban.group_id = :groupId', { groupId })
     if (typeof sort !== 'undefined') {
       sort.forEach(s => qb.addOrderBy(...s))
     }
@@ -37,14 +37,14 @@ export default class BanService {
     return await qb.getMany()
   }
 
-  async getBan (groupId: number, userId: number, scopes?: string[]): Promise<Ban> {
+  public async getBan (groupId: number, userId: number, scopes?: string[]): Promise<Ban> {
     if (!BanScopes.has(scopes)) {
       throw new UnprocessableError('Invalid scope.')
     }
 
     const ban = await this.banRepository.scopes.apply(scopes)
-      .andWhere('ban.groupId = :groupId', { groupId })
-      .andWhere('ban.userId = :userId', { userId })
+      .andWhere('ban.group_id = :groupId', { groupId })
+      .andWhere('ban.user_id = :userId', { userId })
       .getOne()
 
     if (typeof ban === 'undefined') {
@@ -53,12 +53,16 @@ export default class BanService {
     return ban
   }
 
-  async ban (
+  public async ban (
     groupId: number,
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration?: number | null, reason: string }
   ): Promise<Ban> {
-    if (typeof await this.banRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+    if (typeof await this.banRepository.scopes.default
+      .andWhere('ban.group_id = :groupId', { groupId })
+      .andWhere('ban.user_id = :userId', { userId })
+      .getOne() !== 'undefined'
+    ) {
       throw new ConflictError('User is already banned.')
     }
     const role = await this.groupService.getRole(groupId, userId)
@@ -77,14 +81,14 @@ export default class BanService {
       }
     }
 
-    const ban = await this.banRepository.save({
+    const ban = await this.banRepository.save(this.banRepository.create({
       authorId,
       duration,
       groupId,
       reason,
       roleId: role.id,
       userId
-    })
+    }))
 
     const [authorName, username] = await Promise.all([
       this.userService.getUsername(ban.authorId),
@@ -95,13 +99,17 @@ export default class BanService {
     return ban
   }
 
-  async unban (
+  public async unban (
     groupId: number,
     userId: number,
     { authorId, reason }: { authorId: number, reason: string }
   ): Promise<BanCancellation> {
     const ban = await this.getBan(groupId, userId)
-    const cancellation = await this.banCancellationRepository.save({ banId: ban.id, authorId, reason })
+    const cancellation = await this.banCancellationRepository.save(this.banCancellationRepository.create({
+      banId: ban.id,
+      authorId,
+      reason
+    }))
 
     const [authorName, username] = await Promise.all([
       this.userService.getUsername(cancellation.authorId),
@@ -112,7 +120,7 @@ export default class BanService {
     return cancellation
   }
 
-  async extendBan (
+  public async extendBan (
     groupId: number,
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration: number, reason: string }
@@ -133,12 +141,12 @@ export default class BanService {
       throw new UnprocessableError('Too many days.')
     }
 
-    const extension = await this.banExtensionRepository.save({
+    const extension = await this.banExtensionRepository.save(this.banExtensionRepository.create({
       authorId,
       banId: ban.id,
       duration,
       reason
-    })
+    }))
 
     const [authorName, username] = await Promise.all([
       this.userService.getUsername(extension.authorId),
@@ -150,7 +158,7 @@ export default class BanService {
     return extension
   }
 
-  async changeBan (
+  public async changeBan (
     groupId: number,
     userId: number,
     { changes, editorId }: {

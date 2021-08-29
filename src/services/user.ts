@@ -12,7 +12,7 @@ export type GetUsers = GetUsersByUserIds['data']
 export default class UserService {
   @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
 
-  async getUserIdFromUsername (username: string): Promise<number> {
+  public async getUserIdFromUsername (username: string): Promise<number> {
     const client = this.robloxManager.getClient()
     const user = await client.getUserIdFromUsername(username)
 
@@ -24,7 +24,7 @@ export default class UserService {
     return user.id
   }
 
-  async hasBadge (userId: number, badgeId: number): Promise<boolean> {
+  public async hasBadge (userId: number, badgeId: number): Promise<boolean> {
     const client = this.robloxManager.getClient()
     return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
       userId,
@@ -33,16 +33,16 @@ export default class UserService {
     })).data.length === 1
   }
 
-  async getUsers (userIds: number[]): Promise<GetUsers> {
+  public async getUsers (userIds: number[]): Promise<GetUsers> {
     const client = this.robloxManager.getClient()
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
   }
 
-  async getUsername (userId: number): Promise<string> {
+  public async getUsername (userId: number): Promise<string> {
     return (await this.getUser(userId)).name
   }
 
-  async getUser (userId: number): Promise<GetUserById> {
+  public async getUser (userId: number): Promise<GetUserById> {
     const client = this.robloxManager.getClient()
     return await client.apis.usersAPI.getUserById({ userId })
   }

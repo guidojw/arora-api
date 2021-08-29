@@ -4,11 +4,11 @@ import { Training } from '../entities'
 
 @EntityRepository(Training)
 export default class TrainingRepository extends BaseRepository<Training> {
-  get scopes (): TrainingScopes {
+  public get scopes (): TrainingScopes {
     return new TrainingScopes(this, this.createQueryBuilder('training'))
   }
 
-  transform (record: any): Training {
+  public transform (record: any): Training {
     record.type = record.type_id == null
       ? record.type_id
       : {
@@ -22,11 +22,11 @@ export default class TrainingRepository extends BaseRepository<Training> {
 }
 
 export class TrainingScopes extends BaseScopes<Training> {
-  get default (): this {
+  public get default (): this {
     return this
-      .select('training.*')
+      .addSelect('training.*')
       .leftJoinAndSelect('training.type', 'type')
-      .leftJoinAndSelect('training_cancellations', 'cancellation', 'cancellation.trainingId = training.id')
+      .leftJoin('training_cancellations', 'cancellation', 'cancellation.training_id = training.id')
       .andWhere('cancellation.id IS NULL')
       .andWhere('training.date > NOW() - INTERVAL \'15 minutes\'')
   }

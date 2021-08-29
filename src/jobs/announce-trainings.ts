@@ -16,17 +16,19 @@ export default class AnnounceTrainingsJob implements BaseJob {
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.UserService) private readonly userService!: UserService
 
-  async run (groupId?: number): Promise<any> {
+  public async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
       const groupIds = (await this.trainingRepository.scopes.default
-        .select('DISTINCT training.groupId')
-        .addGroupBy('training.groupId')
+        .select('DISTINCT training.group_id')
+        .addGroupBy('training.group_id')
         .getMany()
       ).map(training => training.groupId)
-      return Promise.all(groupIds.map(async groupId => await this.run(groupId)))
+      return await Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
-    const trainings = await this.trainingRepository.find({ where: { groupId } })
+    const trainings = await this.trainingRepository.scopes.default
+      .andWhere('training.group_id = :groupId', { groupId })
+      .getMany()
     for (const training of trainings) {
       const jobName = `training_${training.id}`
       const job = cron.scheduledJobs[jobName]
@@ -92,7 +94,7 @@ function getTrainingsInfo (trainings: Training[], authors: GetUsers): string {
         const timeString = getTime(training.date)
         const author = authors.find(author => author.id === training.authorId)
 
-        result += ` ${timeString} (host: ${author?.name ?? 'unknown'})`
+        result += ` ${timeString} (host: ${author?.name as string ?? 'unknown'})`
         if (j < typeTrainings.length - 2) {
           result += ','
         } else if (j === typeTrainings.length - 2) {

@@ -10,7 +10,6 @@ services:
       - POSTGRES_HOST=db
     volumes:
       - /opt/app/node_modules
-      - /storage/backups:/storage/backups
       - ./private.key:/opt/app/private.key
       - ./public.key:/opt/app/public.key
     labels:

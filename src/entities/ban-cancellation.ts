@@ -5,19 +5,19 @@ import { IsNotEmpty } from 'class-validator'
 @Entity({ name: 'ban_cancellations' })
 export default class BanCancellation {
   @PrimaryGeneratedColumn()
-  readonly id!: number
+  public readonly id!: number
 
   @Column('bigint', { name: 'author_id' })
-  authorId!: number
+  public authorId!: number
 
   @Column({ name: 'ban_id' })
-  banId!: number
+  public banId!: number
 
   @Column({ length: 255 })
   @IsNotEmpty()
-  reason!: string
+  public reason!: string
 
   @OneToOne(() => Ban, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ban_id' })
-  ban!: Ban
+  public ban!: Ban
 }

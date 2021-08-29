@@ -19,6 +19,7 @@ module.exports = {
         ignoreTemplateLiterals: true
       }
     ],
-    'sort-imports': 'error'
+    'sort-imports': 'error',
+    '@typescript-eslint/explicit-member-accessibility': 'error'
   }
 }
