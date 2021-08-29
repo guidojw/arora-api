@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify'
 import BaseJob from './base'
-import { CursorPage } from 'bloxy/dist/structures/Asset'
+import { CursorPage } from '@guidojw/bloxy/dist/structures/Asset'
 import DiscordMessageJob from './discord-message'
 import { Exile } from '../entities'
-import { GetJoinRequest } from 'bloxy/dist/client/apis/GroupsAPI'
+import { GetJoinRequest } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import HealthCheckJob from './health-check'
 import { Repository } from 'typeorm'
 import { RobloxManager } from '../managers'
@@ -24,7 +24,6 @@ export default class AcceptJoinRequestsJob implements BaseJob {
 
     let cursor = null
     do {
-      // @ts-expect-error
       const requests: CursorPage<GetJoinRequest> = await group.getJoinRequests({ cursor: cursor ?? undefined })
       for (const request of requests.data) {
         const userId = request.requester.userId
