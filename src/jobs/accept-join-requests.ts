@@ -1,18 +1,15 @@
 import { inject, injectable } from 'inversify'
 import BaseJob from './base'
-import { CursorPage } from 'bloxy/dist/structures/Asset'
+import { CursorPage } from '@guidojw/bloxy/dist/structures/Asset'
 import DiscordMessageJob from './discord-message'
 import { Exile } from '../entities'
-import { GroupJoinRequest } from 'bloxy/dist/structures/Group'
+import { GetJoinRequest } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import HealthCheckJob from './health-check'
 import { Repository } from 'typeorm'
 import { RobloxManager } from '../managers'
 import { constants } from '../util'
 
 const { TYPES } = constants
-
-export type JoinRequest = Omit<GroupJoinRequest, 'user'> & { user: Omit<GroupJoinRequest['user'], 'name'> & {
-  name: string }}
 
 @injectable()
 export default class AcceptJoinRequestsJob implements BaseJob {
@@ -27,16 +24,16 @@ export default class AcceptJoinRequestsJob implements BaseJob {
 
     let cursor = null
     do {
-      const requests: CursorPage<GroupJoinRequest> = await group.getJoinRequests({ cursor: cursor ?? undefined })
-      for (const request of requests.data as JoinRequest[]) {
-        const userId = request.user.id
+      const requests: CursorPage<GetJoinRequest> = await group.getJoinRequests({ cursor: cursor ?? undefined })
+      for (const request of requests.data) {
+        const userId = request.requester.userId
 
         if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
           await group.declineJoinRequest(userId)
-          await this.discordMessageJob.run(`Declined **${request.user.name}**'s join request`)
+          await this.discordMessageJob.run(`Declined **${request.requester.username}**'s join request`)
         } else {
           await group.acceptJoinRequest(userId)
-          await this.discordMessageJob.run(`Accepted **${request.user.name}**'s join request`)
+          await this.discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
         }
       }
 

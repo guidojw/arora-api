@@ -1,7 +1,7 @@
 import { Ban, BanCancellation, BanExtension, Exile, Training, TrainingCancellation, TrainingType } from '../../entities'
 import { BanService, ExileService, GroupService, TrainingService } from '../../services'
 import { ChangeMemberRole, GetGroupStatus, UpdateGroupStatus } from '../../services/group'
-import { GetGroup, GetGroupRoles } from 'bloxy/dist/client/apis/GroupsAPI'
+import { GetGroup, GetGroupRoles } from '@guidojw/bloxy/src/client/apis/GroupsAPI'
 import { ValidationChain, body, header, param, query } from 'express-validator'
 import { constants, requestUtil } from '../../util'
 import {
