@@ -33,7 +33,7 @@ export default class RobloxManager implements BaseManager {
       for (const groupId of groupIds) {
         this.authenticatedClients[groupId] = client
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err.message)
     }
   }
@@ -57,7 +57,7 @@ async function requester (this: RESTRequester, options: RESTRequestOptions): Pro
   try {
     // this refers to Bloxy's original requester.
     return await this(options)
-  } catch (err: any) {
+  } catch (err) {
     if (err instanceof HTTPError) {
       if (typeof err.response !== 'undefined' && err.response.statusCode === 403 && (err.response.statusMessage as
         string).includes('Token Validation Failed')) {
