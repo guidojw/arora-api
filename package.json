@@ -18,7 +18,7 @@
   "dependencies": {
     "@sentry/node": "^6.3.5",
     "axios": "^0.21.1",
-    "bloxy": "^5.7.4",
+    "@guidojw/bloxy": "^5.7.4",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "debug": "^4.3.1",
