@@ -8,7 +8,7 @@ export default class TrainingRepository extends BaseRepository<Training> {
     return new TrainingScopes(this, this.createQueryBuilder('training'))
   }
 
-  public transform (record: any): Training {
+  public override transform (record: any): Training {
     record.type = record.type_id == null
       ? record.type_id
       : {

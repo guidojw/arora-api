@@ -1,4 +1,4 @@
-FROM node:14.17.5
+FROM node:16.8.0
 
 ARG NODE_ENV
 ENV NODE_ENV=$NODE_ENV
@@ -10,7 +10,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production=false
 
 COPY . .
-RUN yarn build-bloxy && yarn build
+RUN yarn build
 
 RUN chmod +x ./bin/wait-for-it.sh
 

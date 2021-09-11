@@ -8,7 +8,7 @@ export default class BanRepository extends BaseRepository<Ban> {
     return new BanScopes(this, this.createQueryBuilder('ban'))
   }
 
-  public transform (record: any): Ban {
+  public override transform (record: any): Ban {
     if (typeof record.extension_id !== 'undefined') {
       record.extensions = record.extension_id === null
         ? []
@@ -25,7 +25,7 @@ export default class BanRepository extends BaseRepository<Ban> {
 }
 
 export class BanScopes extends BaseScopes<Ban> {
-  public static readonly scopes = ['finished']
+  public static override readonly scopes = ['finished']
 
   public get default (): this {
     return this

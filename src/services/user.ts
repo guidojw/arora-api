@@ -1,4 +1,4 @@
-import { GetUserById, GetUsersByUserIds } from 'bloxy/dist/client/apis/UsersAPI'
+import { GetUserById, GetUsersByUserIds } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
 import { inject, injectable } from 'inversify'
 import { NotFoundError } from '../errors'
 import { RobloxManager } from '../managers'
