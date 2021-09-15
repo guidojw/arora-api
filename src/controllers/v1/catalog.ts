@@ -1,5 +1,11 @@
+import {
+  BaseHttpController,
+  controller,
+  httpGet,
+  interfaces,
+  results
+} from 'inversify-express-utils'
 import { ValidationChain, header, query } from 'express-validator'
-import { controller, httpGet, interfaces } from 'inversify-express-utils'
 import { CatalogService } from '../../services'
 import { Request } from 'express'
 import { constants } from '../../util'
@@ -8,16 +14,16 @@ import { inject } from 'inversify'
 const { TYPES } = constants
 
 @controller('/v1/catalog')
-export default class CatalogController implements interfaces.Controller {
+export default class CatalogController extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.CatalogService) private readonly catalogService!: CatalogService
 
   @httpGet('/', ...CatalogController.validate('getItems'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  public async getItems (req: Request): Promise<object[]> {
+  public async getItems (req: Request): Promise<results.JsonResult> {
     const queryStart = req.originalUrl.indexOf('?')
     const queryString = queryStart > 0
       ? req.originalUrl.slice(queryStart + 1)
       : ''
-    return await this.catalogService.getItems(queryString)
+    return this.json(await this.catalogService.getItems(queryString))
   }
 
   private static validate (method: string): ValidationChain[] {
