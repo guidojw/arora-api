@@ -1,10 +1,6 @@
-import { Ban, BanCancellation, BanExtension, Exile, Training, TrainingCancellation, TrainingType } from '../../entities'
 import { BanService, ExileService, GroupService, TrainingService } from '../../services'
-import { ChangeMemberRole, GetGroupStatus, UpdateGroupStatus } from '../../services/group'
-import { GetGroup, GetGroupRoles } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
-import { ValidationChain, body, header, param, query } from 'express-validator'
-import { constants, requestUtil } from '../../util'
 import {
+  BaseHttpController,
   controller,
   httpDelete,
   httpGet,
@@ -13,8 +9,11 @@ import {
   interfaces,
   queryParam,
   requestBody,
-  requestParam
+  requestParam,
+  results
 } from 'inversify-express-utils'
+import { ValidationChain, body, header, param, query } from 'express-validator'
+import { constants, requestUtil } from '../../util'
 import { SortQuery } from '../../util/request'
 import { inject } from 'inversify'
 
@@ -22,7 +21,7 @@ const { TYPES } = constants
 const { decodeScopeQueryParam, decodeSortQueryParam } = requestUtil
 
 @controller('/v1/groups')
-export default class GroupController implements interfaces.Controller {
+export default class GroupController extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.BanService) private readonly banService!: BanService
   @inject(TYPES.ExileService) private readonly exileService!: ExileService
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
@@ -35,8 +34,8 @@ export default class GroupController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async getGroupStatus (@requestParam('groupId') groupId: number): Promise<GetGroupStatus> {
-    return await this.groupService.getGroupStatus(groupId)
+  public async getGroupStatus (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.groupService.getGroupStatus(groupId))
   }
 
   @httpGet(
@@ -45,13 +44,13 @@ export default class GroupController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async getRoles (@requestParam('groupId') groupId: number): Promise<GetGroupRoles> {
-    return await this.groupService.getRoles(groupId)
+  public async getRoles (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.groupService.getRoles(groupId))
   }
 
   @httpGet('/:groupId', ...GroupController.validate('getGroup'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  public async getGroup (@requestParam('groupId') groupId: number): Promise<GetGroup> {
-    return await this.groupService.getGroup(groupId)
+  public async getGroup (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.groupService.getGroup(groupId))
   }
 
   @httpPut(
@@ -63,8 +62,8 @@ export default class GroupController implements interfaces.Controller {
   public async updateGroupStatus (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, message: string }
-  ): Promise<UpdateGroupStatus> {
-    return await this.groupService.updateGroupStatus(groupId, body.message, body.authorId)
+  ): Promise<results.JsonResult> {
+    return this.json(this.groupService.updateGroupStatus(groupId, body.message, body.authorId))
   }
 
   @httpPost(
@@ -77,8 +76,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number }
-  ): Promise<ChangeMemberRole> {
-    return await this.groupService.promoteMember(groupId, userId, body.authorId)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.groupService.promoteMember(groupId, userId, body.authorId))
   }
 
   @httpPost(
@@ -91,8 +90,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number }
-  ): Promise<ChangeMemberRole> {
-    return await this.groupService.demoteMember(groupId, userId, body.authorId)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.groupService.demoteMember(groupId, userId, body.authorId))
   }
 
   @httpPut(
@@ -105,11 +104,11 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, rank: number }
-  ): Promise<ChangeMemberRole> {
-    return await this.groupService.changeMemberRole(groupId, userId, {
+  ): Promise<results.JsonResult> {
+    return this.json(await this.groupService.changeMemberRole(groupId, userId, {
       authorId: body.authorId,
       role: body.rank
-    })
+    }))
   }
 
   // BanService
@@ -123,8 +122,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @queryParam('scope') scope: string[],
       @queryParam('sort') sort: SortQuery
-  ): Promise<Ban[]> {
-    return await this.banService.getBans(groupId, scope, sort)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.banService.getBans(groupId, scope, sort))
   }
 
   @httpGet(
@@ -137,8 +136,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @queryParam('scope') scope: string[]
-  ): Promise<Ban> {
-    return await this.banService.getBan(groupId, userId, scope)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.banService.getBan(groupId, userId, scope))
   }
 
   @httpPost(
@@ -150,8 +149,8 @@ export default class GroupController implements interfaces.Controller {
   public async postBan (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, duration?: number, reason: string, userId: number }
-  ): Promise<Ban> {
-    return await this.banService.ban(groupId, body.userId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.banService.ban(groupId, body.userId, body))
   }
 
   @httpPost(
@@ -164,8 +163,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, reason: string }
-  ): Promise<BanCancellation> {
-    return await this.banService.unban(groupId, userId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.banService.unban(groupId, userId, body))
   }
 
   @httpPost(
@@ -178,8 +177,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, duration: number, reason: string }
-  ): Promise<BanExtension> {
-    return await this.banService.extendBan(groupId, userId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.banService.extendBan(groupId, userId, body))
   }
 
   @httpPut(
@@ -192,8 +191,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { changes: { authorId?: number, reason?: string }, editorId: number }
-  ): Promise<Ban> {
-    return await this.banService.changeBan(groupId, userId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.banService.changeBan(groupId, userId, body))
   }
 
   // ExileService
@@ -203,8 +202,8 @@ export default class GroupController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async getExiles (@requestParam('groupId') groupId: number): Promise<Exile[]> {
-    return await this.exileService.getExiles(groupId)
+  public async getExiles (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.exileService.getExiles(groupId))
   }
 
   @httpGet(
@@ -216,8 +215,8 @@ export default class GroupController implements interfaces.Controller {
   public async getExile (
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number
-  ): Promise<Exile> {
-    return await this.exileService.getExile(groupId, userId)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.exileService.getExile(groupId, userId))
   }
 
   @httpPost(
@@ -229,8 +228,8 @@ export default class GroupController implements interfaces.Controller {
   public async postExile (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, reason: string, userId: number }
-  ): Promise<Exile> {
-    return await this.exileService.exile(groupId, body.userId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.exileService.exile(groupId, body.userId, body))
   }
 
   @httpDelete(
@@ -243,8 +242,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, reason: string }
-  ): Promise<void> {
-    return await this.exileService.unexile(groupId, userId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.exileService.unexile(groupId, userId, body))
   }
 
   // TrainingService
@@ -258,8 +257,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @queryParam('scope') scope: string[],
       @queryParam('sort') sort: SortQuery
-  ): Promise<Training[]> {
-    return await this.trainingService.getTrainings(groupId, scope, sort)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.getTrainings(groupId, scope, sort))
   }
 
   @httpGet(
@@ -268,8 +267,8 @@ export default class GroupController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async getTrainingTypes (@requestParam('groupId') groupId: number): Promise<TrainingType[]> {
-    return await this.trainingService.getTrainingTypes(groupId)
+  public async getTrainingTypes (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.getTrainingTypes(groupId))
   }
 
   @httpGet(
@@ -282,8 +281,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
       @queryParam('scope') scope: string[]
-  ): Promise<Training> {
-    return await this.trainingService.getTraining(groupId, trainingId, scope)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.getTraining(groupId, trainingId, scope))
   }
 
   @httpPost(
@@ -295,8 +294,8 @@ export default class GroupController implements interfaces.Controller {
   public async postTraining (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { authorId: number, typeId: number, date: number, notes?: string }
-  ): Promise<Training> {
-    return await this.trainingService.addTraining(groupId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.addTraining(groupId, body))
   }
 
   @httpPost(
@@ -309,8 +308,8 @@ export default class GroupController implements interfaces.Controller {
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
       @requestBody() body: { authorId: number, reason: string }
-  ): Promise<TrainingCancellation> {
-    return await this.trainingService.cancelTraining(groupId, trainingId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.cancelTraining(groupId, trainingId, body))
   }
 
   @httpPost(
@@ -322,8 +321,8 @@ export default class GroupController implements interfaces.Controller {
   public async postTrainingType (
     @requestParam('groupId') groupId: number,
       @requestBody() body: { abbreviation: string, name: string }
-  ): Promise<TrainingType> {
-    return await this.trainingService.createTrainingType(groupId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.createTrainingType(groupId, body))
   }
 
   @httpPut(
@@ -339,8 +338,8 @@ export default class GroupController implements interfaces.Controller {
         changes: { typeId?: number, date?: number, notes?: string, authorId?: number }
         editorId: number
       }
-  ): Promise<Training> {
-    return await this.trainingService.changeTraining(groupId, trainingId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.changeTraining(groupId, trainingId, body))
   }
 
   @httpPut(
@@ -356,8 +355,8 @@ export default class GroupController implements interfaces.Controller {
         changes: { abbreviation?: string, name?: string }
         editorId: number
       }
-  ): Promise<TrainingType> {
-    return await this.trainingService.changeTrainingType(groupId, typeId, body)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.changeTrainingType(groupId, typeId, body))
   }
 
   @httpDelete(
@@ -369,8 +368,8 @@ export default class GroupController implements interfaces.Controller {
   public async deleteTrainingType (
     @requestParam('groupId') groupId: number,
       @requestParam('typeId') typeId: number
-  ): Promise<void> {
-    return await this.trainingService.deleteTrainingType(groupId, typeId)
+  ): Promise<results.JsonResult> {
+    return this.json(await this.trainingService.deleteTrainingType(groupId, typeId))
   }
 
   private static validate (method: string): ValidationChain[] {
