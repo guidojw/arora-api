@@ -560,7 +560,7 @@ export default class GroupController implements interfaces.Controller {
           body('editorId').exists().isInt().toInt(),
           body('changes.typeId').optional().isInt().toInt(),
           body('changes.date').optional().isInt().toInt(),
-          body('changes.notes').optional().isString(),
+          body('changes.notes').optional({ nullable: true }).isString(),
           body('changes.authorId').optional().isInt().toInt()
         ]
       case 'putTrainingType':
