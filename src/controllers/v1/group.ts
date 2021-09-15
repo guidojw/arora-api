@@ -559,7 +559,7 @@ export default class GroupController extends BaseHttpController implements inter
           body('editorId').exists().isInt().toInt(),
           body('changes.typeId').optional().isInt().toInt(),
           body('changes.date').optional().isInt().toInt(),
-          body('changes.notes').optional().isString(),
+          body('changes.notes').optional({ nullable: true }).isString(),
           body('changes.authorId').optional().isInt().toInt()
         ]
       case 'putTrainingType':
