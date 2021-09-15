@@ -15,24 +15,27 @@ export interface DeveloperSales {
 }
 
 const developers = {
-  Supersnel11: { robloxId: 32851718, discordId: '228110777825886210' },
-  Iowa_Chan: { robloxId: 7050507, discordId: '175345544799977472' },
-  DerailingOn: { robloxId: 21753709, discordId: '273910287663497216' },
-  Happywalker: { robloxId: 6882179, discordId: '235476265325428736' },
   BuildIntoTrains: { robloxId: 49248891, discordId: '263770097288609794' },
-  COEN1000: { robloxId: 5775031, discordId: '223172958510645250' }
+  COEN1000: { robloxId: 5775031, discordId: '223172958510645250' },
+  Supersnel11: { robloxId: 32851718, discordId: '228110777825886210' },
+  DerailingOn: { robloxId: 21753709, discordId: '273910287663497216' },
+  DeVy_y: { robloxId: 823586147, discordId: '560047641426264065' },
+  Happywalker: { robloxId: 6882179, discordId: '235476265325428736' },
+  Iowa_Chan: { robloxId: 7050507, discordId: '175345544799977472' },
+  Policeofficernl: { robloxId: 122457876, discordId: '253934068725448715' }
 }
 
 const products = [
   { id: 1371397, developers: [developers.Supersnel11] },
+  { id: 1399819, developers: [developers.DerailingOn, developers.Happywalker] },
+  { id: 1426909, developers: [developers.COEN1000] },
+  { id: 1492453, developers: [developers.BuildIntoTrains] },
   { id: 1547370, developers: [developers.Supersnel11] },
+  { id: 22406514, developers: [developers.Policeofficernl, developers.Policeofficernl, developers.DeVy_y] },
+  { id: 2297243, developers: [developers.COEN1000] },
   { id: 2300769, developers: [developers.Iowa_Chan] },
   { id: 3886194, developers: [developers.Iowa_Chan] },
-  { id: 4787242, developers: [developers.Iowa_Chan] },
-  { id: 1399819, developers: [developers.DerailingOn, developers.Happywalker] },
-  { id: 1492453, developers: [developers.BuildIntoTrains] },
-  { id: 1426909, developers: [developers.COEN1000] },
-  { id: 2297243, developers: [developers.COEN1000] }
+  { id: 4787242, developers: [developers.Iowa_Chan] }
 ]
 
 const PAY_RATE = 0.5
