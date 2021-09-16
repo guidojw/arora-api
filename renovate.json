@@ -1,5 +1,5 @@
 {
-  "extends": ["config:base", "docker:disable"],
+  "extends": ["config:base"],
   "labels": ["dependencies"],
   "rangeStrategy": "replace",
   "packageRules": [
@@ -11,6 +11,9 @@
     }
   ],
   "buildkite": {
+    "enabled": false
+  },
+  "docker-compose": {
     "enabled": false
   }
 }
