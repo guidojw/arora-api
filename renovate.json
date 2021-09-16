@@ -5,9 +5,22 @@
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
+      "excludePackageNames": ["node"],
 			"matchUpdateTypes": ["minor", "patch"],
 			"groupName": "all non-major dependencies",
 			"groupSlug": "all-minor-patch"
+    },
+    {
+      "matchManagers": ["dockerfile", "nvm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Node.js",
+      "groupSlug": "nodejs"
+    },
+    {
+      "matchManagers": ["dockerfile", "nvm"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Node.js",
+      "groupSlug": "nodejs"
     }
   ],
   "buildkite": {
