@@ -9,5 +9,11 @@
 			"groupName": "all non-major dependencies",
 			"groupSlug": "all-minor-patch"
     }
-  ]
+  ],
+  "buildkite": {
+    "enabled": false
+  },
+  "docker-compose": {
+    "enabled": false
+  }
 }
