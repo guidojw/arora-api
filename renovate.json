@@ -1,5 +1,5 @@
 {
-  "extends": ["config:base", "docker:disable", "buildkite:disable"],
+  "extends": ["config:base", "docker:disable"],
   "labels": ["dependencies"],
   "rangeStrategy": "replace",
   "packageRules": [
@@ -9,5 +9,8 @@
 			"groupName": "all non-major dependencies",
 			"groupSlug": "all-minor-patch"
     }
-  ]
+  ],
+  "buildkite": {
+    "enabled": false
+  }
 }
