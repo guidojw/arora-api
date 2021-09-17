@@ -1,5 +1,12 @@
+import {
+  BaseHttpController,
+  controller,
+  httpGet,
+  interfaces,
+  requestParam,
+  results
+} from 'inversify-express-utils'
 import { ValidationChain, header, param } from 'express-validator'
-import { controller, httpGet, interfaces, requestParam } from 'inversify-express-utils'
 import { GetStatus } from '../../services/status'
 import { StatusService } from '../../services'
 import { constants } from '../../util'
@@ -8,7 +15,7 @@ import { inject } from 'inversify'
 const { TYPES } = constants
 
 @controller('/v1/status')
-export default class StatusController implements interfaces.Controller {
+export default class StatusController extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.StatusService) private readonly statusService!: StatusService
 
   @httpGet('/', ...StatusController.validate('getStatus'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
@@ -22,8 +29,8 @@ export default class StatusController implements interfaces.Controller {
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async getGroupClientStatus (@requestParam('groupId') groupId: number): Promise<boolean> {
-    return await this.statusService.getGroupClientStatus(groupId)
+  public async getGroupClientStatus (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.statusService.getGroupClientStatus(groupId))
   }
 
   private static validate (method: string): ValidationChain[] {
