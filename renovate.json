@@ -3,10 +3,11 @@
   "labels": ["dependencies"],
   "packageRules": [
     {
+      "matchManagers": ["npm"],
       "matchPackagePatterns": ["*"],
-			"matchUpdateTypes": ["minor", "patch"],
-			"groupName": "all non-major dependencies",
-			"groupSlug": "all-minor-patch"
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
     },
     {
       "matchManagers": ["npm"],
@@ -16,13 +17,13 @@
     {
       "matchManagers": ["dockerfile", "nvm"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "Node.js",
+      "groupName": "Node.js (non-major)",
       "groupSlug": "nodejs"
     },
     {
       "matchManagers": ["dockerfile", "nvm"],
       "matchUpdateTypes": ["major"],
-      "groupName": "Node.js",
+      "groupName": "Node.js (major)",
       "groupSlug": "nodejs"
     }
   ],

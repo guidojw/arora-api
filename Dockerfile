@@ -7,7 +7,7 @@ ENV BUILD_HASH=$BUILD_HASH
 
 WORKDIR /opt/app
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production=false
+RUN yarn install --immutable
 
 COPY . .
 RUN yarn build
