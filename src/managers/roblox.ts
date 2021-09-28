@@ -48,7 +48,7 @@ async function requester (options: RESTRequestOptions): Promise<RESTResponseData
       method: options.method as Method,
       headers: options.headers,
       params: options.qs,
-      data: options.json
+      data: options.body
     })
     return {
       body: response.data,
