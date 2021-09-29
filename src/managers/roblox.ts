@@ -1,7 +1,8 @@
-import { RESTRequestOptions, RESTRequester, RESTResponseDataType } from '@guidojw/bloxy/dist/interfaces/RESTInterfaces'
+import { RESTRequestOptions, RESTResponseDataType } from '@guidojw/bloxy/dist/interfaces/RESTInterfaces'
 import BaseManager from './base'
 import { Client } from '@guidojw/bloxy'
-import { HTTPError } from 'got'
+import type { Method } from 'axios'
+import axios from 'axios'
 import { injectable } from 'inversify'
 
 @injectable()
@@ -10,20 +11,14 @@ export default class RobloxManager implements BaseManager {
   private readonly unauthenticatedClient: Client
 
   public constructor () {
-    // Unauthenticated client
-    const client = new Client()
-    // Set the client's requester to the custom requester. Needs to be done
-    // after instantiation as we need to know what the original requester was.
-    client.rest.requester = requester.bind(client.rest.requester)
-    this.unauthenticatedClient = client
+    // Unauthenticated client with custom requester.
+    this.unauthenticatedClient = new Client({ rest: { requester } })
   }
 
   public async init (): Promise<void> {
     // Authenticated client(s)
     try {
-      const client = new Client()
-      // Set custom requester again, like with the unauthenticated client.
-      client.rest.requester = requester.bind(client.rest.requester)
+      const client = new Client({ rest: { requester } })
 
       await client.login(process.env.ROBLOX_COOKIE)
       console.log('Roblox account logged in!')
@@ -45,23 +40,34 @@ export default class RobloxManager implements BaseManager {
   }
 }
 
-// Custom requester that uses Bloxy's default requester but
-// enables its throwHttpErrors option as the project relies on that.
-async function requester (this: RESTRequester, options: RESTRequestOptions): Promise<RESTResponseDataType> {
-  // HTTP 403s are thrown on fetching new X-CSRF tokens, Bloxy's token refresh
-  // mechanism however relies on this so don't throw HTTP errors then.
-  if (options.xcsrf !== false && options.url !== 'https://auth.roblox.com/v2/login') {
-    options.throwHttpErrors = true
-  }
-
+// Custom Bloxy requester that adapts Got requests to Axios.
+async function requester (options: RESTRequestOptions): Promise<RESTResponseDataType> {
   try {
-    // this refers to Bloxy's original requester.
-    return await this(options)
+    const response = await axios({
+      url: options.url,
+      method: options.method as Method,
+      headers: options.headers,
+      params: options.qs,
+      data: options.body
+    })
+    return {
+      body: response.data,
+      statusMessage: response.statusText,
+      statusCode: response.status,
+      headers: response.headers
+    }
   } catch (err) {
-    if (err instanceof HTTPError) {
-      if (typeof err.response !== 'undefined' && err.response.statusCode === 403 && (err.response.statusMessage as
-        string).includes('Token Validation Failed')) {
-        return err.response as RESTResponseDataType
+    if (axios.isAxiosError(err) && typeof err.response !== 'undefined') {
+      // Don't throw token validation errors because Bloxy's token refresh
+      // mechanism relies on these being successfully returned.
+      if ((options.xcsrf === false && options.url === 'https://auth.roblox.com/v2/login') ||
+        (err.response.status === 403 && err.response.statusText.includes('Token Validation Failed'))) {
+        return {
+          body: err.response.data,
+          statusMessage: err.response.statusText,
+          statusCode: err.response.status,
+          headers: err.response.headers
+        }
       }
     }
     throw err
