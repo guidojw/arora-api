@@ -11,6 +11,7 @@ module.exports = {
     project: './tsconfig.json',
     sourceType: 'module'
   },
+  plugins: ['unicorn'],
   rules: {
     'max-len': [
       'error',
@@ -20,6 +21,7 @@ module.exports = {
       }
     ],
     'sort-imports': 'error',
+    'unicorn/prefer-node-protocol': 'error',
     '@typescript-eslint/explicit-member-accessibility': 'error'
   }
 }
