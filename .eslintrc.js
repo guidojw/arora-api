@@ -11,15 +11,19 @@ module.exports = {
     project: './tsconfig.json',
     sourceType: 'module'
   },
+  plugins: ['unicorn'],
   rules: {
     'max-len': [
       'error',
       120,
       {
-        ignoreTemplateLiterals: true
+        comments: 80,
+        ignoreTemplateLiterals: true,
+        tabWidth: 2
       }
     ],
     'sort-imports': 'error',
+    'unicorn/prefer-node-protocol': 'error',
     '@typescript-eslint/explicit-member-accessibility': 'error'
   }
 }
