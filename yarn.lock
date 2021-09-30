@@ -38,10 +38,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@guidojw/bloxy@^5.7.5":
-  version "5.7.5"
-  resolved "https://registry.yarnpkg.com/@guidojw/bloxy/-/bloxy-5.7.5.tgz#fd8da6788b4541786123f95185f2a5c241249217"
-  integrity sha512-Skq/J6P8upl68RJRsuLWyBuFdGbBnxCA7eXnN+mbRzfprvvjDoGkrtzp1UT37PIvNbPTlwiecM1cyHe8UN79hQ==
+"@guidojw/bloxy@^5.7.6":
+  version "5.7.6"
+  resolved "https://registry.yarnpkg.com/@guidojw/bloxy/-/bloxy-5.7.6.tgz#6b7702e7aca19d2a973ece0e4a64d10c17ca5103"
+  integrity sha512-FwYES5qkOBe19S4TaRBOcmngxaSca4QPij5LzdUWrTV8zQ6n5broUk3lMGL+EPXLc/ONpmCMDO4EJRFyKwFH5A==
   dependencies:
     debug "^4.3.1"
     signalr-client "0.0.20"
