@@ -17,7 +17,9 @@ module.exports = {
       'error',
       120,
       {
-        ignoreTemplateLiterals: true
+        comments: 80,
+        ignoreTemplateLiterals: true,
+        tabWidth: 2
       }
     ],
     'sort-imports': 'error',
