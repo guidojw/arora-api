@@ -14,6 +14,7 @@ import {
 } from 'inversify-express-utils'
 import { ValidationChain, body, header, param, query } from 'express-validator'
 import { constants, requestUtil } from '../../util'
+import type { PayoutTrainDevelopersJob } from '../../jobs'
 import { SortQuery } from '../../util/request'
 import { inject } from 'inversify'
 
@@ -25,6 +26,7 @@ export default class GroupController extends BaseHttpController implements inter
   @inject(TYPES.BanService) private readonly banService!: BanService
   @inject(TYPES.ExileService) private readonly exileService!: ExileService
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
+  @inject(TYPES.PayoutTrainDevelopersJob) private readonly payoutTrainDevelopersJob!: PayoutTrainDevelopersJob
   @inject(TYPES.TrainingService) private readonly trainingService!: TrainingService
 
   // GroupService
@@ -372,6 +374,19 @@ export default class GroupController extends BaseHttpController implements inter
     return this.json(await this.trainingService.deleteTrainingType(groupId, typeId))
   }
 
+  // Miscellaneous
+  @httpPost(
+    '/:groupId/payout-report',
+    ...GroupController.validate('postPayoutReport'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
+  public async postPayoutReport (@requestParam('groupId') groupId: number): Promise<results.OkResult> {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    setImmediate(async () => await this.payoutTrainDevelopersJob.run(groupId)).unref()
+    return this.ok()
+  }
+
   private static validate (method: string): ValidationChain[] {
     switch (method) {
       // GroupService
@@ -578,6 +593,14 @@ export default class GroupController extends BaseHttpController implements inter
           param('groupId').isInt().toInt(),
           param('typeId').isInt().toInt()
         ]
+
+      // Miscellaneous
+      case 'postPayoutReport': {
+        return [
+          header('authorization').exists().isString(),
+          param('groupId').isInt().toInt()
+        ]
+      }
 
       default:
         return []
