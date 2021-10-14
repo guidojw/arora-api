@@ -28,13 +28,15 @@ export default class AcceptJoinRequestsJob implements BaseJob {
       for (const request of requests.data) {
         const userId = request.requester.userId
 
-        if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
-          await group.declineJoinRequest(userId)
-          await this.discordMessageJob.run(`Declined **${request.requester.username}**'s join request`)
-        } else {
-          await group.acceptJoinRequest(userId)
-          await this.discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
-        }
+        try {
+          if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+            await group.declineJoinRequest(userId)
+            await this.discordMessageJob.run(`Declined **${request.requester.username}**'s join request`)
+          } else {
+            await group.acceptJoinRequest(userId)
+            await this.discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
+          }
+        } catch {} // Ignore error, this job is run frequently anyways.
       }
 
       cursor = requests.cursors.next
