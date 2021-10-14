@@ -6,8 +6,8 @@ ARG BUILD_HASH
 ENV BUILD_HASH=$BUILD_HASH
 
 WORKDIR /opt/app
-COPY package.json yarn.lock ./
-RUN yarn set version berry
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn .yarn
 RUN yarn install --immutable
 
 COPY . .
