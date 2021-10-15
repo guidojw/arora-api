@@ -1,12 +1,13 @@
+import { RobloxManager, WebSocketManager } from '../managers'
 import { inject, injectable } from 'inversify'
 import BaseJob from './base'
 import { CursorPage } from '@guidojw/bloxy/dist/structures/Asset'
 import DiscordMessageJob from './discord-message'
 import { Exile } from '../entities'
 import { GetJoinRequest } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
+import { GroupService } from '../services'
 import HealthCheckJob from './health-check'
 import { Repository } from 'typeorm'
-import { RobloxManager } from '../managers'
 import { constants } from '../util'
 
 const { TYPES } = constants
@@ -14,9 +15,11 @@ const { TYPES } = constants
 @injectable()
 export default class AcceptJoinRequestsJob implements BaseJob {
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
+  @inject(TYPES.ExileRepository) private readonly exileRepository!: Repository<Exile>
+  @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.HealthCheckJob) private readonly healthCheckJob!: HealthCheckJob
   @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
-  @inject(TYPES.ExileRepository) private readonly exileRepository!: Repository<Exile>
+  @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
   public async run (groupId: number): Promise<any> {
     const client = this.robloxManager.getClient(groupId)
@@ -34,6 +37,8 @@ export default class AcceptJoinRequestsJob implements BaseJob {
             await this.discordMessageJob.run(`Declined **${request.requester.username}**'s join request`)
           } else {
             await group.acceptJoinRequest(userId)
+            const rank = await this.groupService.getRank(groupId, userId)
+            this.webSocketManager.broadcast('rankChange', { groupId, userId, rank })
             await this.discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
           }
         } catch {} // Ignore error, this job is run frequently anyways.
