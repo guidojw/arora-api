@@ -30,7 +30,7 @@
     "helmet": "^4.6.0",
     "hpp": "^0.2.3",
     "inversify": "^6.0.1",
-    "inversify-express-utils": "^6.4.2",
+    "inversify-express-utils": "^6.4.3",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
