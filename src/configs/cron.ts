@@ -20,11 +20,11 @@ const cronConfig: { [key: string]: CronConfig } = {
     job: TYPES.HealthCheckJob,
     args: ['main']
   },
-  payoutTrainDevelopersJob: {
-    expression: '0 12 * * 6', // https://crontab.guru/#0_12_*_*_6
-    job: TYPES.PayoutTrainDevelopersJob,
-    args: [1018818]
-  }
+  // payoutTrainDevelopersJob: {
+  //   expression: '0 12 * * 6', // https://crontab.guru/#0_12_*_*_6
+  //   job: TYPES.PayoutTrainDevelopersJob,
+  //   args: [1018818]
+  // }
 }
 
 export default cronConfig
