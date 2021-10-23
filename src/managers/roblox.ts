@@ -46,7 +46,7 @@ async function requester (options: RESTRequestOptions): Promise<RESTResponseData
     const response = await axios({
       url: options.url,
       method: options.method as Method,
-      headers: options.headers,
+      headers: options.headers as Record<string, string>,
       params: options.qs,
       data: options.body
     })
