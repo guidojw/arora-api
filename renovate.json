@@ -17,14 +17,14 @@
     },
     {
       "matchManagers": ["dockerfile", "nvm"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "Node.js (non-major)",
-      "groupSlug": "nodejs"
+      "groupName": "Node.js",
+      "groupSlug": "nodejs",
+      "ignoreUnstable": false
     },
     {
       "matchManagers": ["dockerfile", "nvm"],
-      "matchUpdateTypes": ["major"],
-      "groupName": "Node.js (major)",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Node.js (non-major)",
       "groupSlug": "nodejs"
     }
   ],
