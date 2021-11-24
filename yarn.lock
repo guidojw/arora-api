@@ -1041,7 +1041,7 @@ __metadata:
     eslint-plugin-import: ^2.25.2
     eslint-plugin-node: ^11.1.0
     eslint-plugin-promise: ^5.1.1
-    eslint-plugin-unicorn: ^38.0.0
+    eslint-plugin-unicorn: ^39.0.0
     express: ^4.17.1
     express-async-errors: ^3.1.1
     express-validator: ^6.13.0
@@ -1952,9 +1952,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-unicorn@npm:^38.0.0":
-  version: 38.0.0
-  resolution: "eslint-plugin-unicorn@npm:38.0.0"
+"eslint-plugin-unicorn@npm:^39.0.0":
+  version: 39.0.0
+  resolution: "eslint-plugin-unicorn@npm:39.0.0"
   dependencies:
     "@babel/helper-validator-identifier": ^7.14.9
     ci-info: ^3.2.0
@@ -1973,7 +1973,7 @@ __metadata:
     strip-indent: ^3.0.0
   peerDependencies:
     eslint: ">=7.32.0"
-  checksum: 5ef60a29f64bf37171b79e9419dc8e14829b32d51e7895131ff39ff6835abcf0af04a41df945c63882a99da125d251528e7a35b8b84ca09742b667fe7488b50f
+  checksum: a20bee80f1a5a5e4a5984394ba8f9e1669f89f186e92af5eec6bf1f0d90afe3a578b1ed124667b33843a7cac6e0476a86bb1a4ccf8f3293b8d21ae427f4b5168
   languageName: node
   linkType: hard
 
