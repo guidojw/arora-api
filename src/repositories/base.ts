@@ -1,5 +1,5 @@
 import * as lodash from 'lodash'
-import { ClassConstructor, plainToClass } from 'class-transformer'
+import { ClassConstructor, plainToInstance } from 'class-transformer'
 import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
 import { util } from '../util'
 
@@ -7,7 +7,7 @@ const { groupBy } = util
 
 export default abstract class BaseRepository<T> extends Repository<T> {
   public transform (record: any): T {
-    return plainToClass(
+    return plainToInstance(
       this.target as ClassConstructor<T>,
       record,
       { excludeExtraneousValues: true }
