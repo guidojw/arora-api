@@ -1,14 +1,14 @@
-import {
+import type {
   UpdateGroupStatus as BloxyUpdateGroupStatus,
   GetGroup,
   GetGroupRoles
 } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import { ForbiddenError, UnprocessableError } from '../errors'
-import { RobloxManager, WebSocketManager } from '../managers'
+import type { RobloxManager, WebSocketManager } from '../managers'
 import { constants, util } from '../util'
 import { inject, injectable } from 'inversify'
-import { DiscordMessageJob } from '../jobs'
-import UserService from './user'
+import type { DiscordMessageJob } from '../jobs'
+import type UserService from './user'
 import applicationConfig from '../configs/application'
 
 const { TYPES } = constants

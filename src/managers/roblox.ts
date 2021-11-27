@@ -1,5 +1,5 @@
-import { RESTRequestOptions, RESTResponseDataType } from '@guidojw/bloxy/dist/interfaces/RESTInterfaces'
-import BaseManager from './base'
+import type { RESTRequestOptions, RESTResponseDataType } from '@guidojw/bloxy/dist/interfaces/RESTInterfaces'
+import type BaseManager from './base'
 import { Client } from '@guidojw/bloxy'
 import type { Method } from 'axios'
 import axios from 'axios'

@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm'
+import { type MigrationInterface, type QueryRunner, Table, TableForeignKey } from 'typeorm'
 
 export class createBanBanCancellationBanExtensionExilePayoutTrainingTrainingCancellationTrainingType1620169219541
 implements MigrationInterface {
