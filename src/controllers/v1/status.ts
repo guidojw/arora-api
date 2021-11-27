@@ -2,13 +2,13 @@ import {
   BaseHttpController,
   controller,
   httpGet,
-  interfaces,
+  type interfaces,
   requestParam,
-  results
+  type results
 } from 'inversify-express-utils'
-import { ValidationChain, header, param } from 'express-validator'
-import { GetStatus } from '../../services/status'
-import { StatusService } from '../../services'
+import { type ValidationChain, header, param } from 'express-validator'
+import type { GetStatus } from '../../services/status'
+import type { StatusService } from '../../services'
 import { constants } from '../../util'
 import { inject } from 'inversify'
 

@@ -1,11 +1,11 @@
 import { ConflictError, ForbiddenError, NotFoundError } from '../errors'
 import { constants, util } from '../util'
 import { inject, injectable } from 'inversify'
-import { DiscordMessageJob } from '../jobs'
-import { Exile } from '../entities'
-import GroupService from './group'
-import { Repository } from 'typeorm'
-import UserService from './user'
+import type { DiscordMessageJob } from '../jobs'
+import type { Exile } from '../entities'
+import type GroupService from './group'
+import type { Repository } from 'typeorm'
+import type UserService from './user'
 import applicationConfig from '../configs/application'
 
 const { TYPES } = constants

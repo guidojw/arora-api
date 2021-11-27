@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify'
 import { NotFoundError } from '../errors'
-import { RobloxManager } from '../managers'
+import type { RobloxManager } from '../managers'
 import { constants } from '../util'
 
 const { TYPES } = constants

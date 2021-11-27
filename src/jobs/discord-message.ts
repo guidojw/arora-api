@@ -1,4 +1,4 @@
-import BaseJob from './base'
+import type BaseJob from './base'
 import axios from 'axios'
 import { injectable } from 'inversify'
 

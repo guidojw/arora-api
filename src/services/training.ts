@@ -1,13 +1,13 @@
-import { AnnounceTrainingsJob, DiscordMessageJob } from '../jobs'
+import type { AnnounceTrainingsJob, DiscordMessageJob } from '../jobs'
 import { ConflictError, NotFoundError, UnprocessableError } from '../errors'
-import { ILike, Repository } from 'typeorm'
-import { Training, TrainingCancellation, TrainingType } from '../entities'
-import { TrainingRepository, TrainingScopes } from '../repositories'
+import { ILike, type Repository } from 'typeorm'
+import type { Training, TrainingCancellation, TrainingType } from '../entities'
+import { type TrainingRepository, TrainingScopes } from '../repositories'
 import { constants, timeUtil } from '../util'
-import cron, { JobCallback } from 'node-schedule'
+import cron, { type JobCallback } from 'node-schedule'
 import { inject, injectable } from 'inversify'
-import { SortQuery } from '../util/request'
-import UserService from './user'
+import type { SortQuery } from '../util/request'
+import type UserService from './user'
 
 const { TYPES } = constants
 const { getDate, getTime, getTimeZoneAbbreviation } = timeUtil

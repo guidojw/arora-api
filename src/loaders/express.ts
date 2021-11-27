@@ -1,8 +1,15 @@
 import '../controllers'
 import * as Sentry from '@sentry/node'
-import express, { Application, ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express'
-import { Container } from 'inversify'
-import ErrorMiddleware from '../middlewares/error'
+import express, {
+  type Application,
+  type ErrorRequestHandler,
+  type NextFunction,
+  type Request,
+  type RequestHandler,
+  type Response
+} from 'express'
+import type { Container } from 'inversify'
+import type ErrorMiddleware from '../middlewares/error'
 import { InversifyExpressServer } from 'inversify-express-utils'
 import { NotFoundError } from '../errors'
 import { constants } from '../util'

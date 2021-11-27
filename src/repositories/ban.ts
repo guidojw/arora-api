@@ -1,5 +1,5 @@
 import BaseRepository, { BaseScopes } from './base'
-import { EntityRepository, SelectQueryBuilder } from 'typeorm'
+import { EntityRepository, type SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
 
 @EntityRepository(Ban)

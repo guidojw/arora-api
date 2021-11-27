@@ -2,16 +2,16 @@ import {
   BaseHttpController,
   controller,
   httpGet,
-  interfaces,
+  type interfaces,
   requestBody,
   requestParam,
-  results
+  type results
 } from 'inversify-express-utils'
-import { GroupService, UserService } from '../../services'
-import { ValidationChain, body, header, param } from 'express-validator'
-import { GetGroupRole } from '../../services/group'
-import { GetUserById } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
-import { GetUsers } from '../../services/user'
+import type { GroupService, UserService } from '../../services'
+import { type ValidationChain, body, header, param } from 'express-validator'
+import type { GetGroupRole } from '../../services/group'
+import type { GetUserById } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
+import type { GetUsers } from '../../services/user'
 import { constants } from '../../util'
 import { inject } from 'inversify'
 

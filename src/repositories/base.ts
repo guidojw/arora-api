@@ -1,6 +1,6 @@
 import * as lodash from 'lodash'
-import { ClassConstructor, plainToInstance } from 'class-transformer'
-import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
+import { type ClassConstructor, plainToInstance } from 'class-transformer'
+import { type ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
 import { util } from '../util'
 
 const { groupBy } = util
