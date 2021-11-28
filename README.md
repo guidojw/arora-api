@@ -2,8 +2,6 @@ arora-api
 ================
 
 [![Discord](https://discordapp.com/api/guilds/761634353859395595/embed.png)](https://discord.gg/tJFNC5Y)
-[![Depfu](https://badges.depfu.com/badges/8d74b1db957c28ca20ea845f9181f3c4/count.svg)](https://depfu.com/github/guidojw/arora-api?project_id=10273)
-[![Build status](https://badge.buildkite.com/63cd463b34afdd64116e2983ec91e8b2d1755b5d1b35373718.svg)](https://buildkite.com/guidos-projects/arora-api)
 [![Continuous Integration](https://github.com/guidojw/arora-api/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/guidojw/arora-api/actions/workflows/continuous-integration.yml)
 [![Continuous Delivery](https://github.com/guidojw/arora-api/actions/workflows/continuous-delivery.yml/badge.svg)](https://github.com/guidojw/arora-api/actions/workflows/continuous-delivery.yml)
 
