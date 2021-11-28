@@ -11,7 +11,7 @@ COPY .yarn .yarn
 RUN yarn install --immutable
 
 COPY . .
-RUN yarn build
+RUN yarn build:prod
 
 RUN chmod +x ./bin/wait-for-it.sh
 
