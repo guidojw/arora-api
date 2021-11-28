@@ -10,10 +10,6 @@ on:
         required: false
         type: string
 
-concurrency:
-  group: ci-${{ github.ref_name }}
-  cancel-in-progress: true
-
 jobs:
   build:
     name: Build
