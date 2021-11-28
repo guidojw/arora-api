@@ -1045,7 +1045,7 @@ __metadata:
     jsonwebtoken: ^8.5.1
     lodash: ^4.17.21
     morgan: ^1.10.0
-    node-schedule: ^2.0.0
+    node-schedule: ^2.1.0
     pg: ^8.7.1
     pluralize: ^8.0.0
     reflect-metadata: ^0.1.13
@@ -1486,13 +1486,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cron-parser@npm:^3.1.0":
-  version: 3.3.0
-  resolution: "cron-parser@npm:3.3.0"
+"cron-parser@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "cron-parser@npm:3.5.0"
   dependencies:
-    is-nan: ^1.3.0
-    luxon: ^1.25.0
-  checksum: ad5fc1a6e6eef234c25906378e16f681eb704fae978806707a6e02449fa686198d76992c8e57c4a472c1fac6b68631dbb857aa3f986a330383250bfb290aacf9
+    is-nan: ^1.3.2
+    luxon: ^1.26.0
+  checksum: 80096ac1c30fa4017648ad2fa062ae002e6c0d7775b96a00dbadf1e2d7f9e01b3db0324eef2a33fe6136363be3ffb0d6065cf1b91e6a13fd5ed4d3c168abbc69
   languageName: node
   linkType: hard
 
@@ -2981,7 +2981,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-nan@npm:^1.3.0":
+"is-nan@npm:^1.3.2":
   version: 1.3.2
   resolution: "is-nan@npm:1.3.2"
   dependencies:
@@ -3329,10 +3329,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"luxon@npm:^1.25.0":
-  version: 1.26.0
-  resolution: "luxon@npm:1.26.0"
-  checksum: 06706c615863f52f13bed0ba2b522150935c13d59f18cf924357d1fe621691cb5996e9275d19e5628a6cbccf5a2a8495b6b34ec462dc9462ed0fe0313c809019
+"luxon@npm:^1.26.0":
+  version: 1.28.0
+  resolution: "luxon@npm:1.28.0"
+  checksum: 5250cb9f138b6048eeb0b3a9044a4ac994d0058f680c72a0da4b6aeaec8612460385639cba2b1052ef6d5564879e9ed144d686f26d9d97b38ab920d82e18281c
   languageName: node
   linkType: hard
 
@@ -3642,14 +3642,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-schedule@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "node-schedule@npm:2.0.0"
+"node-schedule@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "node-schedule@npm:2.1.0"
   dependencies:
-    cron-parser: ^3.1.0
+    cron-parser: ^3.5.0
     long-timeout: 0.1.1
     sorted-array-functions: ^1.3.0
-  checksum: a93b042a3fbef6b4970c4e1b587212df38a81e8e9c2c3eada611864ddc3be1e99e372037680daae4d4933733154dcd77ff024b4024a67eaeed7058fdb5716e72
+  checksum: e457e76e633ed551e384ab2404628f0980bd3263057665dd3166a72b0eaca093cd57e42e144f9241b913383c1c58c633d3c782580009cbd51b1b9e2623193d52
   languageName: node
   linkType: hard
 

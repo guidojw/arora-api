@@ -35,7 +35,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
-    "node-schedule": "^2.0.0",
+    "node-schedule": "^2.1.0",
     "pg": "^8.7.1",
     "pluralize": "^8.0.0",
     "typeorm": "^0.2.41",
