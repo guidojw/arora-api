@@ -1,0 +1,23 @@
+name: Cleanup Registry
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # https://crontab.guru/#0_0_*_*_1
+  workflow_dispatch:
+
+env:
+  IMAGE_NAMES: arora-api
+
+jobs:
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old versions
+        uses: snok/container-retention-policy@d025f77c10899031a36a5dab9724043a5809c437 # renovate: tag=v1.2.1
+        with:
+          image-names: ${{ env.IMAGE_NAMES }}
+          cut-off: 2 days ago UTC
+          account-type: personal
+          skip-tags: latest,staging
+          token: ${{ secrets.PAT }}
