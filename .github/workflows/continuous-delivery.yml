@@ -8,9 +8,6 @@ on:
         required: false
         default: 'n'
 
-concurrency:
-  group: cd-${{ github.ref_name }}
-
 env:
   PROJECT_NAME: arora-api
   SENTRY_ORG: guidos-projects
