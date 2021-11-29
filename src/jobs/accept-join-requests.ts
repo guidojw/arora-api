@@ -1,13 +1,13 @@
-import type { RobloxManager, WebSocketManager } from '../managers'
+import { RobloxManager, WebSocketManager } from '../managers'
 import { inject, injectable } from 'inversify'
 import type BaseJob from './base'
 import type { CursorPage } from '@guidojw/bloxy/dist/structures/Asset'
-import type DiscordMessageJob from './discord-message'
+import DiscordMessageJob from './discord-message'
 import type { Exile } from '../entities'
 import type { GetJoinRequest } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
-import type { GroupService } from '../services'
-import type HealthCheckJob from './health-check'
-import type { Repository } from 'typeorm'
+import { GroupService } from '../services'
+import HealthCheckJob from './health-check'
+import { Repository } from 'typeorm'
 import { constants } from '../util'
 
 const { TYPES } = constants

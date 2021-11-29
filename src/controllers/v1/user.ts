@@ -7,7 +7,7 @@ import {
   requestParam,
   type results
 } from 'inversify-express-utils'
-import type { GroupService, UserService } from '../../services'
+import { GroupService, UserService } from '../../services'
 import { type ValidationChain, body, header, param } from 'express-validator'
 import type { GetGroupRole } from '../../services/group'
 import type { GetUserById } from '@guidojw/bloxy/dist/client/apis/UsersAPI'

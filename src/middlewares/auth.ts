@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { inject, injectable } from 'inversify'
-import type { AuthService } from '../services'
+import { AuthService } from '../services'
 import { BaseMiddleware } from 'inversify-express-utils'
 import { UnauthorizedError } from '../errors'
 import { constants } from '../util'
