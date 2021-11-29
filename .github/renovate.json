@@ -27,14 +27,8 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Node.js (non-major)",
       "groupSlug": "nodejs"
-    },
-    {
-      "matchManagers": ["github-actions"]
     }
   ],
-  "buildkite": {
-    "enabled": false
-  },
   "docker-compose": {
     "enabled": false
   }
