@@ -1,9 +1,9 @@
-import type { RobloxManager, WebSocketManager } from '../managers'
+import { RobloxManager, WebSocketManager } from '../managers'
 import { inject, injectable } from 'inversify'
 import type { GetGroupTransactions } from '@guidojw/bloxy/dist/client/apis/EconomyAPI'
-import type HealthCheckJob from './health-check'
+import HealthCheckJob from './health-check'
 import { Payout } from '../entities'
-import type { PayoutRepository } from '../repositories'
+import { PayoutRepository } from '../repositories'
 import { constants } from '../util'
 
 const { TYPES } = constants

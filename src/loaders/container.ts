@@ -18,12 +18,12 @@ import {
   UserService
 } from '../services'
 import {
-  Ban,
+  type Ban,
   BanCancellation,
   BanExtension,
   Exile,
-  Payout,
-  Training,
+  type Payout,
+  type Training,
   TrainingCancellation,
   TrainingType
 } from '../entities'

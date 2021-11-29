@@ -7,8 +7,8 @@ import {
   type results
 } from 'inversify-express-utils'
 import { type ValidationChain, header, param } from 'express-validator'
-import type { GetStatus } from '../../services/status'
-import type { StatusService } from '../../services'
+import { GetStatus } from '../../services/status'
+import { StatusService } from '../../services'
 import { constants } from '../../util'
 import { inject } from 'inversify'
 

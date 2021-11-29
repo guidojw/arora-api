@@ -1,4 +1,4 @@
-import type { BanService, ExileService, GroupService, TrainingService } from '../../services'
+import { BanService, ExileService, GroupService, TrainingService } from '../../services'
 import {
   BaseHttpController,
   controller,
@@ -14,8 +14,8 @@ import {
 } from 'inversify-express-utils'
 import { type ValidationChain, body, header, param, query } from 'express-validator'
 import { constants, requestUtil } from '../../util'
-import type { PayoutTrainDevelopersJob } from '../../jobs'
-import type { SortQuery } from '../../util/request'
+import { PayoutTrainDevelopersJob } from '../../jobs'
+import { SortQuery } from '../../util/request'
 import { inject } from 'inversify'
 
 const { TYPES } = constants
