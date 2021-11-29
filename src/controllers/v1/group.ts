@@ -6,15 +6,15 @@ import {
   httpGet,
   httpPost,
   httpPut,
-  interfaces,
+  type interfaces,
   queryParam,
   requestBody,
   requestParam,
-  results
+  type results
 } from 'inversify-express-utils'
-import { ValidationChain, body, header, param, query } from 'express-validator'
+import { type ValidationChain, body, header, param, query } from 'express-validator'
 import { constants, requestUtil } from '../../util'
-import type { PayoutTrainDevelopersJob } from '../../jobs'
+import { PayoutTrainDevelopersJob } from '../../jobs'
 import { SortQuery } from '../../util/request'
 import { inject } from 'inversify'
 

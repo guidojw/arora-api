@@ -1,4 +1,4 @@
-import { Range } from '../util/util'
+import type { Range } from '../util/util'
 
 const applicationConfig: { [key: string]: Range[] } = {
   skippedRanks: [2, 99],

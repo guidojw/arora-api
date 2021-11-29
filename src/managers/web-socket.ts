@@ -1,5 +1,5 @@
-import BaseManager from './base'
-import WebSocket from 'ws'
+import type BaseManager from './base'
+import type WebSocket from 'ws'
 import { injectable } from 'inversify'
 
 export type AroraWebSocket = WebSocket & { isAlive: boolean }

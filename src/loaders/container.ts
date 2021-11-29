@@ -18,17 +18,17 @@ import {
   UserService
 } from '../services'
 import {
-  Ban,
+  type Ban,
   BanCancellation,
   BanExtension,
   Exile,
-  Payout,
-  Training,
+  type Payout,
+  type Training,
   TrainingCancellation,
   TrainingType
 } from '../entities'
 import { BanRepository, PayoutRepository, TrainingRepository } from '../repositories'
-import { Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
+import { type Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { constants } from '../util'
 

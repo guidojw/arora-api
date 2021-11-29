@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { BaseMiddleware } from 'inversify-express-utils'
 import { injectable } from 'inversify'
 import { validationResult } from 'express-validator'

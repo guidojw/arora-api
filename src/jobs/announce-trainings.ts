@@ -1,10 +1,10 @@
 import { GroupService, UserService } from '../services'
 import { constants, timeUtil } from '../util'
-import cron, { JobCallback } from 'node-schedule'
+import cron, { type JobCallback } from 'node-schedule'
 import { inject, injectable } from 'inversify'
-import BaseJob from './base'
-import { GetUsers } from '../services/user'
-import { Training } from '../entities'
+import type BaseJob from './base'
+import type { GetUsers } from '../services/user'
+import type { Training } from '../entities'
 import { TrainingRepository } from '../repositories'
 
 const { TYPES } = constants

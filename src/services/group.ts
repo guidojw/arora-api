@@ -1,4 +1,4 @@
-import {
+import type {
   UpdateGroupStatus as BloxyUpdateGroupStatus,
   GetGroup,
   GetGroupRoles

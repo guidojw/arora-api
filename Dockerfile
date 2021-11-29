@@ -1,4 +1,4 @@
-FROM node:16.9.1
+FROM node:17.1.0
 
 ARG NODE_ENV
 ENV NODE_ENV=$NODE_ENV
@@ -11,7 +11,7 @@ COPY .yarn .yarn
 RUN yarn install --immutable
 
 COPY . .
-RUN yarn build
+RUN yarn build:prod
 
 RUN chmod +x ./bin/wait-for-it.sh
 

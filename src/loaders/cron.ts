@@ -1,5 +1,5 @@
-import { BaseJob } from '../jobs'
-import { Container } from 'inversify'
+import type { BaseJob } from '../jobs'
+import type { Container } from 'inversify'
 import cron from 'node-schedule'
 import cronConfig from '../configs/cron'
 
