@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # renovate: tag=v2.4.0
+        with:
+          fetch-depth: 0
 
       - name: Get metadata
         id: get_metadata
@@ -46,7 +48,6 @@ jobs:
         run: |
           if [ $GITHUB_REF_NAME = 'main' ]; then
             if [ "${INPUT_MERGE,,}" = 'y' ]; then
-              git fetch origin staging
               if ! git diff origin/main origin/staging --exit-code; then
                 echo '::set-output name=has_diff::true'
               else
