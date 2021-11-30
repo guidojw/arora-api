@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@guidojw/bloxy": "^5.7.6",
+    "@sentry/integrations": "^6.15.0",
     "@sentry/node": "^6.15.0",
     "axios": "^0.24.0",
     "axios-retry": "^3.2.4",
@@ -48,7 +49,7 @@
     "@types/jsonwebtoken": "^8.5.6",
     "@types/lodash": "^4.14.177",
     "@types/morgan": "^1.9.3",
-    "@types/node": "^16.11.10",
+    "@types/node": "^16.11.11",
     "@types/node-schedule": "^1.3.2",
     "@types/pluralize": "^0.0.29",
     "@types/validator": "^13.7.0",
