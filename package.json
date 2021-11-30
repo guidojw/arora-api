@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@guidojw/bloxy": "^5.7.6",
+    "@sentry/integrations": "^6.15.0",
     "@sentry/node": "^6.15.0",
     "axios": "^0.24.0",
     "axios-retry": "^3.2.4",
