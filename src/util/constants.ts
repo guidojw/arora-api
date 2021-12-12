@@ -3,7 +3,6 @@ export const TYPES = {
   AnnounceTrainingsJob: Symbol.for('AnnounceTrainingsJob'),
   DiscordMessageJob: Symbol.for('DiscordMessageJob'),
   HealthCheckJob: Symbol.for('HealthCheckJob'),
-  PayoutTrainDevelopersJob: Symbol.for('PayoutTrainDevelopersJob'),
 
   RobloxManager: Symbol.for('RobloxManager'),
   WebSocketManager: Symbol.for('WebSocketManager'),
@@ -15,7 +14,6 @@ export const TYPES = {
   BanCancellationRepository: Symbol.for('BanCancellationRepository'),
   BanExtensionRepository: Symbol.for('BanExtensionRepository'),
   ExileRepository: Symbol.for('ExileRepository'),
-  PayoutRepository: Symbol.for('PayoutRepository'),
   TrainingRepository: Symbol.for('TrainingRepository'),
   TrainingCancellationRepository: Symbol.for('TrainingCancellationRepository'),
   TrainingTypeRepository: Symbol.for('TrainingTypeRepository'),
