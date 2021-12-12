@@ -100,7 +100,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_PROJECT: ${{ env.PROJECT_NAME }}
         with:
-          environment: ${{ needs.metadata.outputs.stage }}
           finalize: false
           sourcemaps: sourcemaps
           version: ${{ github.event.inputs.sha }}
