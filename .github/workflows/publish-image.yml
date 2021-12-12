@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.get_metadata.outputs.tag }}
+      stage: ${{ steps.get_metadata.outputs.stage }}
       build_args: ${{ steps.get_metadata.outputs.build_args }}
     steps:
       - name: Get metadata
@@ -102,6 +103,7 @@ jobs:
           environment: ${{ needs.metadata.outputs.stage }}
           finalize: false
           sourcemaps: sourcemaps
+          version: ${{ github.event.inputs.sha }}
           url_prefix: ~/dist
 
   update_check_run:
