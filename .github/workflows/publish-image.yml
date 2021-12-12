@@ -25,7 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.get_metadata.outputs.tag }}
-      stage: ${{ steps.get_metadata.outputs.stage }}
       build_args: ${{ steps.get_metadata.outputs.build_args }}
     steps:
       - name: Get metadata
@@ -41,12 +40,8 @@ jobs:
             BUILD_ARGS='BUILD_HASH='$GITHUB_SHA
             if [ $GITHUB_REF_NAME = 'main' ]; then
               BUILD_ARGS+=$'\nNODE_ENV=production'
-
-              echo '::set-output name=stage::production'
             else
               BUILD_ARGS+=$'\nNODE_ENV=staging'
-
-              echo '::set-output name=stage::staging'
             fi
             BUILD_ARGS=${BUILD_ARGS//$'\n'/'%0A'}
             echo '::set-output name=build_args::'$BUILD_ARGS
