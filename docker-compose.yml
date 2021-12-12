@@ -8,7 +8,6 @@ services:
     environment:
       - POSTGRES_HOST=db
     volumes:
-      - /opt/app/node_modules
       - ./private.key:/opt/app/private.key
       - ./public.key:/opt/app/public.key
     labels:
