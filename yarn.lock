@@ -1032,7 +1032,7 @@ __metadata:
     class-transformer: ^0.5.1
     class-validator: ^0.13.2
     debug: ^4.3.3
-    dotenv: ^10.0.0
+    dotenv: ^14.0.0
     eslint: ^8.4.1
     eslint-config-standard-with-typescript: ^21.0.1
     eslint-plugin-import: ^2.25.3
@@ -1646,10 +1646,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "dotenv@npm:10.0.0"
-  checksum: f412c5fe8c24fbe313d302d2500e247ba8a1946492db405a4de4d30dd0eb186a88a43f13c958c5a7de303938949c4231c56994f97d05c4bc1f22478d631b4005
+"dotenv@npm:^14.0.0":
+  version: 14.1.0
+  resolution: "dotenv@npm:14.1.0"
+  checksum: 9e7afe54688c6ddd270797766b1f51421cc1d38cce5a470750537d598cc1719e1b6effcb35022fccd949f2da701b5f186d4c0da44a72fb3a8bd1e2513159a9d2
   languageName: node
   linkType: hard
 
