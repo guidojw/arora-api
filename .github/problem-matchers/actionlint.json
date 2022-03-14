@@ -2,7 +2,6 @@
   "problemMatcher": [
     {
       "owner": "actionlint",
-      "severity": "error",
       "pattern": [
         {
           "regexp": "^([^:]+):(\\d+):(\\d+):\\s(.+)\\s\\[(\\S+)\\]$",
