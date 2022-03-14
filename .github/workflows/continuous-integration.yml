@@ -47,7 +47,7 @@ jobs:
       - name: Download actionlint
         id: download_actionlint
         run: |
-          curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
 
       - name: Load test image
         uses: guidojw/actions/load-docker-image@2b1dea8cbd9e44491c269e771b75636026caf8ca # tag=v1.1.0
