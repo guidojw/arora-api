@@ -375,12 +375,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-schedule@npm:^1.3.2":
-  version: 1.3.2
-  resolution: "@types/node-schedule@npm:1.3.2"
+"@types/node-schedule@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@types/node-schedule@npm:2.1.0"
   dependencies:
     "@types/node": "*"
-  checksum: 6fbe54106d55236a0fd39a7bb1b59dea6efff2f4430f78ac18cd9bd3ed2ce9c8249ccf3c353089d1469abd9cca9bb1a348b960527509755b00f80626bee70096
+  checksum: db782544dbdfaddc78488b463cdc474f76c55ebb1ffcec9fc9d3d67e02e23e0ff1d36e6bdca562097db650e6d8a1fac17c3dd03dc5564e5dbb54e5368019e55b
   languageName: node
   linkType: hard
 
@@ -786,7 +786,7 @@ __metadata:
     "@types/lodash": ^4.14.178
     "@types/morgan": ^1.9.3
     "@types/node": ^16.11.12
-    "@types/node-schedule": ^1.3.2
+    "@types/node-schedule": ^2.1.0
     "@types/pluralize": ^0.0.29
     "@types/validator": ^13.7.0
     "@types/ws": ^8.2.2
