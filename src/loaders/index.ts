@@ -29,7 +29,7 @@ export async function init (): Promise<Application> {
 
   await dataSource.initialize()
 
-  const container = await containerLoader()
+  const container = containerLoader()
   await container.get<BaseManager>(TYPES.RobloxManager).init()
   container.get<BaseManager>(TYPES.WebSocketManager).init()
 
