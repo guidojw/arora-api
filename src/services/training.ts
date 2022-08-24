@@ -47,7 +47,7 @@ export default class TrainingService {
       .andWhere('training.id = :id', { id })
       .getOne()
 
-    if (typeof training === 'undefined') {
+    if (training === null) {
       throw new NotFoundError('Training not found.')
     }
     return training
@@ -175,7 +175,7 @@ export default class TrainingService {
 
   public async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
     const trainingType = await this.trainingTypeRepository.findOne({ where: { groupId, id } })
-    if (typeof trainingType === 'undefined') {
+    if (trainingType === null) {
       throw new NotFoundError('Training type not found.')
     }
     return trainingType

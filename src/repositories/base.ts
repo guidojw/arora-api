@@ -56,8 +56,8 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
     return this.repository.transformMany(await super.getRawMany())
   }
 
-  public override async getOne (): Promise<T | undefined> {
-    return this.repository.transformMany(await super.getRawMany()).shift()
+  public override async getOne (): Promise<T | null> {
+    return this.repository.transformMany(await super.getRawMany()).shift() ?? null
   }
 
   public override leftJoin (
