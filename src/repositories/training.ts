@@ -1,6 +1,8 @@
 import BaseRepository, { BaseScopes } from './base'
+import { EntityRepository } from 'typeorm'
 import { Training } from '../entities'
 
+@EntityRepository(Training)
 export default class TrainingRepository extends BaseRepository<Training> {
   public get scopes (): TrainingScopes {
     return new TrainingScopes(this, this.createQueryBuilder('training'))
