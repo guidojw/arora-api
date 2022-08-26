@@ -24,7 +24,7 @@ import {
   TrainingCancellation,
   TrainingType
 } from '../entities'
-import { BanRepository, TrainingRepository } from '../repositories'
+import { BanRepository, BaseRepository, TrainingRepository } from '../repositories'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { Container } from 'inversify'
 import { type Repository } from 'typeorm'
@@ -49,7 +49,7 @@ export default function init (): Container {
   bind<ErrorMiddleware>(TYPES.ErrorMiddleware).to(ErrorMiddleware)
 
   bind<Repository<Ban>>(TYPES.BanRepository).toDynamicValue(() => {
-    return dataSource.getRepository(Ban).extend(BanRepository)
+    return dataSource.getRepository(Ban).extend(BaseRepository).extend(BanRepository)
   }).inRequestScope()
   bind<Repository<BanCancellation>>(TYPES.BanCancellationRepository).toDynamicValue(() => {
     return dataSource.getRepository(BanCancellation)
@@ -61,7 +61,7 @@ export default function init (): Container {
     return dataSource.getRepository(Exile)
   }).inRequestScope()
   bind<Repository<Training>>(TYPES.TrainingRepository).toDynamicValue(() => {
-    return dataSource.getRepository(Training).extend(TrainingRepository)
+    return dataSource.getRepository(Training).extend(BaseRepository).extend(TrainingRepository)
   }).inRequestScope()
   bind<Repository<TrainingCancellation>>(TYPES.TrainingCancellationRepository).toDynamicValue(() => {
     return dataSource.getRepository(TrainingCancellation)

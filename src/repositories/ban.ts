@@ -1,13 +1,19 @@
-import BaseRepository, { BaseScopes } from './base'
+import { type BaseRepositoryProperties, BaseScopes } from './base'
+import type { Repository, SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
-import { type SelectQueryBuilder } from 'typeorm'
 
-export default class BanRepository extends BaseRepository<Ban> {
-  public get scopes (): BanScopes {
+abstract class BanRepositoryProperties {
+  public abstract scopes (): BanScopes
+  public abstract transform (record: any): Ban
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+export default {
+  scopes (): BanScopes {
     return new BanScopes(this, this.createQueryBuilder('ban'))
-  }
+  },
 
-  public override transform (record: any): Ban {
+  transform (record: any): Ban {
     if (typeof record.extension_id !== 'undefined') {
       record.extensions = record.extension_id === null
         ? []
@@ -19,9 +25,9 @@ export default class BanRepository extends BaseRepository<Ban> {
             reason: record.extension_reason
           }]
     }
-    return super.transform(record)
+    return this._transform(record)
   }
-}
+} as Repository<Ban> & BaseRepositoryProperties<Ban> & BanRepositoryProperties
 
 export class BanScopes extends BaseScopes<Ban> {
   public static override readonly scopes = ['finished']

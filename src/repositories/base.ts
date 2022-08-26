@@ -5,28 +5,39 @@ import { util } from '../util'
 
 const { groupBy } = util
 
-export default abstract class BaseRepository<T> extends Repository<T> {
-  public transform (record: any): T {
+export abstract class BaseRepositoryProperties<T> {
+  public abstract transform (record: any): T
+  public abstract transformMany (records: any[]): T[]
+  public abstract _transform (record: any): T
+  public abstract _transformMany (records: any[]): T[]
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+export default {
+  _transform<T> (record: any): T {
     return plainToInstance(
       this.target as ClassConstructor<T>,
       record,
       { excludeExtraneousValues: true }
     )
-  }
+  },
 
-  public transformMany (records: any[]): T[] {
+  _transformMany<T> (records: any[]): T[] {
     return groupBy(records, 'id')
       .map(groupedRecords => groupedRecords.map(this.transform.bind(this)))
       .map(([first, ...rest]) => lodash.mergeWith(first, ...rest, (objValue: any, srcValue: any) => (
         Array.isArray(objValue) ? objValue.concat(srcValue) : undefined
       )))
   }
-}
+} as Repository<any> & BaseRepositoryProperties<any>
 
 export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
   public static readonly scopes: string[] = []
 
-  public constructor (private readonly repository: BaseRepository<T>, queryBuilder: SelectQueryBuilder<T>) {
+  public constructor (
+    private readonly repository: Repository<T> & BaseRepositoryProperties<T>,
+    queryBuilder: SelectQueryBuilder<T>
+  ) {
     super(queryBuilder)
   }
 
