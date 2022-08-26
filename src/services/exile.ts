@@ -24,7 +24,7 @@ export default class ExileService {
 
   public async getExile (groupId: number, userId: number): Promise<Exile> {
     const exile = await this.exileRepository.findOne({ where: { groupId, userId } })
-    if (exile === null) {
+    if (typeof exile === 'undefined') {
       throw new NotFoundError('Exile not found.')
     }
     return exile
