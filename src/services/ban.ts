@@ -47,7 +47,7 @@ export default class BanService {
       .andWhere('ban.user_id = :userId', { userId })
       .getOne()
 
-    if (typeof ban === 'undefined') {
+    if (ban === null) {
       throw new NotFoundError('Ban not found.')
     }
     return ban

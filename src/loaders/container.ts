@@ -4,7 +4,6 @@ import {
   DiscordMessageJob,
   HealthCheckJob
 } from '../jobs'
-import { AsyncContainerModule, Container } from 'inversify'
 import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
 import {
   AuthService,
@@ -17,21 +16,24 @@ import {
   UserService
 } from '../services'
 import {
-  type Ban,
+  Ban,
   BanCancellation,
   BanExtension,
   Exile,
-  type Training,
+  Training,
   TrainingCancellation,
   TrainingType
 } from '../entities'
 import { BanRepository, BaseRepository, TrainingRepository } from '../repositories'
 import { RobloxManager, WebSocketManager } from '../managers'
+import { Container } from 'inversify'
+import { Repository } from 'typeorm'
 import { constants } from '../util'
+import dataSource from '../configs/data-source'
 
 const { TYPES } = constants
 
-export default async function init (): Promise<Container> {
+export default function init (): Container {
   const container = new Container()
   const bind = container.bind.bind(container)
 
