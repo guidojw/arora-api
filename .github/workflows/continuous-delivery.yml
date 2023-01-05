@@ -141,6 +141,18 @@ jobs:
         with:
           ref: ${{ needs.merge.outputs.sha }}
 
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-archive-keyring.gpg] https://pkg.cloudflare.com/cloudflared '"$(lsb_release -cs)"' main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update && sudo apt install cloudflared
+
+      - name: Set up SSH key
+        uses: shimataro/ssh-key-action@02d189fc92ea6279c0fea0e7a259da1b4f1d22a5 # v2.5.0
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
       - name: Start deployment
         uses: bobheadxi/deployments@9d4477fdaa4120020cd10ab7e97f68c801422e73 # tag=v1.3.0
         id: start_deployment
@@ -149,19 +161,19 @@ jobs:
           env: ${{ needs.metadata.outputs.stage }}
 
       - name: Deploy
-        uses: appleboy/ssh-action@4a03da89e5c43da56e502053be4bbcb293411883 # v0.1.6
         env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          CLOUDFLARE_SERVICE_TOKEN_ID: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }}
+          CLOUDFLARE_SERVICE_TOKEN_SECRET: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
           STAGE: ${{ needs.metadata.outputs.stage }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: github-actions
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: PROJECT_NAME,STAGE
-          script: |
-            cd /opt/docker/$PROJECT_NAME/$STAGE
+        run: |
+          ssh -o ProxyCommand='cloudflared access ssh --hostname '"$SSH_HOST"' --id '"$CLOUDFLARE_SERVICE_TOKEN_ID"'
+          --secret '"$CLOUDFLARE_SERVICE_TOKEN_SECRET" github-actions@"$SSH_HOST" <<EOF
+            cd '/opt/docker/'"$PROJECT_NAME"'/'"$STAGE"
             docker-compose pull
             docker-compose run --rm app yarn run typeorm migration:run
             docker-compose up -d
+          EOF
 
       - name: Finalize Sentry release
         uses: getsentry/action-release@bd5f874fcda966ba48139b0140fb3ec0cb3aabdd # v1.2.1
