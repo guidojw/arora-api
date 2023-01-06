@@ -41,10 +41,8 @@ jobs:
 
       - name: Test
         run: |
-          ssh maya <<EOF
+          ssh -q maya <<EOF
             whoami
-            cd /opt/docker/arora-api
-            ls -al
           EOF
 
       - name: Add problem matchers
