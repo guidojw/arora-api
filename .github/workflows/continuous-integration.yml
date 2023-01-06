@@ -40,10 +40,8 @@ jobs:
               ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
 
       - name: Test
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh github-actions@"$SSH_HOST" <<EOF
+          ssh maya <<EOF
             whoami
             cd /opt/docker/arora-api
             ls -al
