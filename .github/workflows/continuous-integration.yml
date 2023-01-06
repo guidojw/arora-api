@@ -39,8 +39,11 @@ jobs:
           CLOUDFLARE_SERVICE_TOKEN_ID: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }}
           CLOUDFLARE_SERVICE_TOKEN_SECRET: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
         run: |
-          ssh -o ProxyCommand='cloudflared access ssh --hostname '"$SSH_HOST"' --id '"$CLOUDFLARE_SERVICE_TOKEN_ID"' --secret '"$CLOUDFLARE_SERVICE_TOKEN_SECRET" github-actions@"$SSH_HOST" <<EOF
-            ls
+          ssh -q -o ProxyCommand='cloudflared access ssh --hostname '"$SSH_HOST"' --id '"$CLOUDFLARE_SERVICE_TOKEN_ID"'
+          --secret '"$CLOUDFLARE_SERVICE_TOKEN_SECRET" github-actions@"$SSH_HOST" <<EOF
+            whoami
+            cd /opt/docker/arora-api
+            ls -al
           EOF
 
       - name: Add problem matchers
