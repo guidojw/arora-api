@@ -43,7 +43,7 @@ jobs:
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh -q github-actions@"$SSH_HOST" <<EOF
+          ssh github-actions@"$SSH_HOST" <<EOF
             whoami
             cd /opt/docker/arora-api
             ls -al
