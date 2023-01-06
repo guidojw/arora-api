@@ -41,9 +41,9 @@ jobs:
 
       - name: Test
         run: |
-          ssh -T maya <<EOF
+          ssh maya '
             whoami
-          EOF
+          '
 
       - name: Add problem matchers
         run: |
