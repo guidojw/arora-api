@@ -36,7 +36,6 @@ jobs:
             Host maya
               HostName ${{ secrets.SSH_HOST }}
               User github-actions
-              IdentityFile ~/.ssh/id_rsa
               ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
 
       - name: Test
