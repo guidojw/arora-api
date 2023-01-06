@@ -21,6 +21,28 @@ jobs:
         with:
           ref: ${{ inputs.sha }}
 
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared '"$(lsb_release -cs)"' main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update && sudo apt install cloudflared
+
+      - name: Set up SSH key
+        uses: shimataro/ssh-key-action@02d189fc92ea6279c0fea0e7a259da1b4f1d22a5 # v2.5.0
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Test
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          CLOUDFLARE_SERVICE_TOKEN_ID: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }}
+          CLOUDFLARE_SERVICE_TOKEN_SECRET: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
+        run: |
+          ssh -o ProxyCommand='cloudflared access ssh --hostname '"$SSH_HOST"' --id '"$CLOUDFLARE_SERVICE_TOKEN_ID"' --secret '"$CLOUDFLARE_SERVICE_TOKEN_SECRET" github-actions@"$SSH_HOST" <<EOF
+            ls
+          EOF
+
       - name: Add problem matchers
         run: |
           echo '::add-matcher::.github/problem-matchers/tsc.json'
