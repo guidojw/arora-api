@@ -32,15 +32,19 @@ jobs:
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          config: |
+            Host maya
+              HostName ${{ secrets.SSH_HOST }}
+              User github-actions
+              IdentityFile ~/.ssh/id_rsa
+              ProxyCommand: cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} \
+                --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
 
       - name: Test
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
-          CLOUDFLARE_SERVICE_TOKEN_ID: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }}
-          CLOUDFLARE_SERVICE_TOKEN_SECRET: ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
         run: |
-          ssh -q -o ProxyCommand='cloudflared access ssh --hostname '"$SSH_HOST"' --id '"$CLOUDFLARE_SERVICE_TOKEN_ID"'
-          --secret '"$CLOUDFLARE_SERVICE_TOKEN_SECRET" github-actions@"$SSH_HOST" <<EOF
+          ssh -q github-actions@"$SSH_HOST" <<EOF
             whoami
             cd /opt/docker/arora-api
             ls -al
