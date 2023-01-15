@@ -10,10 +10,10 @@ const { TYPES } = constants
 export default class CatalogService {
   @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
 
-  public async getItems (queryString: string): Promise<{}> {
+  public async getMusicAssets (queryString: string): Promise<unknown> {
     const client = this.robloxManager.getAuthenticatedClient() ?? this.robloxManager.getClient()
     const api = new CatalogAPI(client)
-    return await api.getItems(queryString)
+    return await api.getMusicAssets(queryString)
   }
 }
 
@@ -25,11 +25,22 @@ class CatalogAPI extends BaseAPI {
     })
   }
 
-  public async getItems (queryString: string): Promise<{}> {
-    return (await this.request({
+  public async getMusicAssets (queryString: string): Promise<unknown> {
+    const result = (await this.request({
       requiresAuth: true,
       request: {
         path: `v1/marketplace/300?${queryString}`
+      },
+      json: true
+    })).body
+    return await this.getDetails(result.data.map((asset: { id: number }) => asset.id))
+  }
+
+  public async getDetails (assetIds: number[]): Promise<unknown> {
+    return (await this.request({
+      requiresAuth: true,
+      request: {
+        path: `v1/items/details?assetIds=${assetIds.join(',')}`
       },
       json: true
     })).body
