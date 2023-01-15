@@ -2,8 +2,7 @@ import {
   AcceptJoinRequestsJob,
   AnnounceTrainingsJob,
   DiscordMessageJob,
-  HealthCheckJob,
-  PayoutTrainDevelopersJob
+  HealthCheckJob
 } from '../jobs'
 import { AsyncContainerModule, Container } from 'inversify'
 import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
@@ -22,12 +21,11 @@ import {
   BanCancellation,
   BanExtension,
   Exile,
-  type Payout,
   type Training,
   TrainingCancellation,
   TrainingType
 } from '../entities'
-import { BanRepository, PayoutRepository, TrainingRepository } from '../repositories'
+import { BanRepository, TrainingRepository } from '../repositories'
 import { type Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { constants } from '../util'
@@ -44,7 +42,6 @@ export default async function init (): Promise<Container> {
     bind<AnnounceTrainingsJob>(TYPES.AnnounceTrainingsJob).to(AnnounceTrainingsJob)
     bind<DiscordMessageJob>(TYPES.DiscordMessageJob).to(DiscordMessageJob)
     bind<HealthCheckJob>(TYPES.HealthCheckJob).to(HealthCheckJob)
-    bind<PayoutTrainDevelopersJob>(TYPES.PayoutTrainDevelopersJob).to(PayoutTrainDevelopersJob)
 
     bind<RobloxManager>(TYPES.RobloxManager).to(RobloxManager).inSingletonScope()
     bind<WebSocketManager>(TYPES.WebSocketManager).to(WebSocketManager).inSingletonScope()
@@ -63,9 +60,6 @@ export default async function init (): Promise<Container> {
     }).inRequestScope()
     bind<Repository<Exile>>(TYPES.ExileRepository).toDynamicValue(() => {
       return getRepository(Exile)
-    }).inRequestScope()
-    bind<Repository<Payout>>(TYPES.PayoutRepository).toDynamicValue(() => {
-      return getCustomRepository(PayoutRepository)
     }).inRequestScope()
     bind<Repository<Training>>(TYPES.TrainingRepository).toDynamicValue(() => {
       return getCustomRepository(TrainingRepository)

@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Validate branch
         run: |
-          if [ $GITHUB_REF_NAME != 'staging' ] && [ $GITHUB_REF_NAME != 'main' ]; then
+          if [ "$GITHUB_REF_NAME" != 'staging' ] && [ "$GITHUB_REF_NAME" != 'main' ]; then
             echo 'This workflow can only be run on branches staging and main.'
             exit 1
           fi
@@ -37,26 +37,26 @@ jobs:
       stage: ${{ steps.get_metadata.outputs.stage }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # renovate: tag=v2.4.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Get metadata
         id: get_metadata
         env:
           INPUT_MERGE: ${{ github.event.inputs.merge }}
         run: |
-          if [ $GITHUB_REF_NAME = 'main' ]; then
+          if [ "$GITHUB_REF_NAME" = 'main' ]; then
             if [ "${INPUT_MERGE,,}" = 'y' ]; then
               git fetch origin staging
               if ! git diff origin/main origin/staging --exit-code; then
-                echo '::set-output name=has_diff::true'
+                echo 'has_diff=true' >> "$GITHUB_OUTPUT"
               else
-                echo '::set-output name=has_diff::false'
+                echo 'has_diff=false' >> "$GITHUB_OUTPUT"
               fi
             fi
 
-            echo '::set-output name=stage::production'
+            echo 'stage=production' >> "$GITHUB_OUTPUT"
           else
-            echo '::set-output name=stage::staging'
+            echo 'stage=staging' >> "$GITHUB_OUTPUT"
           fi
 
   merge:
@@ -71,7 +71,7 @@ jobs:
         env:
           HAS_DIFF: ${{ fromJSON(needs.metadata.outputs.has_diff || false) }}
         run: |
-          if [ $GITHUB_REF_NAME != 'main' ]; then
+          if [ "$GITHUB_REF_NAME" != 'main' ]; then
             echo 'Can only merge when the workflow target branch is main.'
             exit 1
           fi
@@ -82,11 +82,11 @@ jobs:
 
       - name: Checkout code
         if: fromJSON(needs.metadata.outputs.has_diff)
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # renovate: tag=v2.4.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Run merge
         if: fromJSON(needs.metadata.outputs.has_diff)
-        uses: devmasx/merge-branch@854d3ac71ed1e9deb668e0074781b81fdd6e771f # renovate: tag=v1.4.0
+        uses: devmasx/merge-branch@854d3ac71ed1e9deb668e0074781b81fdd6e771f # tag=v1.4.0
         with:
           type: now
           from_branch: staging
@@ -98,7 +98,7 @@ jobs:
         if: fromJSON(needs.metadata.outputs.has_diff)
         run: |
           git fetch origin main
-          echo '::set-output name=sha::'$(git rev-parse origin/main)
+          echo 'sha='"$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
 
   continuous_integration:
     name: Continuous Integration
@@ -130,42 +130,54 @@ jobs:
       - name: Get environment URL
         id: get_url
         run: |
-          if [ $GITHUB_REF_NAME = 'main' ]; then
-            echo '::set-output name=environment_url::https://nsadmin.guidojw.nl/api'
+          if [ "$GITHUB_REF_NAME" = 'main' ]; then
+            echo 'environment_url=https://nsadmin.guidojw.nl/api' >> "$GITHUB_OUTPUT"
           else
-            echo '::set-output name=environment_url::https://staging.nsadmin.guidojw.nl/api'
+            echo 'environment_url=https://staging.nsadmin.guidojw.nl/api' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout code
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # renovate: tag=v2.4.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           ref: ${{ needs.merge.outputs.sha }}
 
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared '"$(lsb_release -cs)"' main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update && sudo apt install cloudflared
+
+      - name: Set up SSH key
+        uses: shimataro/ssh-key-action@02d189fc92ea6279c0fea0e7a259da1b4f1d22a5 # v2.5.0
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          config: |
+            Host maya
+              HostName ${{ secrets.SSH_HOST }}
+              User github-actions
+              ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
+
       - name: Start deployment
-        uses: bobheadxi/deployments@3288e49ca0bde112b9414f998339321d537e2a51 # renovate: tag=v0.6.1
+        uses: bobheadxi/deployments@9d4477fdaa4120020cd10ab7e97f68c801422e73 # tag=v1.3.0
         id: start_deployment
         with:
           step: start
-          token: ${{ secrets.GITHUB_TOKEN }}
           env: ${{ needs.metadata.outputs.stage }}
 
       - name: Deploy
-        uses: appleboy/ssh-action@1d1b21ca96111b1eb4c03c21c14ebb971d2200f6 # renovate: tag=v0.1.4
         env:
           STAGE: ${{ needs.metadata.outputs.stage }}
-        with:
-          host: guidojw.nl
-          username: github-actions
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: PROJECT_NAME,STAGE
-          script: |
-            cd /opt/docker/$PROJECT_NAME/$STAGE
+        run: |
+          ssh maya '
+            cd /opt/docker/'"$PROJECT_NAME"'/'"$STAGE"'
             docker-compose pull
             docker-compose run --rm app yarn run typeorm migration:run
             docker-compose up -d
+          '
 
       - name: Finalize Sentry release
-        uses: getsentry/action-release@744e4b262278339b79fb39c8922efcae71e98e39 # renovate: tag=v1.1.6
+        uses: getsentry/action-release@bd5f874fcda966ba48139b0140fb3ec0cb3aabdd # v1.2.1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_PROJECT: ${{ env.PROJECT_NAME }}
@@ -175,13 +187,13 @@ jobs:
           set_commits: skip
 
       - name: Finish deployment
-        uses: bobheadxi/deployments@3288e49ca0bde112b9414f998339321d537e2a51 # renovate: tag=v0.6.1
+        uses: bobheadxi/deployments@9d4477fdaa4120020cd10ab7e97f68c801422e73 # tag=v1.3.0
         if: steps.start_deployment.conclusion == 'success' && always()
         with:
           step: finish
-          token: ${{ secrets.GITHUB_TOKEN }}
           status: ${{ job.status }}
           deployment_id: ${{ steps.start_deployment.outputs.deployment_id }}
+          env: ${{ needs.metadata.outputs.stage }}
           env_url: ${{ steps.get_url.outputs.environment_url }}
 
   update_check_run:
@@ -195,16 +207,16 @@ jobs:
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          echo '::set-output name=conclusion::success'
+          echo 'conclusion=success' >> "$GITHUB_OUTPUT"
           for RESULT in $RESULTS; do
-            if [ $RESULT = 'cancelled' ] || [ $RESULT = 'failure' ]; then
-              echo '::set-output name=conclusion::'$RESULT
+            if [ "$RESULT" = 'cancelled' ] || [ "$RESULT" = 'failure' ]; then
+              echo 'conclusion='"$RESULT" >> "$GITHUB_OUTPUT"
               break
             fi
           done
 
       - name: Update Continuous Delivery check run
-        uses: guidojw/actions/update-check-run@fcb92ed90a3965b130f4e5ed3f53df9ef65e6de1 # renovate: tag=v1
+        uses: guidojw/actions/update-check-run@abb0ee8d1336edf73383f2e5a09abd3a22f25b13 # v1.3.3
         with:
           app_id: ${{ env.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
