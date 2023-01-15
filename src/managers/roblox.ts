@@ -37,6 +37,10 @@ export default class RobloxManager implements BaseManager {
       ? this.authenticatedClients[groupId] ?? this.unauthenticatedClient
       : this.unauthenticatedClient
   }
+
+  public getAuthenticatedClient (): Client | undefined {
+    return Object.values(this.authenticatedClients)[0]
+  }
 }
 
 // Custom Bloxy requester that adapts Got requests to Axios.

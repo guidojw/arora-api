@@ -31,13 +31,13 @@ export default class CatalogController extends BaseHttpController implements int
       case 'getItems':
         return [
           header('authorization').exists().isString(),
-          query('CatalogContext').optional().isInt().toInt(),
-          query('Category').optional().isInt().toInt(),
-          query('CreatorID').optional().isInt().toInt(),
-          query('ResultsPerPage').optional().isInt().toInt(),
-          query('Keyword').optional().isString(),
-          query('SortType').optional().isString(),
-          query('PageNumber').optional().isInt().toInt()
+          query('limit').optional().isInt().toInt(),
+          query('pageNumber').optional().isInt().toInt(),
+          query('keyword').optional().isString(),
+          query('creatorType').optional().isInt().toInt(),
+          query('creatorTargetId').optional().isInt().toInt(),
+          query('useCreatorWhitelist').optional().isBoolean(),
+          query('includeOnlyVerifiedCreators').optional().isBoolean()
         ]
 
       default:
