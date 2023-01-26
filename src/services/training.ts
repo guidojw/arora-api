@@ -55,7 +55,7 @@ export default class TrainingService {
 
   public async addTraining (
     groupId: number,
-    { typeId, authorId, date, notes }: { typeId: number, authorId: number, date: number, notes?: string | null }
+    { typeId, authorId, date, notes }: { typeId: number, authorId: number, date: number, notes?: string }
   ): Promise<Training> {
     const trainingType = await this.getTrainingType(groupId, typeId)
     const training = await this.trainingRepository.save(this.trainingRepository.create({
