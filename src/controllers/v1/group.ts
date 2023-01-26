@@ -335,7 +335,7 @@ export default class GroupController extends BaseHttpController implements inter
     @requestParam('groupId') groupId: number,
       @requestParam('trainingId') trainingId: number,
       @requestBody() body: {
-        changes: { typeId?: number, date?: number, notes?: string, authorId?: number }
+        changes: { typeId?: number, date?: number, notes?: string | null, authorId?: number }
         editorId: number
       }
   ): Promise<results.JsonResult> {
