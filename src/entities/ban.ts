@@ -28,6 +28,7 @@ export default class Ban {
 
   @Expose()
   @Column('timestamp with time zone', { default: () => 'NOW()' })
+  @ValidateIf(ban => typeof ban.date !== 'undefined')
   @IsDate()
   public date!: Date
 
