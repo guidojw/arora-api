@@ -13,6 +13,7 @@ export default class Exile {
   public authorId!: number
 
   @Column('timestamp with time zone', { default: () => 'NOW()' })
+  @ValidateIf(exile => typeof exile.date !== 'undefined')
   @IsDate()
   public date!: Date
 
