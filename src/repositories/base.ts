@@ -47,7 +47,8 @@ export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBui
       if (scope !== 'default' && !(this.constructor as typeof BaseScopes).scopes.includes(scope)) {
         throw new Error(`Invalid scope "${scope}" called`)
       }
-      // @ts-expect-error
+      // @ts-expect-error: By above scopes include check, we know scope exists
+      // on the query builder.
       return qb[scope]
     }, this)
   }
@@ -61,7 +62,7 @@ export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBui
   }
 
   public override leftJoin (
-    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | ((...args: any[]) => any),
     alias: string,
     condition?: string,
     parameters?: ObjectLiteral
@@ -73,7 +74,7 @@ export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBui
   }
 
   public override leftJoinAndSelect (
-    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | ((...args: any[]) => any),
     alias: string,
     condition?: string,
     parameters?: ObjectLiteral
