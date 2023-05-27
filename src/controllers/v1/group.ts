@@ -242,8 +242,9 @@ export default class GroupController extends BaseHttpController implements inter
     @requestParam('groupId') groupId: number,
       @requestParam('userId') userId: number,
       @requestBody() body: { authorId: number, reason: string }
-  ): Promise<results.JsonResult> {
-    return this.json(await this.exileService.unexile(groupId, userId, body))
+  ): Promise<results.OkResult> {
+    await this.exileService.unexile(groupId, userId, body)
+    return this.ok();
   }
 
   // TrainingService
@@ -368,8 +369,9 @@ export default class GroupController extends BaseHttpController implements inter
   public async deleteTrainingType (
     @requestParam('groupId') groupId: number,
       @requestParam('typeId') typeId: number
-  ): Promise<results.JsonResult> {
-    return this.json(await this.trainingService.deleteTrainingType(groupId, typeId))
+  ): Promise<results.OkResult> {
+    await this.trainingService.deleteTrainingType(groupId, typeId)
+    return this.ok()
   }
 
   private static validate (method: string): ValidationChain[] {
