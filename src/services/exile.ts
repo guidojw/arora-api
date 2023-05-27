@@ -33,7 +33,7 @@ export default class ExileService {
   public async exile (
     groupId: number,
     userId: number,
-    { authorId, reason }: { authorId: number, reason: string}
+    { authorId, reason }: { authorId: number, reason: string }
   ): Promise<Exile> {
     if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
       throw new ConflictError('User is already exiled.')
