@@ -15,11 +15,18 @@ export default class ErrorMiddleware extends BaseMiddleware {
     }
     this.sendErrors(res, 422, errors
       .array({ onlyFirstError: true })
-      .map(({ param, location, msg }) => ({
-        param,
-        location,
-        message: msg
-      }))
+      .map(error => {
+        switch (error.type) {
+          case 'field':
+            return {
+              param: error.path,
+              location: error.location,
+              message: error.msg
+            }
+          default:
+            throw new Error(`Unknown error type ${error.type}`)
+        }
+      })
     )
   }
 

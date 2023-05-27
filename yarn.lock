@@ -820,7 +820,7 @@ __metadata:
     eslint-plugin-unicorn: ^47.0.0
     express: ^4.18.1
     express-async-errors: ^3.1.1
-    express-validator: ^6.14.2
+    express-validator: ^7.0.1
     helmet: ^7.0.0
     hpp: ^0.2.3
     inversify: ^6.0.1
@@ -1961,13 +1961,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-validator@npm:^6.14.2":
-  version: 6.14.2
-  resolution: "express-validator@npm:6.14.2"
+"express-validator@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "express-validator@npm:7.0.1"
   dependencies:
     lodash: ^4.17.21
-    validator: ^13.7.0
-  checksum: f19641a8f8bde39ebf9418e8798c22736ffe1c90081f97a4b66d6d0f185bce2c20cbcc170d21c5d10f8fd410bb8de38c31592021be4306b9936bc3c566741dc0
+    validator: ^13.9.0
+  checksum: 34431c106533e761c7875fea023940fb35b426509c5f3b21e30a4bd2f82833494ad047d4c0cc2626788964a720dd049b38156b13a1a9906243c66c68d32819a2
   languageName: node
   linkType: hard
 
@@ -5127,6 +5127,13 @@ __metadata:
   version: 13.7.0
   resolution: "validator@npm:13.7.0"
   checksum: 2b83283de1222ca549a7ef57f46e8d49c6669213348db78b7045bce36a3b5843ff1e9f709ebf74574e06223461ee1f264f8cc9a26a0060a79a27de079d8286ef
+  languageName: node
+  linkType: hard
+
+"validator@npm:^13.9.0":
+  version: 13.9.0
+  resolution: "validator@npm:13.9.0"
+  checksum: e2c936f041f61faa42bafd17c6faddf939498666cd82e88d733621c286893730b008959f4cb12ab3e236148a4f3805c30b85e3dcf5e0efd8b0cbcd36c02bfc0c
   languageName: node
   linkType: hard
 
