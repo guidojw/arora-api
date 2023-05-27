@@ -821,7 +821,7 @@ __metadata:
     express: ^4.18.1
     express-async-errors: ^3.1.1
     express-validator: ^6.14.2
-    helmet: ^6.0.0
+    helmet: ^7.0.0
     hpp: ^0.2.3
     inversify: ^6.0.1
     inversify-express-utils: ^6.4.3
@@ -2451,10 +2451,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "helmet@npm:6.0.0"
-  checksum: 0dd89d5b77c5334e815f5d29376ca7af0ad1007136890f497be3455d9ed9734e7203e13d9931e29e4d2ced1c632c52440f16d2a02e8835fd8b8706a12052faad
+"helmet@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "helmet@npm:7.0.0"
+  checksum: 3622b8b68b7ac4736369fe7717adb5b87ddcdcda7c11c13277d79fb5670acab032e8c971835565b1d2144d234f3e0dbcd327a44249b9e61f0f64c0c753faf1bc
   languageName: node
   linkType: hard
 
