@@ -5,7 +5,7 @@ import { util } from '../util'
 
 const { groupBy } = util
 
-export default abstract class BaseRepository<T> extends Repository<T> {
+export default abstract class BaseRepository<T extends ObjectLiteral> extends Repository<T> {
   public transform (record: any): T {
     return plainToInstance(
       this.target as ClassConstructor<T>,
@@ -23,7 +23,7 @@ export default abstract class BaseRepository<T> extends Repository<T> {
   }
 }
 
-export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
+export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBuilder<T> {
   public static readonly scopes: string[] = []
 
   public constructor (private readonly repository: BaseRepository<T>, queryBuilder: SelectQueryBuilder<T>) {
