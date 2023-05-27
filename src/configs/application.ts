@@ -1,6 +1,6 @@
 import type { Range } from '../util/util'
 
-const applicationConfig: { [key: string]: Range[] } = {
+const applicationConfig: Record<string, Range[]> = {
   skippedRanks: [2, 99],
   unbannableRanks: [99, [103]],
   undemotableRanks: [2, 99, [103]],

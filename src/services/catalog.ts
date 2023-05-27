@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify'
 import BaseAPI from '@guidojw/bloxy/dist/client/apis/BaseAPI'
 import type { Client } from '@guidojw/bloxy'
-import type { RobloxManager } from '../managers'
+import { RobloxManager } from '../managers'
 import { constants } from '../util'
 
 const { TYPES } = constants
