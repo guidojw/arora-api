@@ -47,7 +47,8 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
       if (scope !== 'default' && !(this.constructor as typeof BaseScopes).scopes.includes(scope)) {
         throw new Error(`Invalid scope "${scope}" called`)
       }
-      // @ts-expect-error: By above scopes include check, we know scope exists on the query builder.
+      // @ts-expect-error: By above scopes include check, we know scope exists
+      // on the query builder.
       return qb[scope]
     }, this)
   }

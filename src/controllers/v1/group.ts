@@ -244,7 +244,7 @@ export default class GroupController extends BaseHttpController implements inter
       @requestBody() body: { authorId: number, reason: string }
   ): Promise<results.OkResult> {
     await this.exileService.unexile(groupId, userId, body)
-    return this.ok();
+    return this.ok()
   }
 
   // TrainingService
