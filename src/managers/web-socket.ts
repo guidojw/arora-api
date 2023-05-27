@@ -14,7 +14,8 @@ export default class WebSocketManager implements BaseManager {
     setInterval(() => {
       for (const connection of this.connections) {
         if (!connection.isAlive) {
-          return connection.terminate()
+          connection.terminate()
+          return
         }
         connection.isAlive = false
 

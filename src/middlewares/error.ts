@@ -7,10 +7,11 @@ export type Errors = Array<{ message: string }>
 
 @injectable()
 export default class ErrorMiddleware extends BaseMiddleware {
-  public async handler (req: Request, res: Response, next: NextFunction): Promise<void> {
-    const errors = await validationResult(req)
+  public handler (req: Request, res: Response, next: NextFunction): void {
+    const errors = validationResult(req)
     if (errors.isEmpty()) {
-      return next()
+      next()
+      return
     }
     this.sendErrors(res, 422, errors
       .array({ onlyFirstError: true })
