@@ -17,9 +17,6 @@ on:
 
 env:
   PROJECT_NAME: arora-api
-  REGISTRY_URL: ghcr.io
-  SENTRY_ORG: guidos-projects
-  APP_ID: 152323
 
 jobs:
   metadata:
@@ -35,9 +32,9 @@ jobs:
           INPUT_SHA: ${{ inputs.sha }}
         run: |
           if [ "$GITHUB_REF_NAME" = 'main' ]; then
-            echo '::set-output name=tag::latest'
+            echo 'tag=latest' >> "$GITHUB_OUTPUT"
           else
-            echo '::set-output name=tag::'"$GITHUB_REF_NAME"
+            echo 'tag='"$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
           fi
 
           if [ "$GITHUB_REF_NAME" = 'staging' ] || [ "$GITHUB_REF_NAME" = 'main' ]; then
@@ -47,8 +44,11 @@ jobs:
             else
               BUILD_ARGS+=$'\nNODE_ENV=staging'
             fi
-            BUILD_ARGS=${BUILD_ARGS//$'\n'/'%0A'}
-            echo '::set-output name=build_args::'"$BUILD_ARGS"
+            {
+              echo 'build_args<<EOF'
+              echo "$BUILD_ARGS"
+              echo 'EOF'
+            }  >> "$GITHUB_OUTPUT"
           fi
 
   publish:
@@ -57,24 +57,24 @@ jobs:
     needs: metadata
     steps:
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
         with:
           ref: ${{ inputs.sha }}
           fetch-depth: 0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # tag=v2.0.0
+        uses: docker/setup-buildx-action@4b4e9c3e2d4531116a6f8ba8e71fc6e2cb6e6c8c # v2.5.0
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # tag=v2.0.0
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
         with:
-          registry: ${{ env.REGISTRY_URL }}
+          registry: ${{ vars.DOCKER_REGISTRY_URL }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push image
         id: build_push_image
-        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 # tag=v3.1.1
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 # v4.0.0
         with:
           push: true
           context: .
@@ -82,7 +82,7 @@ jobs:
           cache-from: type=gha,scope=main
           cache-to: type=gha,scope=main
           tags: |
-            ${{ env.REGISTRY_URL }}/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{
+            ${{ vars.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/${{ env.PROJECT_NAME }}:${{
             needs.metadata.outputs.tag }}
 
       - name: Get sourcemaps from image
@@ -94,9 +94,10 @@ jobs:
 
       - name: Create Sentry release
         if: ${{ !(github.event_name == 'workflow_dispatch' && github.workflow == 'Publish Image') }}
-        uses: getsentry/action-release@426b54786363ee2ecb27129f04b99cf714a36d38 # tag=v1.2.0
+        uses: getsentry/action-release@4744f6a65149f441c5f396d5b0877307c0db52c7 # v1.4.1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG_NAME }}
           SENTRY_PROJECT: ${{ env.PROJECT_NAME }}
         with:
           finalize: false
@@ -115,19 +116,19 @@ jobs:
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          echo '::set-output name=conclusion::success'
+          echo 'conclusion=success' >> "$GITHUB_OUTPUT"
           for RESULT in $RESULTS; do
             if [ "$RESULT" = 'cancelled' ] || [ "$RESULT" = 'failure' ]; then
-              echo '::set-output name=conclusion::'"$RESULT"
+              echo 'conclusion='"$RESULT" >> "$GITHUB_OUTPUT"
               break
             fi
           done
 
       - name: Update Publish Image check run
-        uses: guidojw/actions/update-check-run@5faa9418b42a6a77f81e11ae935287900673f98b # tag=v1.3.2
+        uses: guidojw/actions/update-check-run@abb0ee8d1336edf73383f2e5a09abd3a22f25b13 # v1.3.3
         with:
-          app_id: ${{ env.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app_id: ${{ vars.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           name: Publish Image
           conclusion: ${{ steps.get_conclusion.outputs.conclusion }}
           details_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

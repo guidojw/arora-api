@@ -4,7 +4,7 @@ const { TYPES } = constants
 
 export interface CronConfig { expression: string, job: symbol, args?: any[] }
 
-const cronConfig: { [key: string]: CronConfig } = {
+const cronConfig: Record<string, CronConfig> = {
   acceptJoinRequestsJob: {
     expression: '*/5 * * * *', // https://crontab.guru/#*/30_*_*_*_*
     job: TYPES.AcceptJoinRequestsJob,

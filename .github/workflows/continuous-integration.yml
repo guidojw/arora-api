@@ -4,6 +4,7 @@ on:
   push:
     branches: [staging, main]
   pull_request:
+  merge_group:
   workflow_call:
     inputs:
       sha:
@@ -17,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
         with:
           ref: ${{ inputs.sha }}
 
@@ -26,7 +27,7 @@ jobs:
           echo '::add-matcher::.github/problem-matchers/tsc.json'
 
       - name: Build test image
-        uses: guidojw/actions/build-docker-image@5faa9418b42a6a77f81e11ae935287900673f98b # tag=v1.3.2
+        uses: guidojw/actions/build-docker-image@abb0ee8d1336edf73383f2e5a09abd3a22f25b13 # v1.3.3
         with:
           name: app
 
@@ -36,7 +37,7 @@ jobs:
     needs: build
     steps:
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
         with:
           ref: ${{ inputs.sha }}
 
@@ -47,17 +48,17 @@ jobs:
 
       - name: Download actionlint
         run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.6.16
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.6.24
 
       - name: Load test image
-        uses: guidojw/actions/load-docker-image@5faa9418b42a6a77f81e11ae935287900673f98b # tag=v1.3.2
+        uses: guidojw/actions/load-docker-image@abb0ee8d1336edf73383f2e5a09abd3a22f25b13 # v1.3.3
         with:
           name: app
 
       - name: Lint
         run: |
           EXIT_STATUS=0
-          ./actionlint -ignore 'property "app_private_key" is not defined' -ignore 'SC2153:' \
-            -ignore 'property "sha" is not defined in object type {}' || EXIT_STATUS=$?
+          ./actionlint -ignore 'property "gh_app_private_key" is not defined' -ignore 'SC2153:' -ignore 'SC2087:' || \
+            EXIT_STATUS=$?
           docker run app yarn lint || EXIT_STATUS=$?
           exit $EXIT_STATUS

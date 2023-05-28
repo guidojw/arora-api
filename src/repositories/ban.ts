@@ -58,9 +58,8 @@ export class BanScopes extends BaseScopes<Ban> {
   }
 
   private static makeEndsAtQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
-    // Connection is somehow undefined on this qb, and repository is a
-    // connection instance so weird fix but works?
-    // @ts-expect-error
+    // @ts-expect-error: Connection is somehow undefined on this qb and
+    // repository is a connection instance so weird fix but works?
     qb.connection = qb.repository
     return qb
       .select('ban.id', 'id')

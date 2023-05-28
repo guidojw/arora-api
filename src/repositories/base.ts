@@ -1,6 +1,6 @@
 import * as lodash from 'lodash'
 import { type ClassConstructor, plainToInstance } from 'class-transformer'
-import { type ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
+import { type ObjectLiteral, type Repository, SelectQueryBuilder } from 'typeorm'
 import { util } from '../util'
 
 const { groupBy } = util
@@ -31,7 +31,7 @@ export default {
   }
 } as Repository<any> & BaseRepositoryProperties<any>
 
-export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
+export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBuilder<T> {
   public static readonly scopes: string[] = []
 
   public constructor (
@@ -58,7 +58,8 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
       if (scope !== 'default' && !(this.constructor as typeof BaseScopes).scopes.includes(scope)) {
         throw new Error(`Invalid scope "${scope}" called`)
       }
-      // @ts-expect-error
+      // @ts-expect-error: By above scopes include check, we know scope exists
+      // on the query builder.
       return qb[scope]
     }, this)
   }
@@ -72,7 +73,7 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
   }
 
   public override leftJoin (
-    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | ((...args: any[]) => any),
     alias: string,
     condition?: string,
     parameters?: ObjectLiteral
@@ -84,7 +85,7 @@ export abstract class BaseScopes<T> extends SelectQueryBuilder<T> {
   }
 
   public override leftJoinAndSelect (
-    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | Function,
+    entityOrProperty: ((qb: SelectQueryBuilder<any>) => SelectQueryBuilder<any>) | string | ((...args: any[]) => any),
     alias: string,
     condition?: string,
     parameters?: ObjectLiteral

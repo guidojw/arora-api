@@ -17,27 +17,27 @@ const { TYPES } = constants
 export default class CatalogController extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.CatalogService) private readonly catalogService!: CatalogService
 
-  @httpGet('/', ...CatalogController.validate('getItems'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  public async getItems (req: Request): Promise<results.JsonResult> {
+  @httpGet('/', ...CatalogController.validate('getMusicAssets'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
+  public async getMusicAssets (req: Request): Promise<results.JsonResult> {
     const queryStart = req.originalUrl.indexOf('?')
     const queryString = queryStart > 0
       ? req.originalUrl.slice(queryStart + 1)
       : ''
-    return this.json(await this.catalogService.getItems(queryString))
+    return this.json(await this.catalogService.getMusicAssets(queryString))
   }
 
   private static validate (method: string): ValidationChain[] {
     switch (method) {
-      case 'getItems':
+      case 'getMusicAssets':
         return [
           header('authorization').exists().isString(),
-          query('CatalogContext').optional().isInt().toInt(),
-          query('Category').optional().isInt().toInt(),
-          query('CreatorID').optional().isInt().toInt(),
-          query('ResultsPerPage').optional().isInt().toInt(),
-          query('Keyword').optional().isString(),
-          query('SortType').optional().isString(),
-          query('PageNumber').optional().isInt().toInt()
+          query('limit').optional().isInt().toInt(),
+          query('pageNumber').optional().isInt().toInt(),
+          query('keyword').optional().isString(),
+          query('creatorType').optional().isInt().toInt(),
+          query('creatorTargetId').optional().isInt().toInt(),
+          query('useCreatorWhitelist').optional().isBoolean(),
+          query('includeOnlyVerifiedCreators').optional().isBoolean()
         ]
 
       default:

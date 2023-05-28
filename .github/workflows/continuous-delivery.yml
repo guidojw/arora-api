@@ -13,8 +13,6 @@ concurrency:
 
 env:
   PROJECT_NAME: arora-api
-  SENTRY_ORG: guidos-projects
-  APP_ID: 152323
 
 jobs:
   branch_check:
@@ -37,7 +35,7 @@ jobs:
       stage: ${{ steps.get_metadata.outputs.stage }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
 
       - name: Get metadata
         id: get_metadata
@@ -48,15 +46,15 @@ jobs:
             if [ "${INPUT_MERGE,,}" = 'y' ]; then
               git fetch origin staging
               if ! git diff origin/main origin/staging --exit-code; then
-                echo '::set-output name=has_diff::true'
+                echo 'has_diff=true' >> "$GITHUB_OUTPUT"
               else
-                echo '::set-output name=has_diff::false'
+                echo 'has_diff=false' >> "$GITHUB_OUTPUT"
               fi
             fi
 
-            echo '::set-output name=stage::production'
+            echo 'stage=production' >> "$GITHUB_OUTPUT"
           else
-            echo '::set-output name=stage::staging'
+            echo 'stage=staging' >> "$GITHUB_OUTPUT"
           fi
 
   merge:
@@ -82,7 +80,7 @@ jobs:
 
       - name: Checkout code
         if: fromJSON(needs.metadata.outputs.has_diff)
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
 
       - name: Run merge
         if: fromJSON(needs.metadata.outputs.has_diff)
@@ -98,7 +96,7 @@ jobs:
         if: fromJSON(needs.metadata.outputs.has_diff)
         run: |
           git fetch origin main
-          echo '::set-output name=sha::'"$(git rev-parse origin/main)"
+          echo 'sha='"$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
 
   continuous_integration:
     name: Continuous Integration
@@ -131,42 +129,56 @@ jobs:
         id: get_url
         run: |
           if [ "$GITHUB_REF_NAME" = 'main' ]; then
-            echo '::set-output name=environment_url::https://nsadmin.guidojw.nl/api'
+            echo 'environment_url=https://nsadmin.guidojw.nl/api' >> "$GITHUB_OUTPUT"
           else
-            echo '::set-output name=environment_url::https://staging.nsadmin.guidojw.nl/api'
+            echo 'environment_url=https://staging.nsadmin.guidojw.nl/api' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout code
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
         with:
           ref: ${{ needs.merge.outputs.sha }}
 
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared '"$(lsb_release -cs)"' main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update && sudo apt install cloudflared
+
+      - name: Set up SSH key
+        uses: shimataro/ssh-key-action@685d0f20da72e4b53cc81d373a2ed0a867770e46 # v2.5.1
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          config: |
+            Host maya
+              HostName ${{ secrets.SSH_HOST }}
+              User github-actions
+              ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
+
       - name: Start deployment
-        uses: bobheadxi/deployments@9d4477fdaa4120020cd10ab7e97f68c801422e73 # tag=v1.3.0
+        uses: bobheadxi/deployments@88ce5600046c82542f8246ac287d0a53c461bca3 # v1.4.0
         id: start_deployment
         with:
           step: start
           env: ${{ needs.metadata.outputs.stage }}
 
       - name: Deploy
-        uses: appleboy/ssh-action@f9010ff7f1bbd7db1a0b4bab661437550cea20c0 # tag=v0.1.5
         env:
           STAGE: ${{ needs.metadata.outputs.stage }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: github-actions
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: PROJECT_NAME,STAGE
-          script: |
-            cd /opt/docker/$PROJECT_NAME/$STAGE
+        run: |
+          ssh maya '
+            cd /opt/docker/'"$PROJECT_NAME"'/'"$STAGE"'
             docker-compose pull
             docker-compose run --rm app yarn run typeorm migration:run
             docker-compose up -d
+          '
 
       - name: Finalize Sentry release
-        uses: getsentry/action-release@426b54786363ee2ecb27129f04b99cf714a36d38 # tag=v1.2.0
+        uses: getsentry/action-release@4744f6a65149f441c5f396d5b0877307c0db52c7 # v1.4.1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG_NAME }}
           SENTRY_PROJECT: ${{ env.PROJECT_NAME }}
         with:
           environment: ${{ needs.metadata.outputs.stage }}
@@ -174,7 +186,7 @@ jobs:
           set_commits: skip
 
       - name: Finish deployment
-        uses: bobheadxi/deployments@9d4477fdaa4120020cd10ab7e97f68c801422e73 # tag=v1.3.0
+        uses: bobheadxi/deployments@88ce5600046c82542f8246ac287d0a53c461bca3 # v1.4.0
         if: steps.start_deployment.conclusion == 'success' && always()
         with:
           step: finish
@@ -194,19 +206,19 @@ jobs:
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          echo '::set-output name=conclusion::success'
+          echo 'conclusion=success' >> "$GITHUB_OUTPUT"
           for RESULT in $RESULTS; do
             if [ "$RESULT" = 'cancelled' ] || [ "$RESULT" = 'failure' ]; then
-              echo '::set-output name=conclusion::'"$RESULT"
+              echo 'conclusion='"$RESULT" >> "$GITHUB_OUTPUT"
               break
             fi
           done
 
       - name: Update Continuous Delivery check run
-        uses: guidojw/actions/update-check-run@5faa9418b42a6a77f81e11ae935287900673f98b # tag=v1.3.2
+        uses: guidojw/actions/update-check-run@abb0ee8d1336edf73383f2e5a09abd3a22f25b13 # v1.3.3
         with:
-          app_id: ${{ env.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app_id: ${{ vars.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           sha: ${{ needs.merge.outputs.sha }}
           name: Continuous Delivery
           conclusion: ${{ steps.get_conclusion.outputs.conclusion }}

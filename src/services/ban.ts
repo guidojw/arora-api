@@ -56,7 +56,7 @@ export default class BanService {
   public async ban (
     groupId: number,
     userId: number,
-    { authorId, duration, reason }: { authorId: number, duration?: number | null, reason: string }
+    { authorId, duration, reason }: { authorId: number, duration?: number, reason: string }
   ): Promise<Ban> {
     if (typeof await this.banRepository.scopes().default
       .andWhere('ban.group_id = :groupId', { groupId })

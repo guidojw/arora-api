@@ -9,7 +9,8 @@ implements MigrationInterface {
       // so delete the Sequelize migrations table and skip all other migrations.
       // If the database is migrated from nothing, this if statement will not
       // run.
-      return await queryRunner.dropTable('sequelize_meta')
+      await queryRunner.dropTable('sequelize_meta')
+      return
     }
 
     await queryRunner.createTable(new Table({

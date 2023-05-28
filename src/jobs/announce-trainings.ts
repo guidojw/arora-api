@@ -28,6 +28,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
 
     const trainings = await this.trainingRepository.scopes().default
       .andWhere('training.group_id = :groupId', { groupId })
+      .addOrderBy('date', 'ASC')
       .getMany()
     for (const training of trainings) {
       const jobName = `training_${training.id}`
@@ -79,7 +80,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
 
 function getTrainingsInfo (trainings: Training[], authors: GetUsers): string {
   const groupedTrainings = groupTrainingsByType(trainings)
-  const types = Object.keys(groupedTrainings)
+  const types = Object.keys(groupedTrainings).sort()
   let result = ''
 
   if (types.length > 0) {
