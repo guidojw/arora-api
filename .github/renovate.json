@@ -1,4 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>guidojw/.github"]
+  "extends": ["github>guidojw/.github"],
+  "packageRules": [
+    {
+      "matchPackageNames": "typeorm",
+      "enabled": false,
+      "description": "Disable TypeORM updates until there's a good alternative to do custom repositories."
+    }
+  ]
 }
