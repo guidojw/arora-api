@@ -10,7 +10,8 @@ abstract class TrainingRepositoryProperties {
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 export default {
   scopes (): TrainingScopes {
-    return new TrainingScopes(this, this.createQueryBuilder('training'))
+    // @ts-expect-error
+    return new TrainingScopes(this.createQueryBuilder('training'), null, this)
   },
 
   transform (record: any): Training {

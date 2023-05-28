@@ -10,7 +10,8 @@ abstract class BanRepositoryProperties {
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 export default {
   scopes (): BanScopes {
-    return new BanScopes(this, this.createQueryBuilder('ban'))
+    // @ts-expect-error
+    return new BanScopes(this.createQueryBuilder('ban'), null, this)
   },
 
   transform (record: any): Ban {
@@ -58,9 +59,6 @@ export class BanScopes extends BaseScopes<Ban> {
   }
 
   private static makeEndsAtQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
-    // @ts-expect-error: Connection is somehow undefined on this qb and
-    // repository is a connection instance so weird fix but works?
-    qb.connection = qb.repository
     return qb
       .select('ban.id', 'id')
       .addSelect(

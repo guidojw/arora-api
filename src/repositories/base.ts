@@ -1,6 +1,6 @@
 import * as lodash from 'lodash'
 import { type ClassConstructor, plainToInstance } from 'class-transformer'
-import { type ObjectLiteral, type Repository, SelectQueryBuilder } from 'typeorm'
+import { type ObjectLiteral, type QueryRunner, type Repository, SelectQueryBuilder } from 'typeorm'
 import { util } from '../util'
 
 const { groupBy } = util
@@ -35,8 +35,9 @@ export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBui
   public static readonly scopes: string[] = []
 
   public constructor (
-    private readonly repository: Repository<T> & BaseRepositoryProperties<T>,
-    queryBuilder: SelectQueryBuilder<T>
+    queryBuilder: SelectQueryBuilder<T>,
+    _queryRunner: QueryRunner,
+    private readonly repository: Repository<T> & BaseRepositoryProperties<T>
   ) {
     super(queryBuilder)
   }
