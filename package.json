@@ -39,7 +39,7 @@
     "node-schedule": "^2.1.0",
     "pg": "^8.8.0",
     "pluralize": "^8.0.0",
-    "typeorm": "^0.2.41",
+    "typeorm": "^0.3.7",
     "ws": "^8.8.1"
   },
   "devDependencies": {

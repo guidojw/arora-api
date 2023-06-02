@@ -8,6 +8,7 @@ import { constants } from '../util'
 import containerLoader from './container'
 import cronConfig from '../configs/cron'
 import cronLoader from './cron'
+import dataSource from '../configs/data-source'
 import expressLoader from './express'
 
 const { TYPES } = constants
@@ -26,7 +27,9 @@ export async function init (): Promise<Application> {
     })
   }
 
-  const container = await containerLoader()
+  await dataSource.initialize()
+
+  const container = containerLoader()
   await container.get<BaseManager>(TYPES.RobloxManager).init()
   container.get<BaseManager>(TYPES.WebSocketManager).init()
 

@@ -16,7 +16,7 @@ const { getDate, getTime, getTimeZoneAbbreviation } = timeUtil
 export default class TrainingService {
   @inject(TYPES.AnnounceTrainingsJob) private readonly announceTrainingsJob!: AnnounceTrainingsJob
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
-  @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
+  @inject(TYPES.TrainingRepository) private readonly trainingRepository!: typeof TrainingRepository
   @inject(TYPES.TrainingCancellationRepository) private readonly trainingCancellationRepository!:
   Repository<TrainingCancellation>
 
@@ -28,7 +28,7 @@ export default class TrainingService {
       throw new UnprocessableError('Invalid scope.')
     }
 
-    const qb = this.trainingRepository.scopes.apply(scopes)
+    const qb = this.trainingRepository.scopes().apply(scopes)
       .andWhere('training.group_id = :groupId', { groupId })
     if (typeof sort !== 'undefined') {
       sort.forEach(s => qb.addOrderBy(...s))
@@ -47,7 +47,7 @@ export default class TrainingService {
       .andWhere('training.id = :id', { id })
       .getOne()
 
-    if (typeof training === 'undefined') {
+    if (training === null) {
       throw new NotFoundError('Training not found.')
     }
     return training
@@ -175,7 +175,7 @@ export default class TrainingService {
 
   public async getTrainingType (groupId: number, id: number): Promise<TrainingType> {
     const trainingType = await this.trainingTypeRepository.findOne({ where: { groupId, id } })
-    if (typeof trainingType === 'undefined') {
+    if (trainingType === null) {
       throw new NotFoundError('Training type not found.')
     }
     return trainingType
