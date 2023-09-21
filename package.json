@@ -61,12 +61,12 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^16.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-unicorn": "^47.0.0",
+    "eslint-plugin-unicorn": "^48.0.0",
     "reflect-metadata": "^0.1.13",
-    "typescript": "^5.0.4"
+    "typescript": "^5.2.2"
   },
   "engines": {
     "node": ">=14"
   },
-  "packageManager": "yarn@3.5.1"
+  "packageManager": "yarn@3.6.3"
 }
