@@ -42,7 +42,9 @@ export default function init (container: Container): Application {
       })
 
       if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.errorHandler() as ErrorRequestHandler)
+        app.use(Sentry.Handlers.errorHandler({
+          shouldHandleError: (err: any) => err?.statusCode >= 400
+        }) as ErrorRequestHandler)
       }
 
       app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
