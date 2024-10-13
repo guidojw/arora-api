@@ -48,6 +48,7 @@ export default function init (container: Container): Application {
       }
 
       app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+        console.log(err)
         errorMiddleware.sendError(
           res,
           err.response?.status ?? err.statusCode ?? 500,
