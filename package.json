@@ -61,7 +61,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^16.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-unicorn": "^48.0.0",
+    "eslint-plugin-unicorn": "^56.0.1",
     "reflect-metadata": "^0.1.13",
     "typescript": "^5.2.2"
   },
