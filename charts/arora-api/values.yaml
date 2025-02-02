@@ -11,7 +11,7 @@ image:
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: staging
+  tag: feat-helm
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -128,6 +128,17 @@ env:
 #   valueFrom:
 #     fieldRef:
 #       fieldPath: metadata.name
+- name: NODE_ENV
+  value: staging
+- name: POSTGRES_HOST
+  value: arora-api-postgresql.arora-api-production.svc.cluster.local
+- name: POSTGRES_USER
+  value: postgres
+- name: POSTGRES_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: arora-api-postgresql
+      key: postgres-password
 - name: KEY_DIR
   value: /opt/app/keys
 

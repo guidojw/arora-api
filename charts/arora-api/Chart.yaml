@@ -22,3 +22,8 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: staging
+
+dependencies:
+  - name: postgresql
+    version: 16.4.5
+    repository: oci://registry-1.docker.io/bitnamicharts
