@@ -147,3 +147,13 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+postgresql:
+  auth:
+    database: arora_api_staging
+
+  primary:
+    initdb:
+      scripts:
+        00_grant_role.sql: |
+          GRANT CONNECT ON DATABASE arora_api_staging TO postgres;
