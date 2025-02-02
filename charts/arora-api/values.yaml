@@ -7,11 +7,11 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: nginx
+  repository: ghcr.io/guidojw/arora-api
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: staging
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
@@ -104,17 +104,32 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
+volumes:
 # - name: foo
 #   secret:
 #     secretName: mysecret
 #     optional: false
+- name: auth-keys
+  secret:
+    secretName: auth-keys
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
+volumeMounts:
 # - name: foo
 #   mountPath: "/etc/foo"
 #   readOnly: true
+- name: auth-keys
+  mountPath: /opt/app/keys
+  readOnly: true
+
+# Additional env on the output Deployment definition.
+env:
+# - name: POD_NAME
+#   valueFrom:
+#     fieldRef:
+#       fieldPath: metadata.name
+- name: KEY_DIR
+  value: /opt/app/keys
 
 nodeSelector: {}
 

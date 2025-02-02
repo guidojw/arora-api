@@ -36,3 +36,7 @@ arora-api
 * To compile the TypeScript source to `.js` files, run `yarn build` or `npm run build`. 
 * To start the server, run `yarn start` or `npm start`. 
 * The project is now accessible [http://localhost:3000](http://localhost:3000).
+
+```sh
+kubectl create secret generic auth-keys -n arora-api-production --from-file=private.key=private.key --from-file=public.key=public.key
+```
