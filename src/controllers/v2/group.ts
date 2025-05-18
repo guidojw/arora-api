@@ -47,19 +47,6 @@ export default class GroupV2Controller extends BaseHttpController implements int
     return this.json(await this.groupService.getGroup(groupId))
   }
 
-  @httpPut(
-    '/:groupId/status',
-    ...GroupV2Controller.validate('updateGroupStatus'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async updateGroupStatus (
-    @requestParam('groupId') groupId: number,
-      @requestBody() body: { authorId: number, message: string }
-  ): Promise<results.JsonResult> {
-    return this.json(this.groupService.updateGroupStatus(groupId, body.message, body.authorId))
-  }
-
   @httpPost(
     '/:groupId/users/:userId/promote',
     ...GroupV2Controller.validate('promoteMember'),
