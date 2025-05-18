@@ -12,9 +12,14 @@ const { getTime, getTimeZoneAbbreviation } = timeUtil
 
 @injectable()
 export default class AnnounceTrainingsJob implements BaseJob {
-  @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
-  @inject(TYPES.GroupService) private readonly groupService!: GroupService
-  @inject(TYPES.UserService) private readonly userService!: UserService
+  @inject(TYPES.TrainingRepository)
+  private readonly trainingRepository!: TrainingRepository
+
+  @inject(TYPES.GroupService)
+  private readonly groupService!: GroupService
+
+  @inject(TYPES.UserService)
+  private readonly userService!: UserService
 
   public async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
