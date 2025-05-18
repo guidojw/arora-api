@@ -89,7 +89,7 @@ export default class GroupService {
   @inject(TYPES.UserService) private readonly userService!: UserService
   @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
-  public async getGroupStatus (groupId: number): Promise<GetGroupShout> {
+  public async getGroupShout (groupId: number): Promise<GetGroupShout> {
     return (await robloxOpenCloudAdapter('GET', `groups/${groupId}/shout`)).data
   }
 

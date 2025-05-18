@@ -23,13 +23,13 @@ export default class GroupV2Controller extends BaseHttpController implements int
 
   // GroupService
   @httpGet(
-    '/:groupId/status',
-    ...GroupV2Controller.validate('getGroupStatus'),
+    '/:groupId/shout',
+    ...GroupV2Controller.validate('getGroupShout'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
-  public async getGroupStatus (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
-    return this.json(await this.groupService.getGroupStatus(groupId))
+  public async getGroupShout (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
+    return this.json(await this.groupService.getGroupShout(groupId))
   }
 
   @httpGet(
@@ -108,7 +108,7 @@ export default class GroupV2Controller extends BaseHttpController implements int
   private static validate (method: string): ValidationChain[] {
     switch (method) {
       // GroupService
-      case 'getGroupStatus':
+      case 'getGroupShout':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt()
