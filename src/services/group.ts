@@ -145,7 +145,7 @@ export default class GroupService {
     do {
       const result = (await robloxOpenCloudAdapter(
         'GET',
-        `groups/${groupId}/roles${cursor === null ? '' : `?cursor=${cursor}`}`)
+        `groups/${groupId}/roles${cursor === null ? '' : `?pageToken=${cursor}`}`)
       ).data as GetGroupRoles
       roles.push(...result.groupRoles)
       cursor = result.nextPageToken
@@ -175,7 +175,7 @@ export default class GroupService {
     do {
       const result = (await robloxOpenCloudAdapter(
         'GET',
-        `groups/${groupId}/join-requests${cursor === null ? '' : `?cursor=${cursor}`}`)
+        `groups/${groupId}/join-requests${cursor === null ? '' : `?pageToken=${cursor}`}`)
       ).data as GetGroupJoinRequests
       joinRequests.push(...result.groupJoinRequests)
       cursor = result.nextPageToken
