@@ -6,7 +6,7 @@ import { inject, injectable } from 'inversify'
 import { DiscordMessageJob } from '../jobs'
 import UserService from './user'
 import applicationConfig from '../configs/application'
-import robloxOpenCloudAdapter from '../adapters/roblox-open-cloud'
+import { robloxOpenCloudAdapter } from '../adapters'
 
 const { TYPES } = constants
 
@@ -27,6 +27,17 @@ export interface GetGroup {
   readonly verified: boolean
 }
 
+export interface GetGroupJoinRequest {
+  readonly path: string
+  readonly createTime: string
+  readonly user: string
+}
+
+export interface GetGroupJoinRequests {
+  readonly groupJoinRequests: Array<GetGroupJoinRequest>
+  readonly nextPageToken: string
+}
+
 export interface GetGroupRole {
   readonly path: string
   readonly createTime: string
@@ -41,7 +52,7 @@ export interface GetGroupRole {
 
 export interface GetGroupRoles {
   readonly groupRoles: Array<GetGroupRole>
-  readonly nextPageToken?: string
+  readonly nextPageToken: string
 }
 
 export interface GroupRolePermissions {
@@ -116,8 +127,17 @@ export default class GroupService {
   }
 
   public async getRoles (groupId: number): Promise<GetGroupRoles['groupRoles']> {
-    const result = (await robloxOpenCloudAdapter('GET', `groups/${groupId}/roles`)).data
-    return result.groupRoles
+    const roles: Array<GetGroupRole> = []
+    let cursor = null
+    do {
+      const result = (await robloxOpenCloudAdapter(
+        'GET',
+        `groups/${groupId}/roles${cursor === null ? '' : `?cursor=${cursor}`}`)
+      ).data as GetGroupRoles
+      roles.push(...result.groupRoles)
+      cursor = result.nextPageToken
+    } while (cursor !== "")
+    return roles
   }
 
   public async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
@@ -134,6 +154,28 @@ export default class GroupService {
     }
 
     return shout
+  }
+
+  public async getJoinRequests (groupId: number): Promise<GetGroupJoinRequests['groupJoinRequests']> {
+    const joinRequests: Array<GetGroupJoinRequest> = []
+    let cursor = null
+    do {
+      const result = (await robloxOpenCloudAdapter(
+        'GET',
+        `groups/${groupId}/join-requests${cursor === null ? '' : `?cursor=${cursor}`}`)
+      ).data as GetGroupJoinRequests
+      joinRequests.push(...result.groupJoinRequests)
+      cursor = result.nextPageToken
+    } while (cursor !== "")
+    return joinRequests
+  }
+
+  public async acceptJoinRequest (path: string): Promise<void> {
+    await robloxOpenCloudAdapter('POST', `${path}:accept`, {})
+  }
+
+  public async declineJoinRequest (path: string): Promise<void> {
+    await robloxOpenCloudAdapter('POST', `${path}:decline`, {})
   }
 
   public async setMemberRole (groupId: number, userId: number, role: GetGroupRole | number): Promise<GetGroupRole> {

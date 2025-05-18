@@ -1,2 +1,2 @@
-export { default as RobloxOpenCloudAdapter } from './roblox-open-cloud'
+export { default as robloxOpenCloudAdapter } from './roblox-open-cloud'
 

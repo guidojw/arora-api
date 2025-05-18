@@ -1,13 +1,11 @@
-import { RobloxManager, WebSocketManager } from '../managers'
 import { inject, injectable } from 'inversify'
 import type BaseJob from './base'
-import type { CursorPage } from '@guidojw/bloxy/dist/structures/Asset'
 import DiscordMessageJob from './discord-message'
 import type { Exile } from '../entities'
-import type { GetJoinRequest } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import { GroupService } from '../services'
 import HealthCheckJob from './health-check'
 import { Repository } from 'typeorm'
+import { WebSocketManager } from '../managers'
 import { constants } from '../util'
 
 const { TYPES } = constants
@@ -18,34 +16,25 @@ export default class AcceptJoinRequestsJob implements BaseJob {
   @inject(TYPES.ExileRepository) private readonly exileRepository!: Repository<Exile>
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.HealthCheckJob) private readonly healthCheckJob!: HealthCheckJob
-  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
   @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
   public async run (groupId: number): Promise<any> {
-    const client = this.robloxManager.getClient(groupId)
-    const group = await client.getGroup(groupId)
+    const joinRequests = await this.groupService.getJoinRequests(groupId)
+    for (const joinRequest of joinRequests) {
+      const userId = Number(parseInt(joinRequest.user.split('/')[1]))
 
-    let cursor = null
-    do {
-      const requests: CursorPage<GetJoinRequest> = await group.getJoinRequests({ cursor: cursor ?? undefined })
-      for (const request of requests.data) {
-        const userId = request.requester.userId
-
-        try {
-          if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
-            await group.declineJoinRequest(userId)
-            await this.discordMessageJob.run(`Declined **${request.requester.username}**'s join request`)
-          } else {
-            await group.acceptJoinRequest(userId)
-            const rank = await this.groupService.getRank(groupId, userId)
-            this.webSocketManager.broadcast('rankChange', { groupId, userId, rank })
-            await this.discordMessageJob.run(`Accepted **${request.requester.username}**'s join request`)
-          }
-        } catch {} // Ignore error, this job is run frequently anyways.
-      }
-
-      cursor = requests.cursors.next
-    } while (cursor !== null)
+      try {
+        if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+          await this.groupService.declineJoinRequest(joinRequest.path)
+          await this.discordMessageJob.run(`Declined **${joinRequest.user}**'s join request`)
+        } else {
+          await this.groupService.acceptJoinRequest(joinRequest.path)
+          const rank = await this.groupService.getRank(groupId, userId)
+          this.webSocketManager.broadcast('rankChange', { groupId, userId, rank })
+          await this.discordMessageJob.run(`Accepted **${joinRequest.user}**'s join request`)
+        }
+      } catch {} // Ignore error, this job is run frequently anyways.
+    }
 
     await this.healthCheckJob.run('acceptJoinRequestsJob')
   }
