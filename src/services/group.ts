@@ -38,6 +38,19 @@ export interface GetGroupJoinRequests {
   readonly nextPageToken: string
 }
 
+export interface GetGroupMembership {
+  readonly path: string
+  readonly createTime: string
+  readonly updateTime: string
+  readonly user: string
+  readonly role: string
+}
+
+export interface GetGroupMemberships {
+  readonly groupMemberships: Array<GetGroupMembership>
+  readonly nextPageToken: string
+}
+
 export interface GetGroupRole {
   readonly path: string
   readonly createTime: string
@@ -117,7 +130,7 @@ export default class GroupService {
     const memberships = (await robloxOpenCloudAdapter(
       'GET',
       `groups/${groupId}/memberships?filter=user == 'users/${userId}'`
-    )).data
+    )).data as GetGroupMemberships
     const membership = memberships.groupMemberships[0]
     const roles = await this.getRoles(groupId)
     if (typeof membership === 'undefined') {

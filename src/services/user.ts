@@ -1,12 +1,26 @@
-import type { GetUserById, GetUsersByUserIds } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
 import { inject, injectable } from 'inversify'
+import type { GetUsersByUserIds } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
 import { NotFoundError } from '../errors'
 import { RobloxManager } from '../managers'
 import { constants } from '../util'
+import { robloxOpenCloudAdapter } from '../adapters'
 
 const { TYPES } = constants
 
 export type GetUsers = GetUsersByUserIds['data']
+
+export interface GetUser {
+  readonly path: string
+  readonly createTime: string
+  readonly id: string
+  readonly name: string
+  readonly displayName: string
+  readonly about: string
+  readonly locale: string
+  readonly premium: boolean
+  readonly idVerified?: boolean
+  readonly socialNetworkProfiles?: Record<string, string>
+}
 
 @injectable()
 export default class UserService {
@@ -24,15 +38,6 @@ export default class UserService {
     return user.id
   }
 
-  public async hasBadge (userId: number, badgeId: number): Promise<boolean> {
-    const client = this.robloxManager.getClient()
-    return (await client.apis.inventoryAPI.getUserItemsByTypeAndTargetId({
-      userId,
-      itemType: 'Badge',
-      itemTargetId: badgeId
-    })).data.length === 1
-  }
-
   public async getUsers (userIds: number[]): Promise<GetUsers> {
     const client = this.robloxManager.getClient()
     return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
@@ -42,8 +47,7 @@ export default class UserService {
     return (await this.getUser(userId)).name
   }
 
-  public async getUser (userId: number): Promise<GetUserById> {
-    const client = this.robloxManager.getClient()
-    return await client.apis.usersAPI.getUserById({ userId })
+  public async getUser (userId: number): Promise<GetUser> {
+    return (await robloxOpenCloudAdapter('GET', `users/${userId}`)).data
   }
 }
