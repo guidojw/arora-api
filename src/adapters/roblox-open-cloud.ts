@@ -1,6 +1,10 @@
 import axios, { type AxiosPromise, type AxiosRequestConfig, type Method } from 'axios'
 
-export default async function robloxOpenCloudAdapter (method: Method, pathname: string, data?: any): Promise<AxiosPromise> {
+export default async function robloxOpenCloudAdapter (
+  method: Method,
+  pathname: string,
+  data?: any
+): Promise<AxiosPromise> {
   const options: AxiosRequestConfig = {
     url: `https://apis.roblox.com/cloud/v2/${pathname}`,
     method,

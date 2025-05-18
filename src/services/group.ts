@@ -1,8 +1,8 @@
-import type { UpdateGroupStatus as BloxyUpdateGroupStatus } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import { ForbiddenError, UnprocessableError } from '../errors'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { constants, util } from '../util'
 import { inject, injectable } from 'inversify'
+import type { UpdateGroupStatus as BloxyUpdateGroupStatus } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import { DiscordMessageJob } from '../jobs'
 import UserService from './user'
 import applicationConfig from '../configs/application'
@@ -34,7 +34,7 @@ export interface GetGroupJoinRequest {
 }
 
 export interface GetGroupJoinRequests {
-  readonly groupJoinRequests: Array<GetGroupJoinRequest>
+  readonly groupJoinRequests: GetGroupJoinRequest[]
   readonly nextPageToken: string
 }
 
@@ -47,7 +47,7 @@ export interface GetGroupMembership {
 }
 
 export interface GetGroupMemberships {
-  readonly groupMemberships: Array<GetGroupMembership>
+  readonly groupMemberships: GetGroupMembership[]
   readonly nextPageToken: string
 }
 
@@ -64,7 +64,7 @@ export interface GetGroupRole {
 }
 
 export interface GetGroupRoles {
-  readonly groupRoles: Array<GetGroupRole>
+  readonly groupRoles: GetGroupRole[]
   readonly nextPageToken: string
 }
 
@@ -140,7 +140,7 @@ export default class GroupService {
   }
 
   public async getRoles (groupId: number): Promise<GetGroupRoles['groupRoles']> {
-    const roles: Array<GetGroupRole> = []
+    const roles: GetGroupRole[] = []
     let cursor = null
     do {
       const result = (await robloxOpenCloudAdapter(
@@ -149,7 +149,7 @@ export default class GroupService {
       ).data as GetGroupRoles
       roles.push(...result.groupRoles)
       cursor = result.nextPageToken
-    } while (cursor !== "")
+    } while (cursor !== '')
     return roles
   }
 
@@ -170,7 +170,7 @@ export default class GroupService {
   }
 
   public async getJoinRequests (groupId: number): Promise<GetGroupJoinRequests['groupJoinRequests']> {
-    const joinRequests: Array<GetGroupJoinRequest> = []
+    const joinRequests: GetGroupJoinRequest[] = []
     let cursor = null
     do {
       const result = (await robloxOpenCloudAdapter(
@@ -179,7 +179,7 @@ export default class GroupService {
       ).data as GetGroupJoinRequests
       joinRequests.push(...result.groupJoinRequests)
       cursor = result.nextPageToken
-    } while (cursor !== "")
+    } while (cursor !== '')
     return joinRequests
   }
 
