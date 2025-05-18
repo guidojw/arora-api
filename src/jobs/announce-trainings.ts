@@ -72,7 +72,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
 
     // Compare current shout with new shout and update if they differ.
     const oldShout = await this.groupService.getGroupStatus(groupId)
-    if (shout !== oldShout?.body) {
+    if (shout !== oldShout?.content) {
       await this.groupService.updateGroupStatus(groupId, shout)
     }
   }
