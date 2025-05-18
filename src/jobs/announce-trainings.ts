@@ -12,9 +12,14 @@ const { getTime, getTimeZoneAbbreviation } = timeUtil
 
 @injectable()
 export default class AnnounceTrainingsJob implements BaseJob {
-  @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
-  @inject(TYPES.GroupService) private readonly groupService!: GroupService
-  @inject(TYPES.UserService) private readonly userService!: UserService
+  @inject(TYPES.TrainingRepository)
+  private readonly trainingRepository!: TrainingRepository
+
+  @inject(TYPES.GroupService)
+  private readonly groupService!: GroupService
+
+  @inject(TYPES.UserService)
+  private readonly userService!: UserService
 
   public async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
@@ -71,8 +76,8 @@ export default class AnnounceTrainingsJob implements BaseJob {
     shout += addition
 
     // Compare current shout with new shout and update if they differ.
-    const oldShout = await this.groupService.getGroupStatus(groupId)
-    if (shout !== oldShout?.body) {
+    const oldShout = await this.groupService.getGroupShout(groupId)
+    if (shout !== oldShout?.content) {
       await this.groupService.updateGroupStatus(groupId, shout)
     }
   }

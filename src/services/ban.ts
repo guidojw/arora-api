@@ -86,7 +86,7 @@ export default class BanService {
       duration,
       groupId,
       reason,
-      roleId: role.id,
+      roleId: Number(role.id),
       userId
     }))
 
