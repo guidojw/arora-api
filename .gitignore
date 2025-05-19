@@ -1,6 +1,8 @@
 .env
 *.key
 
+**/charts/*.tgz
+
 node_modules
 dist
 
