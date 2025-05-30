@@ -222,6 +222,10 @@ extraObjects:
       secretName: {{ include "arora-api.fullname" . }}-cert
 
 postgresql:
+  image:
+    pullSecrets:
+    - name: docker-pull
+
   auth:
     username: arora
     database: arora_api
