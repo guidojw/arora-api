@@ -169,10 +169,22 @@ affinity: {}
 
 extraObjects:
 - |
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: {{ include "arora-api.fullname" . }}-cert
+  spec:
+    secretName: {{ include "arora-api.fullname" . }}-cert
+    dnsNames:
+    - "{{ .Values.ingressHost }}"
+    issuerRef:
+      name: letsencrypt-production
+      kind: ClusterIssuer
+- |
   apiVersion: traefik.io/v1alpha1
   kind: IngressRoute
   metadata:
-    name: {{ include "arora-api.fullname" . }}
+    name: {{ include "arora-api.fullname" . }}-web
   spec:
     entryPoints:
     - web
@@ -181,8 +193,10 @@ extraObjects:
     - match: Host(`{{ .Values.ingressHost }}`)
       kind: Rule
       services:
-      - name: {{ include "arora-api.fullname" . }}
+      - name: {{ include "arora-api.fullname" . }}-web
         port: 80
+    tls:
+      secretName: {{ include "arora-api.fullname" . }}-cert
 
 postgresql:
   auth:
