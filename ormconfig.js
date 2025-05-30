@@ -5,6 +5,7 @@ require('pg').defaults.parseInt8 = true // By default PG returns bigint columns 
 
 const baseConfig = {
   type: 'postgres',
+  host: process.env.POSTGRES_HOST,
   port: 5432,
   database: 'arora_api',
   username: process.env.POSTGRES_USER,
@@ -32,12 +33,6 @@ module.exports = {
     database: 'arora_api_development',
     logging: true
   },
-  production: {
-    ...baseConfig,
-    host: process.env.POSTGRES_HOST
-  },
-  staging: {
-    ...baseConfig,
-    host: process.env.POSTGRES_HOST
-  }
+  production: baseConfig,
+  staging: baseConfig
 }[process.env.NODE_ENV ?? 'development']

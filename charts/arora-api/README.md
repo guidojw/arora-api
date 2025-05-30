@@ -15,7 +15,7 @@ kubectl create secret generic auth-keys2 -n <namespace> --from-file=private.key=
 Create the `roblox-auth` secret with:
 
 ```sh
-kubectl create secret generic roblox-auth -n <namespace> --from-literal=api-key=<key> --from-literal=cookie=<cookie>
+kubectl create secret generic roblox-auth -n <namespace> --from-literal=api-key='<key>' --from-literal=cookie='<cookie>'
 ```
 
 Install/upgrade with:

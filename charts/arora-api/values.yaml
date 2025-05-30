@@ -136,7 +136,7 @@ env:
 #     fieldRef:
 #       fieldPath: metadata.name
 - name: NODE_ENV
-  value: staging
+  value: production
 - name: PORT
   value: "80"
 - name: POSTGRES_HOST
@@ -150,16 +150,36 @@ env:
       key: password
 - name: KEY_DIR
   value: /opt/app/keys
-# - name: ROBLOX_API_KEY
-#   valueFrom:
-#     secretKeyRef:
-#       name: roblox-auth
-#       key: api-key
-# - name: ROBLOX_COOKIE
-#   valueFrom:
-#     secretKeyRef:
-#       name: roblox-auth
-#       key: cookie
+- name: ROBLOX_API_KEY
+  valueFrom:
+    secretKeyRef:
+      name: roblox-auth
+      key: api-key
+- name: ROBLOX_COOKIE
+  valueFrom:
+    secretKeyRef:
+      name: roblox-auth
+      key: cookie
+- name: DISCORD_WEBHOOK_URL
+  valueFrom:
+    secretKeyRef:
+      name: discord-webhook
+      key: url
+- name: SENTRY_DSN
+  valueFrom:
+    secretKeyRef:
+      name: sentry-auth
+      key: dsn
+- name: MAIN_HEALTH_CHECK_URL
+  valueFrom:
+    secretKeyRef:
+      name: health-checks
+      key: accept-join-requests-job
+- name: ACCEPT_JOIN_REQUESTS_JOB_HEALTH_CHECK_URL
+  valueFrom:
+    secretKeyRef:
+      name: health-checks
+      key: main
 
 nodeSelector: {}
 
@@ -192,11 +212,12 @@ extraObjects:
     routes:
     - match: Host(`{{ .Values.ingressHost }}`) && PathPrefix(`/api`)
       kind: Rule
+      middlewares:
+      - name: api-strip
+        namespace: traefik
       services:
       - name: {{ include "arora-api.fullname" . }}-web
         port: 80
-    middlewares:
-    - name: api-strip
     tls:
       secretName: {{ include "arora-api.fullname" . }}-cert
 
