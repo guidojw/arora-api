@@ -33,6 +33,7 @@ jobs:
     outputs:
       has_diff: ${{ steps.get_metadata.outputs.has_diff }}
       stage: ${{ steps.get_metadata.outputs.stage }}
+      tag: ${{ steps.get_metadata.outputs.tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
@@ -53,8 +54,10 @@ jobs:
             fi
 
             echo 'stage=production' >> "$GITHUB_OUTPUT"
+            echo 'tag=latest' >> "$GITHUB_OUTPUT"
           else
             echo 'stage=staging' >> "$GITHUB_OUTPUT"
+            echo 'tag=staging' >> "$GITHUB_OUTPUT"
           fi
 
   merge:
@@ -139,22 +142,27 @@ jobs:
         with:
           ref: ${{ needs.merge.outputs.sha }}
 
-      - name: Install cloudflared
-        run: |
-          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
-          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared '"$(lsb_release -cs)"' main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-          sudo apt update && sudo apt install cloudflared
-
-      - name: Set up SSH key
-        uses: shimataro/ssh-key-action@d4fffb50872869abe2d9a9098a6d9c5aa7d16be4 # v2.7.0
+      - name: Set up Helm
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-          config: |
-            Host maya
-              HostName ${{ secrets.SSH_HOST }}
-              User github-actions
-              ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
+          version: v3.17.0
+
+      - name: Create kubeconfig file
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir ~/.kube
+          echo "$KUBECONFIG" > ~/.kube/config
+          chmod go-r ~/.kube/config
+
+      - name: Get Arora API host
+        id: get_host
+        run: |
+          if [ "$GITHUB_REF_NAME" = 'main' ]; then
+            echo 'ingress_host=nsadmin.guidojw.nl' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ingress_host=staging.nsadmin.guidojw.nl' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Start deployment
         uses: bobheadxi/deployments@648679e8e4915b27893bd7dbc35cb504dc915bc8 # v1.5.0
@@ -163,16 +171,19 @@ jobs:
           step: start
           env: ${{ needs.metadata.outputs.stage }}
 
-      - name: Deploy
+      - name: Helm install Arora API
+        run: |
+          helm upgrade arora-api charts/arora-api \
+            --atomic \
+            --dependency-update \
+            -n "arora-api-$STAGE" \
+            -f charts/arora-api/values.yaml \
+            --set "image.tag=$TAG" \
+            --set "ingressHost=$INGRESS_HOST"
         env:
           STAGE: ${{ needs.metadata.outputs.stage }}
-        run: |
-          ssh maya '
-            cd /opt/docker/'"$PROJECT_NAME"'/'"$STAGE"'
-            docker-compose pull
-            docker-compose run --rm app yarn run typeorm migration:run
-            docker-compose up -d
-          '
+          TAG: ${{ needs.metadata.outputs.tag }}
+          INGRESS_HOST: ${{ steps.get_host.outputs.ingress_host }}
 
       - name: Finalize Sentry release
         uses: getsentry/action-release@a74facf8a080ecbdf1cb355f16743530d712abb7 # v1.11.0
