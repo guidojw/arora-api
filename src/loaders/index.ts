@@ -9,6 +9,7 @@ import containerLoader from './container'
 import cronConfig from '../configs/cron'
 import cronLoader from './cron'
 import expressLoader from './express'
+import fs from 'node:fs/promises'
 
 const { TYPES } = constants
 
@@ -32,6 +33,10 @@ export async function init (): Promise<Application> {
 
   const app = expressLoader(container)
   cronLoader(container)
+
+  if (typeof process.env.KUBERNETES_SERVICE_HOST !== 'undefined') {
+    await fs.writeFile('/tmp/healthy', '')
+  }
 
   if (typeof cronConfig.announceTrainingsJob !== 'undefined' && (process.env.NODE_ENV ?? 'development') !==
     'development') {
