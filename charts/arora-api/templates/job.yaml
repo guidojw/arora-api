@@ -43,7 +43,9 @@ spec:
         - migration:run
         {{- with .Values.env }}
         env:
-          {{- toYaml . | nindent 10 }}
+          {{- range $value := . }}
+          - {{ tpl (toYaml $value | toString) $ | indent 12 | trim }}
+          {{- end }}
         {{- end }}
       restartPolicy: Never
 {{- end -}}

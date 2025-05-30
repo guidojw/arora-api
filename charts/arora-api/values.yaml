@@ -140,7 +140,7 @@ env:
 - name: PORT
   value: "80"
 - name: POSTGRES_HOST
-  value: arora-api-postgresql.arora-api-production.svc.cluster.local
+  value: arora-api-postgresql.{{ .Release.Namespace }}.svc.cluster.local
 - name: POSTGRES_USER
   value: arora
 - name: POSTGRES_PASSWORD
