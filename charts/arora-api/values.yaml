@@ -9,7 +9,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/guidojw/arora-api
   # This sets the pull policy for images.
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: feat-helm
 
@@ -73,6 +73,15 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+hooks:
+  dbMigrate:
+    enabled: true
+
+migrationJob:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -87,21 +96,19 @@ resources: {}
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
-  httpGet:
-    path: /
-    port: http
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 5
+  periodSeconds: 5
 readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 5
+  periodSeconds: 5
 
 # Additional volumes on the output Deployment definition.
 volumes:
@@ -130,17 +137,29 @@ env:
 #       fieldPath: metadata.name
 - name: NODE_ENV
   value: staging
+- name: PORT
+  value: "80"
 - name: POSTGRES_HOST
   value: arora-api-postgresql.arora-api-production.svc.cluster.local
 - name: POSTGRES_USER
-  value: postgres
+  value: arora
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: arora-api-postgresql
-      key: postgres-password
+      name: postgres-auth
+      key: password
 - name: KEY_DIR
   value: /opt/app/keys
+# - name: ROBLOX_API_KEY
+#   valueFrom:
+#     secretKeyRef:
+#       name: roblox-auth
+#       key: api-key
+# - name: ROBLOX_COOKIE
+#   valueFrom:
+#     secretKeyRef:
+#       name: roblox-auth
+#       key: cookie
 
 nodeSelector: {}
 
@@ -150,10 +169,15 @@ affinity: {}
 
 postgresql:
   auth:
-    database: arora_api_staging
+    username: arora
+    database: arora_api
+    existingSecret: postgres-auth
 
   primary:
     initdb:
       scripts:
         00_grant_role.sql: |
-          GRANT CONNECT ON DATABASE arora_api_staging TO postgres;
+          GRANT CONNECT ON DATABASE arora_api TO arora;
+
+    persistence:
+      storageClass: local-path-retain

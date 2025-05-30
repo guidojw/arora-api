@@ -33,10 +33,6 @@ export default function init (container: Container): Application {
       app.use(express.urlencoded({ extended: false }) as RequestHandler)
       app.use(helmet() as RequestHandler)
       app.use(hpp())
-
-      // app.use('/health', (_req: Request, res: Response) => {
-      //   res.sendStatus(200)
-      // })
     })
     .setErrorConfig(app => {
       const errorMiddleware = container.get<ErrorMiddleware>(TYPES.ErrorMiddleware)

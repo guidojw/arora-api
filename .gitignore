@@ -15,5 +15,6 @@ dist
 .pnp.*
 yarn-error.log
 
-ecosystem.config.js
 .idea
+
+backup
