@@ -9,7 +9,7 @@ kubectl create secret generic postgres-auth -n <namespace> --from-literal=postgr
 Create the `auth-keys` secret with:
 
 ```sh
-kubectl create secret generic auth-keys2 -n <namespace> --from-file=private.key=private.key --from-file=public.key=public.key
+kubectl create secret generic auth-keys -n <namespace> --from-file=private.key=private.key --from-file=public.key=public.key
 ```
 
 Create the `roblox-auth` secret with:
