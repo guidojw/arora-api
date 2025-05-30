@@ -167,6 +167,23 @@ tolerations: []
 
 affinity: {}
 
+extraObjects:
+- |
+  apiVersion: traefik.io/v1alpha1
+  kind: IngressRoute
+  metadata:
+    name: {{ include "arora-api.fullname" . }}
+  spec:
+    entryPoints:
+    - web
+    - websecure
+    routes:
+    - match: Host(`{{ .Values.ingressHost }}`)
+      kind: Rule
+      services:
+      - name: {{ include "arora-api.fullname" . }}
+        port: 80
+
 postgresql:
   auth:
     username: arora
