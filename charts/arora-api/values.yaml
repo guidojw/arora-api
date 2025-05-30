@@ -173,11 +173,13 @@ env:
     secretKeyRef:
       name: health-checks
       key: accept-join-requests-job
+      optional: true
 - name: ACCEPT_JOIN_REQUESTS_JOB_HEALTH_CHECK_URL
   valueFrom:
     secretKeyRef:
       name: health-checks
       key: main
+      optional: true
 
 nodeSelector: {}
 
