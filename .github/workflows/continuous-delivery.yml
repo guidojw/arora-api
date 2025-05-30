@@ -182,7 +182,7 @@ jobs:
             --set "ingressHost=$INGRESS_HOST"
         env:
           STAGE: ${{ needs.metadata.outputs.stage }}
-          TAG: ${{ needs.metadata.outputs.tag}}
+          TAG: ${{ needs.metadata.outputs.tag }}
           INGRESS_HOST: ${{ steps.get_host.outputs.ingress_host }}
 
       - name: Finalize Sentry release
