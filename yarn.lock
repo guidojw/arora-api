@@ -408,10 +408,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.11.9":
-  version: 18.11.9
-  resolution: "@types/node@npm:18.11.9"
-  checksum: cc0aae109e9b7adefc32eecb838d6fad931663bb06484b5e9cbbbf74865c721b03d16fd8d74ad90e31dbe093d956a7c2c306ba5429ba0c00f3f7505103d7a496
+"@types/node@npm:^22.15.30":
+  version: 22.15.30
+  resolution: "@types/node@npm:22.15.30"
+  dependencies:
+    undici-types: ~6.21.0
+  checksum: c380ad176575dc847a119e63afe457f3481c0095ef1720605d42b3133cac1c5980179643ce67c9a314c83b9a45f2b17bde5f15b29d8aa1d17e0a43318273829b
   languageName: node
   linkType: hard
 
@@ -799,7 +801,7 @@ __metadata:
     "@types/jsonwebtoken": ^9.0.0
     "@types/lodash": ^4.14.184
     "@types/morgan": ^1.9.3
-    "@types/node": ^18.11.9
+    "@types/node": ^22.15.30
     "@types/node-schedule": ^2.1.0
     "@types/pg": ^8.6.5
     "@types/pluralize": ^0.0.29
@@ -5030,6 +5032,13 @@ __metadata:
     has-symbols: ^1.0.2
     which-boxed-primitive: ^1.0.2
   checksum: 89d950e18fb45672bc6b3c961f1e72c07beb9640c7ceed847b571ba6f7d2af570ae1a2584cfee268b9d9ea1e3293f7e33e0bc29eaeb9f8e8a0bab057ff9e6bba
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.21.0":
+  version: 6.21.0
+  resolution: "undici-types@npm:6.21.0"
+  checksum: 46331c7d6016bf85b3e8f20c159d62f5ae471aba1eb3dc52fff35a0259d58dcc7d592d4cc4f00c5f9243fa738a11cfa48bd20203040d4a9e6bc25e807fab7ab3
   languageName: node
   linkType: hard
 
