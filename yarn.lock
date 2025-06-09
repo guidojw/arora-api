@@ -1391,7 +1391,7 @@ __metadata:
     express: "npm:^4.18.1"
     express-async-errors: "npm:^3.1.1"
     express-validator: "npm:^7.0.1"
-    helmet: "npm:^7.0.0"
+    helmet: "npm:^8.1.0"
     hpp: "npm:^0.2.3"
     inversify: "npm:^6.0.1"
     inversify-express-utils: "npm:^6.4.3"
@@ -3151,10 +3151,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "helmet@npm:7.0.0"
-  checksum: 10c0/ec5b4923f9d3e77cb67438c4b49c14151c3fe19e45e17eaf6e2a37290d552dc8124fdd2ee14b2abdb6ba837c1eab1212a3e93f5f1dc037454c3684871b0025e3
+"helmet@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "helmet@npm:8.1.0"
+  checksum: 10c0/94d3a7ebc88dbda1421635bdf33f00724adb5252269e93c5ab296ec0db11336d01265659ad3739ab1a1e881fb23a686ff7e788aac6a5fb929285134f157df763
   languageName: node
   linkType: hard
 
