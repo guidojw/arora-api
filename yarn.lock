@@ -591,18 +591,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/integrations@npm:^7.11.1":
-  version: 7.11.1
-  resolution: "@sentry/integrations@npm:7.11.1"
-  dependencies:
-    "@sentry/types": 7.11.1
-    "@sentry/utils": 7.11.1
-    localforage: ^1.8.1
-    tslib: ^1.9.3
-  checksum: e89ab412462e4d93a6689360d3afe2eb5e64a45f3d2bf9e8c3cdb8f71bfe66b71b62ac1d867d9c726c4d2e1ab9309893bb7f856f74acbc382debe60db33008fa
-  languageName: node
-  linkType: hard
-
 "@sentry/node@npm:^9.27.0":
   version: 9.27.0
   resolution: "@sentry/node@npm:9.27.0"
@@ -658,23 +646,6 @@ __metadata:
     "@opentelemetry/sdk-trace-base": ^1.30.1 || ^2.0.0
     "@opentelemetry/semantic-conventions": ^1.34.0
   checksum: a685b435e66462348a7e37851dfc0e93b45e0b08dde1f137d21b8e6f2114f4374888f9844231be37ad435e890cfc259cb1e6b4fe4bfccfa90a9deda9739b7d50
-  languageName: node
-  linkType: hard
-
-"@sentry/types@npm:7.11.1":
-  version: 7.11.1
-  resolution: "@sentry/types@npm:7.11.1"
-  checksum: 935dbd83d8c43bca202979fef12fe2af0508e44c61a0b3b2e10971006b59938fac36bfde530c7b7db14601dcbb17a2a7b35f479de8bbfe961df3eff7fd9327ce
-  languageName: node
-  linkType: hard
-
-"@sentry/utils@npm:7.11.1":
-  version: 7.11.1
-  resolution: "@sentry/utils@npm:7.11.1"
-  dependencies:
-    "@sentry/types": 7.11.1
-    tslib: ^1.9.3
-  checksum: e0a1d8528e9f99a35c88786cc230a5466966a59554796bbf13a33aa8956911c8bce7c556bb7a90ba20c9af9fa64ef6b87b956d1d8bae6ff42950ce4125c3b44e
   languageName: node
   linkType: hard
 
@@ -1299,7 +1270,6 @@ __metadata:
   resolution: "arora-api@workspace:."
   dependencies:
     "@guidojw/bloxy": ^5.7.6
-    "@sentry/integrations": ^7.11.1
     "@sentry/node": ^9.27.0
     "@types/debug": ^4.1.7
     "@types/express": ^4.17.13
@@ -3148,13 +3118,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immediate@npm:~3.0.5":
-  version: 3.0.6
-  resolution: "immediate@npm:3.0.6"
-  checksum: f9b3486477555997657f70318cc8d3416159f208bec4cca3ff3442fd266bc23f50f0c9bd8547e1371a6b5e82b821ec9a7044a4f7b944798b25aa3cc6d5e63e62
-  languageName: node
-  linkType: hard
-
 "import-fresh@npm:^3.0.0, import-fresh@npm:^3.2.1":
   version: 3.3.0
   resolution: "import-fresh@npm:3.3.0"
@@ -3646,28 +3609,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lie@npm:3.1.1":
-  version: 3.1.1
-  resolution: "lie@npm:3.1.1"
-  dependencies:
-    immediate: ~3.0.5
-  checksum: 6da9f2121d2dbd15f1eca44c0c7e211e66a99c7b326ec8312645f3648935bc3a658cf0e9fa7b5f10144d9e2641500b4f55bd32754607c3de945b5f443e50ddd1
-  languageName: node
-  linkType: hard
-
 "lines-and-columns@npm:^1.1.6":
   version: 1.1.6
   resolution: "lines-and-columns@npm:1.1.6"
   checksum: 198a5436b1fa5cf703bae719c01c686b076f0ad7e1aafd95a58d626cabff302dc0414822126f2f80b58a8c3d66cda8a7b6da064f27130f87e1d3506d6dfd0d68
-  languageName: node
-  linkType: hard
-
-"localforage@npm:^1.8.1":
-  version: 1.10.0
-  resolution: "localforage@npm:1.10.0"
-  dependencies:
-    lie: 3.1.1
-  checksum: f2978b434dafff9bcb0d9498de57d97eba165402419939c944412e179cab1854782830b5ec196212560b22712d1dd03918939f59cf1d4fc1d756fca7950086cf
   languageName: node
   linkType: hard
 
@@ -5474,7 +5419,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.8.1, tslib@npm:^1.9.3":
+"tslib@npm:^1.8.1":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
