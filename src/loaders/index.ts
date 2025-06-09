@@ -23,6 +23,7 @@ export async function init (): Promise<Application> {
           root: process.cwd()
         })
       ],
+      sendDefaultPii: true,
       tracesSampleRate: 0.2
     })
   }
