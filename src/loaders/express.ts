@@ -2,7 +2,6 @@ import '../controllers'
 import * as Sentry from '@sentry/node'
 import express, {
   type Application,
-  type ErrorRequestHandler,
   type NextFunction,
   type Request,
   type Response
@@ -22,10 +21,6 @@ export default function init (container: Container): Application {
   return new InversifyExpressServer(container)
     .setConfig(app => {
       app.set('container', container)
-
-      if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.requestHandler())
-      }
 
       app.use(logger('dev'))
       app.use(express.json())
