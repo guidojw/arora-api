@@ -2,7 +2,6 @@ import '../controllers'
 import * as Sentry from '@sentry/node'
 import express, {
   type Application,
-  type ErrorRequestHandler,
   type NextFunction,
   type Request,
   type Response
@@ -23,10 +22,6 @@ export default function init (container: Container): Application {
     .setConfig(app => {
       app.set('container', container)
 
-      if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.requestHandler())
-      }
-
       app.use(logger('dev'))
       app.use(express.json())
       app.use(express.urlencoded({ extended: false }))
@@ -41,9 +36,9 @@ export default function init (container: Container): Application {
       })
 
       if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.errorHandler({
+        Sentry.setupExpressErrorHandler(app, {
           shouldHandleError: (err: any) => err?.statusCode >= 400
-        }) as ErrorRequestHandler)
+        })
       }
 
       app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
