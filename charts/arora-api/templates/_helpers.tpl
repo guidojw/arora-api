@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "arora-api.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "arora-api.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "arora-api.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
