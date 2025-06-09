@@ -45,7 +45,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/express": "^5.0.3",
-    "@types/hpp": "^0.2.2",
+    "@types/hpp": "^0.2.6",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/lodash": "^4.14.184",
     "@types/morgan": "^1.9.3",
