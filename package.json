@@ -48,7 +48,7 @@
     "@types/jsonwebtoken": "^9.0.0",
     "@types/lodash": "^4.14.184",
     "@types/morgan": "^1.9.3",
-    "@types/node": "^18.11.9",
+    "@types/node": "^22.15.30",
     "@types/node-schedule": "^2.1.0",
     "@types/pg": "^8.6.5",
     "@types/pluralize": "^0.0.29",
