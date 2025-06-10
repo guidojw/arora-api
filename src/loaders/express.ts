@@ -2,10 +2,8 @@ import '../controllers'
 import * as Sentry from '@sentry/node'
 import express, {
   type Application,
-  type ErrorRequestHandler,
   type NextFunction,
   type Request,
-  type RequestHandler,
   type Response
 } from 'express'
 import type { Container } from 'inversify'
@@ -24,14 +22,10 @@ export default function init (container: Container): Application {
     .setConfig(app => {
       app.set('container', container)
 
-      if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.requestHandler() as RequestHandler)
-      }
-
-      app.use(logger('dev') as RequestHandler)
-      app.use(express.json() as RequestHandler)
-      app.use(express.urlencoded({ extended: false }) as RequestHandler)
-      app.use(helmet() as RequestHandler)
+      app.use(logger('dev'))
+      app.use(express.json())
+      app.use(express.urlencoded({ extended: false }))
+      app.use(helmet())
       app.use(hpp())
     })
     .setErrorConfig(app => {
@@ -42,9 +36,9 @@ export default function init (container: Container): Application {
       })
 
       if (typeof process.env.SENTRY_DSN !== 'undefined') {
-        app.use(Sentry.Handlers.errorHandler({
+        Sentry.setupExpressErrorHandler(app, {
           shouldHandleError: (err: any) => err?.statusCode >= 400
-        }) as ErrorRequestHandler)
+        })
       }
 
       app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

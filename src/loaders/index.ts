@@ -3,7 +3,6 @@ import * as Sentry from '@sentry/node'
 import type { Application } from 'express'
 import type { BaseJob } from '../jobs'
 import type { BaseManager } from '../managers'
-import { RewriteFrames } from '@sentry/integrations'
 import { constants } from '../util'
 import containerLoader from './container'
 import cronConfig from '../configs/cron'
@@ -20,10 +19,12 @@ export async function init (): Promise<Application> {
       environment: process.env.NODE_ENV,
       release: process.env.BUILD_HASH,
       integrations: [
-        new RewriteFrames({
+        Sentry.rewriteFramesIntegration({
           root: process.cwd()
         })
-      ]
+      ],
+      sendDefaultPii: true,
+      tracesSampleRate: 0.2
     })
   }
 
