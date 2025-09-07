@@ -53,9 +53,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "template.serviceAccountName" -}}
+{{- define "arora-api.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "template.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "arora-api.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
