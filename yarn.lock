@@ -1399,7 +1399,6 @@ __metadata:
     eslint-plugin-promise: "npm:^7.2.1"
     eslint-plugin-unicorn: "npm:^48.0.0"
     express: "npm:^5.1.0"
-    express-async-errors: "npm:^3.1.1"
     express-validator: "npm:^7.0.1"
     helmet: "npm:^8.1.0"
     hpp: "npm:^0.2.3"
@@ -2649,15 +2648,6 @@ __metadata:
   version: 1.8.1
   resolution: "etag@npm:1.8.1"
   checksum: 10c0/12be11ef62fb9817314d790089a0a49fae4e1b50594135dcb8076312b7d7e470884b5100d249b28c18581b7fd52f8b485689ffae22a11ed9ec17377a33a08f84
-  languageName: node
-  linkType: hard
-
-"express-async-errors@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "express-async-errors@npm:3.1.1"
-  peerDependencies:
-    express: ^4.16.2
-  checksum: 10c0/56c4e90c44e98c7edc5bd38e18dd23b0d9a7139cb94ff3e25943ba257415b433e0e52ea8f9bc1fb5b70a5e6c5246eaace4fb69ab171edfb8896580928bb97ec6
   languageName: node
   linkType: hard
 

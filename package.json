@@ -26,7 +26,6 @@
     "debug": "^4.3.4",
     "dotenv": "^16.0.1",
     "express": "^5.1.0",
-    "express-async-errors": "^3.1.1",
     "express-validator": "^7.0.1",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
