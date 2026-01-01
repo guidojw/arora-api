@@ -186,7 +186,7 @@ jobs:
           INGRESS_HOST: ${{ steps.get_host.outputs.ingress_host }}
 
       - name: Finalize Sentry release
-        uses: getsentry/action-release@00ed2a6cc2171514e031a0f5b4b3cdc586dc171a # v3.1.1
+        uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6 # v3.4.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG_NAME }}
