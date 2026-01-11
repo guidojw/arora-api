@@ -2,8 +2,8 @@ import * as fs from 'node:fs'
 import * as jwt from 'jsonwebtoken'
 import { injectable } from 'inversify'
 
-const publicKey = fs.readFileSync('public.key', 'utf8')
-const privateKey = fs.readFileSync('private.key', 'utf8')
+const publicKey = fs.readFileSync(`${process.env.KEY_DIR as string}/public.key`, 'utf8')
+const privateKey = fs.readFileSync(`${process.env.KEY_DIR as string}/private.key`, 'utf8')
 
 @injectable()
 export default class AuthService {

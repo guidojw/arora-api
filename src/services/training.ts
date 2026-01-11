@@ -8,6 +8,7 @@ import cron, { type JobCallback } from 'node-schedule'
 import { inject, injectable } from 'inversify'
 import type { SortQuery } from '../util/request'
 import UserService from './user'
+import { WebSocketManager } from '../managers'
 
 const { TYPES } = constants
 const { getDate, getTime, getTimeZoneAbbreviation } = timeUtil
@@ -22,6 +23,7 @@ export default class TrainingService {
 
   @inject(TYPES.TrainingTypeRepository) private readonly trainingTypeRepository!: Repository<TrainingType>
   @inject(TYPES.UserService) private readonly userService!: UserService
+  @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
   public async getTrainings (groupId: number, scopes?: string[], sort?: SortQuery): Promise<Training[]> {
     if (!TrainingScopes.has(scopes)) {
@@ -66,6 +68,8 @@ export default class TrainingService {
       notes
     }))
     training.type = trainingType
+
+    this.webSocketManager.broadcast('trainingCreate', { groupId, training })
 
     await this.announceTrainingsJob.run(groupId)
     cron.scheduleJob(
@@ -123,6 +127,8 @@ export default class TrainingService {
     if (changeMessages.length > 0) {
       await this.trainingRepository.save(training)
 
+      this.webSocketManager.broadcast('trainingUpdate', { groupId, training })
+
       const editorName = await this.userService.getUsername(editorId)
       await this.discordMessageJob.run(`**${editorName}**${changeMessages.length > 1 ? `\n- ${changeMessages.join('\n- ')}` : ` ${changeMessages[0]}`}`)
 
@@ -156,6 +162,8 @@ export default class TrainingService {
       authorId,
       reason
     }))
+
+    this.webSocketManager.broadcast('trainingCancel', { groupId, training })
 
     await this.announceTrainingsJob.run(groupId)
     const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]

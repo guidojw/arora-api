@@ -21,41 +21,16 @@ const { TYPES } = constants
 const { decodeScopeQueryParam, decodeSortQueryParam } = requestUtil
 
 @controller('/v1/groups')
-export default class GroupController extends BaseHttpController implements interfaces.Controller {
+export default class GroupV1Controller extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.BanService) private readonly banService!: BanService
   @inject(TYPES.ExileService) private readonly exileService!: ExileService
   @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.TrainingService) private readonly trainingService!: TrainingService
 
   // GroupService
-  @httpGet(
-    '/:groupId/status',
-    ...GroupController.validate('getGroupStatus'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async getGroupStatus (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
-    return this.json(await this.groupService.getGroupStatus(groupId))
-  }
-
-  @httpGet(
-    '/:groupId/roles',
-    ...GroupController.validate('getRoles'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async getRoles (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
-    return this.json(await this.groupService.getRoles(groupId))
-  }
-
-  @httpGet('/:groupId', ...GroupController.validate('getGroup'), TYPES.ErrorMiddleware, TYPES.AuthMiddleware)
-  public async getGroup (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
-    return this.json(await this.groupService.getGroup(groupId))
-  }
-
   @httpPut(
     '/:groupId/status',
-    ...GroupController.validate('updateGroupStatus'),
+    ...GroupV1Controller.validate('updateGroupStatus'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -66,55 +41,10 @@ export default class GroupController extends BaseHttpController implements inter
     return this.json(this.groupService.updateGroupStatus(groupId, body.message, body.authorId))
   }
 
-  @httpPost(
-    '/:groupId/users/:userId/promote',
-    ...GroupController.validate('promoteMember'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async promoteMember (
-    @requestParam('groupId') groupId: number,
-      @requestParam('userId') userId: number,
-      @requestBody() body: { authorId: number }
-  ): Promise<results.JsonResult> {
-    return this.json(await this.groupService.promoteMember(groupId, userId, body.authorId))
-  }
-
-  @httpPost(
-    '/:groupId/users/:userId/demote',
-    ...GroupController.validate('demoteMember'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async demoteMember (
-    @requestParam('groupId') groupId: number,
-      @requestParam('userId') userId: number,
-      @requestBody() body: { authorId: number }
-  ): Promise<results.JsonResult> {
-    return this.json(await this.groupService.demoteMember(groupId, userId, body.authorId))
-  }
-
-  @httpPut(
-    '/:groupId/users/:userId',
-    ...GroupController.validate('changeMemberRole'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async changeMemberRole (
-    @requestParam('groupId') groupId: number,
-      @requestParam('userId') userId: number,
-      @requestBody() body: { authorId: number, rank: number }
-  ): Promise<results.JsonResult> {
-    return this.json(await this.groupService.changeMemberRole(groupId, userId, {
-      authorId: body.authorId,
-      role: body.rank
-    }))
-  }
-
   // BanService
   @httpGet(
     '/:groupId/bans',
-    ...GroupController.validate('getBans'),
+    ...GroupV1Controller.validate('getBans'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -128,7 +58,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpGet(
     '/:groupId/bans/:userId',
-    ...GroupController.validate('getBan'),
+    ...GroupV1Controller.validate('getBan'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -142,7 +72,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/bans',
-    ...GroupController.validate('postBan'),
+    ...GroupV1Controller.validate('postBan'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -155,7 +85,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/bans/:userId/cancel',
-    ...GroupController.validate('cancelBan'),
+    ...GroupV1Controller.validate('cancelBan'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -169,7 +99,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/bans/:userId/extend',
-    ...GroupController.validate('extendBan'),
+    ...GroupV1Controller.validate('extendBan'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -183,7 +113,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPut(
     '/:groupId/bans/:userId',
-    ...GroupController.validate('putBan'),
+    ...GroupV1Controller.validate('putBan'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -198,7 +128,7 @@ export default class GroupController extends BaseHttpController implements inter
   // ExileService
   @httpGet(
     '/:groupId/exiles',
-    ...GroupController.validate('getExiles'),
+    ...GroupV1Controller.validate('getExiles'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -208,7 +138,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpGet(
     '/:groupId/exiles/:userId',
-    ...GroupController.validate('getExile'),
+    ...GroupV1Controller.validate('getExile'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -221,7 +151,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/exiles',
-    ...GroupController.validate('postExile'),
+    ...GroupV1Controller.validate('postExile'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -234,7 +164,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpDelete(
     '/:groupId/exiles/:userId',
-    ...GroupController.validate('deleteExile'),
+    ...GroupV1Controller.validate('deleteExile'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -250,7 +180,7 @@ export default class GroupController extends BaseHttpController implements inter
   // TrainingService
   @httpGet(
     '/:groupId/trainings',
-    ...GroupController.validate('getTrainings'),
+    ...GroupV1Controller.validate('getTrainings'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -264,7 +194,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpGet(
     '/:groupId/trainings/types',
-    ...GroupController.validate('getTrainingTypes'),
+    ...GroupV1Controller.validate('getTrainingTypes'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -274,7 +204,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpGet(
     '/:groupId/trainings/:trainingId',
-    ...GroupController.validate('getTraining'),
+    ...GroupV1Controller.validate('getTraining'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -288,7 +218,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/trainings',
-    ...GroupController.validate('postTraining'),
+    ...GroupV1Controller.validate('postTraining'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -301,7 +231,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/trainings/:trainingId/cancel',
-    ...GroupController.validate('cancelTraining'),
+    ...GroupV1Controller.validate('cancelTraining'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -315,7 +245,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPost(
     '/:groupId/trainings/types',
-    ...GroupController.validate('postTrainingType'),
+    ...GroupV1Controller.validate('postTrainingType'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -328,7 +258,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPut(
     '/:groupId/trainings/:trainingId',
-    ...GroupController.validate('putTraining'),
+    ...GroupV1Controller.validate('putTraining'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -345,7 +275,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpPut(
     '/:groupId/trainings/types/:typeId',
-    ...GroupController.validate('putTrainingType'),
+    ...GroupV1Controller.validate('putTrainingType'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -362,7 +292,7 @@ export default class GroupController extends BaseHttpController implements inter
 
   @httpDelete(
     '/:groupId/trainings/types/:typeId',
-    ...GroupController.validate('deleteTrainingType'),
+    ...GroupV1Controller.validate('deleteTrainingType'),
     TYPES.ErrorMiddleware,
     TYPES.AuthMiddleware
   )
@@ -377,52 +307,12 @@ export default class GroupController extends BaseHttpController implements inter
   private static validate (method: string): ValidationChain[] {
     switch (method) {
       // GroupService
-      case 'getGroupStatus':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt()
-        ]
-      case 'getRoles':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt()
-        ]
-      case 'getGroup':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt()
-        ]
-
       case 'updateGroupStatus':
         return [
           header('authorization').exists().isString(),
           param('groupId').isInt().toInt(),
           body('authorId').exists().isInt().toInt(),
           body('message').exists().isString()
-        ]
-
-      case 'promoteMember':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          body('authorId').optional().isInt().toInt()
-        ]
-      case 'demoteMember':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          body('authorId').optional().isInt().toInt()
-        ]
-
-      case 'changeMemberRole':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt(),
-          param('userId').isInt().toInt(),
-          body('rank').exists().isInt().toInt(),
-          body('authorId').optional().isInt().toInt()
         ]
 
       // BanService

@@ -33,9 +33,10 @@ jobs:
     outputs:
       has_diff: ${{ steps.get_metadata.outputs.has_diff }}
       stage: ${{ steps.get_metadata.outputs.stage }}
+      tag: ${{ steps.get_metadata.outputs.tag }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Get metadata
         id: get_metadata
@@ -53,8 +54,10 @@ jobs:
             fi
 
             echo 'stage=production' >> "$GITHUB_OUTPUT"
+            echo 'tag=latest' >> "$GITHUB_OUTPUT"
           else
             echo 'stage=staging' >> "$GITHUB_OUTPUT"
+            echo 'tag=staging' >> "$GITHUB_OUTPUT"
           fi
 
   merge:
@@ -80,7 +83,7 @@ jobs:
 
       - name: Checkout code
         if: fromJSON(needs.metadata.outputs.has_diff)
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Run merge
         if: fromJSON(needs.metadata.outputs.has_diff)
@@ -135,47 +138,55 @@ jobs:
           fi
 
       - name: Checkout code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           ref: ${{ needs.merge.outputs.sha }}
 
-      - name: Install cloudflared
-        run: |
-          curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
-          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared '"$(lsb_release -cs)"' main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-          sudo apt update && sudo apt install cloudflared
-
-      - name: Set up SSH key
-        uses: shimataro/ssh-key-action@685d0f20da72e4b53cc81d373a2ed0a867770e46 # v2.5.1
+      - name: Set up Helm
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3.5
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-          config: |
-            Host maya
-              HostName ${{ secrets.SSH_HOST }}
-              User github-actions
-              ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_ID }} --secret ${{ secrets.CLOUDFLARE_SERVICE_TOKEN_SECRET }}
+          version: v3.17.0
+
+      - name: Create kubeconfig file
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir ~/.kube
+          echo "$KUBECONFIG" > ~/.kube/config
+          chmod go-r ~/.kube/config
+
+      - name: Get Arora API host
+        id: get_host
+        run: |
+          if [ "$GITHUB_REF_NAME" = 'main' ]; then
+            echo 'ingress_host=nsadmin.guidojw.nl' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ingress_host=staging.nsadmin.guidojw.nl' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Start deployment
-        uses: bobheadxi/deployments@88ce5600046c82542f8246ac287d0a53c461bca3 # v1.4.0
+        uses: bobheadxi/deployments@648679e8e4915b27893bd7dbc35cb504dc915bc8 # v1.5.0
         id: start_deployment
         with:
           step: start
           env: ${{ needs.metadata.outputs.stage }}
 
-      - name: Deploy
+      - name: Helm install Arora API
+        run: |
+          helm upgrade arora-api charts/arora-api \
+            --atomic \
+            --dependency-update \
+            -n "arora-api-$STAGE" \
+            -f charts/arora-api/values.yaml \
+            --set "image.tag=$TAG" \
+            --set "ingressHost=$INGRESS_HOST"
         env:
           STAGE: ${{ needs.metadata.outputs.stage }}
-        run: |
-          ssh maya '
-            cd /opt/docker/'"$PROJECT_NAME"'/'"$STAGE"'
-            docker-compose pull
-            docker-compose run --rm app yarn run typeorm migration:run
-            docker-compose up -d
-          '
+          TAG: ${{ needs.metadata.outputs.tag }}
+          INGRESS_HOST: ${{ steps.get_host.outputs.ingress_host }}
 
       - name: Finalize Sentry release
-        uses: getsentry/action-release@4744f6a65149f441c5f396d5b0877307c0db52c7 # v1.4.1
+        uses: getsentry/action-release@dab6548b3c03c4717878099e43782cf5be654289 # v3.5.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG_NAME }}
@@ -186,7 +197,7 @@ jobs:
           set_commits: skip
 
       - name: Finish deployment
-        uses: bobheadxi/deployments@88ce5600046c82542f8246ac287d0a53c461bca3 # v1.4.0
+        uses: bobheadxi/deployments@648679e8e4915b27893bd7dbc35cb504dc915bc8 # v1.5.0
         if: steps.start_deployment.conclusion == 'success' && always()
         with:
           step: finish
@@ -200,6 +211,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [branch_check, metadata, merge, continuous_integration, publish_image, deploy]
     if: (github.ref_name == 'staging' || github.ref_name == 'main') && always()
+    permissions:
+      checks: write
     steps:
       - name: Get conclusion
         id: get_conclusion
@@ -215,11 +228,10 @@ jobs:
           done
 
       - name: Update Continuous Delivery check run
-        uses: guidojw/actions/update-check-run@abb0ee8d1336edf73383f2e5a09abd3a22f25b13 # v1.3.3
+        uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
         with:
-          app_id: ${{ vars.GH_APP_ID }}
-          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           sha: ${{ needs.merge.outputs.sha }}
+          token: ${{ github.token }}
           name: Continuous Delivery
           conclusion: ${{ steps.get_conclusion.outputs.conclusion }}
           details_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

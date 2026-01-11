@@ -1,6 +1,8 @@
 .env
 *.key
 
+**/charts/*.tgz
+
 node_modules
 dist
 
@@ -13,5 +15,6 @@ dist
 .pnp.*
 yarn-error.log
 
-ecosystem.config.js
 .idea
+
+backup
