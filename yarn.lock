@@ -39,15 +39,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.15.4":
-  version: 7.15.4
-  resolution: "@babel/runtime@npm:7.15.4"
-  dependencies:
-    regenerator-runtime: "npm:^0.13.4"
-  checksum: 10c0/2e366347254c9d3e738641d88a086cdfb1de516111e50ebbe9e6b5d8ed78d41819cf991fc0804fa50e04ae7a2157cc28ef3b4180781af5fecfe65310d7ebf301
-  languageName: node
-  linkType: hard
-
 "@eslint-community/eslint-utils@npm:^4.1.2":
   version: 4.1.2
   resolution: "@eslint-community/eslint-utils@npm:4.1.2"
@@ -1387,7 +1378,7 @@ __metadata:
     "@types/ws": "npm:^8.5.3"
     "@typescript-eslint/eslint-plugin": "npm:^5.54.1"
     axios: "npm:^0.27.2"
-    axios-retry: "npm:^3.3.1"
+    axios-retry: "npm:^4.5.0"
     class-transformer: "npm:^0.5.1"
     class-validator: "npm:^0.14.0"
     debug: "npm:^4.3.4"
@@ -1462,13 +1453,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "axios-retry@npm:3.3.1"
+"axios-retry@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "axios-retry@npm:4.5.0"
   dependencies:
-    "@babel/runtime": "npm:^7.15.4"
     is-retry-allowed: "npm:^2.2.0"
-  checksum: 10c0/3a63bcd4fa3d1f535c9e57f80c51aaf4a790c1f7653d51d768d20194af6f826f923f80a104f1f1013c259b811066957089d8a584ad2c7a6755f3337a8eca205e
+  peerDependencies:
+    axios: 0.x || 1.x
+  checksum: 10c0/574e7b1bf24aad99b560042d232a932d51bfaa29b5a6d4612d748ed799a6f11a5afb2582792492c55d95842200cbdfbe3454027a8c1b9a2d3e895d13c3d03c10
   languageName: node
   linkType: hard
 
@@ -4917,13 +4909,6 @@ __metadata:
   version: 0.1.13
   resolution: "reflect-metadata@npm:0.1.13"
   checksum: 10c0/728bff0b376b05639fd11ed80c648b61f7fe653c5b506d7ca118e58b6752b9b00810fe0c86227ecf02bd88da6251ab3eb19fd403aaf2e9ff5ef36a2fda643026
-  languageName: node
-  linkType: hard
-
-"regenerator-runtime@npm:^0.13.4":
-  version: 0.13.9
-  resolution: "regenerator-runtime@npm:0.13.9"
-  checksum: 10c0/b0f26612204f061a84064d2f3361629eae09993939112b9ffc3680bb369ecd125764d6654eace9ef11b36b44282ee52b988dda946ea52d372e7599a30eea73ee
   languageName: node
   linkType: hard
 
