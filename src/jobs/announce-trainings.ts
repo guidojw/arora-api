@@ -13,7 +13,7 @@ const { getTime, getTimeZoneAbbreviation } = timeUtil
 @injectable()
 export default class AnnounceTrainingsJob implements BaseJob {
   @inject(TYPES.TrainingRepository)
-  private readonly trainingRepository!: TrainingRepository
+  private readonly trainingRepository!: typeof TrainingRepository
 
   @inject(TYPES.GroupService)
   private readonly groupService!: GroupService
@@ -23,7 +23,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
 
   public async run (groupId?: number): Promise<any> {
     if (typeof groupId === 'undefined') {
-      const groupIds = (await this.trainingRepository.scopes.default
+      const groupIds = (await this.trainingRepository.scopes().default
         .select('DISTINCT training.group_id')
         .addGroupBy('training.group_id')
         .getMany()
@@ -31,7 +31,7 @@ export default class AnnounceTrainingsJob implements BaseJob {
       return await Promise.all(groupIds.map(async groupId => await this.run(groupId)))
     }
 
-    const trainings = await this.trainingRepository.scopes.default
+    const trainings = await this.trainingRepository.scopes().default
       .andWhere('training.group_id = :groupId', { groupId })
       .addOrderBy('date', 'ASC')
       .getMany()

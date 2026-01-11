@@ -1,14 +1,20 @@
-import BaseRepository, { BaseScopes } from './base'
-import { EntityRepository } from 'typeorm'
+import { type BaseRepositoryProperties, BaseScopes } from './base'
+import type { Repository } from 'typeorm'
 import { Training } from '../entities'
 
-@EntityRepository(Training)
-export default class TrainingRepository extends BaseRepository<Training> {
-  public get scopes (): TrainingScopes {
-    return new TrainingScopes(this, this.createQueryBuilder('training'))
-  }
+abstract class TrainingRepositoryProperties {
+  public abstract scopes (): TrainingScopes
+  public abstract transform (record: any): Training
+}
 
-  public override transform (record: any): Training {
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+export default {
+  scopes (): TrainingScopes {
+    // @ts-expect-error
+    return new TrainingScopes(this.createQueryBuilder('training'), null, this)
+  },
+
+  transform (record: any): Training {
     record.type = record.type_id == null
       ? record.type_id
       : {
@@ -17,9 +23,9 @@ export default class TrainingRepository extends BaseRepository<Training> {
           group_id: record.type_group_id,
           name: record.type_name
         }
-    return super.transform(record)
+    return this._transform(record)
   }
-}
+} as Repository<Training> & BaseRepositoryProperties<Training> & TrainingRepositoryProperties
 
 export class TrainingScopes extends BaseScopes<Training> {
   public get default (): this {

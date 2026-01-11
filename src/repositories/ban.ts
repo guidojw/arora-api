@@ -1,14 +1,20 @@
-import BaseRepository, { BaseScopes } from './base'
-import { EntityRepository, type SelectQueryBuilder } from 'typeorm'
+import { type BaseRepositoryProperties, BaseScopes } from './base'
+import type { Repository, SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
 
-@EntityRepository(Ban)
-export default class BanRepository extends BaseRepository<Ban> {
-  public get scopes (): BanScopes {
-    return new BanScopes(this, this.createQueryBuilder('ban'))
-  }
+abstract class BanRepositoryProperties {
+  public abstract scopes (): BanScopes
+  public abstract transform (record: any): Ban
+}
 
-  public override transform (record: any): Ban {
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+export default {
+  scopes (): BanScopes {
+    // @ts-expect-error
+    return new BanScopes(this.createQueryBuilder('ban'), null, this)
+  },
+
+  transform (record: any): Ban {
     if (typeof record.extension_id !== 'undefined') {
       record.extensions = record.extension_id === null
         ? []
@@ -20,9 +26,9 @@ export default class BanRepository extends BaseRepository<Ban> {
             reason: record.extension_reason
           }]
     }
-    return super.transform(record)
+    return this._transform(record)
   }
-}
+} as Repository<Ban> & BaseRepositoryProperties<Ban> & BanRepositoryProperties
 
 export class BanScopes extends BaseScopes<Ban> {
   public static override readonly scopes = ['finished']
@@ -53,9 +59,6 @@ export class BanScopes extends BaseScopes<Ban> {
   }
 
   private static makeEndsAtQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
-    // @ts-expect-error: Connection is somehow undefined on this qb and
-    // repository is a connection instance so weird fix but works?
-    qb.connection = qb.repository
     return qb
       .select('ban.id', 'id')
       .addSelect(

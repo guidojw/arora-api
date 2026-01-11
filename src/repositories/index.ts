@@ -1,3 +1,4 @@
+export { default as BaseRepository } from './base'
 export { default as BanRepository } from './ban'
 export { default as TrainingRepository } from './training'
 
