@@ -37,7 +37,7 @@ export default function init (container: Container): Application {
 
       if (typeof process.env.SENTRY_DSN !== 'undefined') {
         Sentry.setupExpressErrorHandler(app, {
-          shouldHandleError: (err: any) => err?.statusCode >= 400
+          shouldHandleError: (err: any) => err?.statusCode >= 400 && ![401, 403, 404, 429].includes(err?.statusCode)
         })
       }
 
