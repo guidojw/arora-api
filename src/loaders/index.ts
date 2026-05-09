@@ -3,12 +3,14 @@ import * as Sentry from '@sentry/node'
 import type { Application } from 'express'
 import type { BaseJob } from '../jobs'
 import type { BaseManager } from '../managers'
+import Bree from 'bree'
 import { constants } from '../util'
 import containerLoader from './container'
 import cronConfig from '../configs/cron'
 import cronLoader from './cron'
 import expressLoader from './express'
 import fs from 'node:fs/promises'
+import path from 'node:path'
 
 const { TYPES } = constants
 
@@ -43,6 +45,16 @@ export async function init (): Promise<Application> {
     'development') {
     await container.get<BaseJob>(TYPES.AnnounceTrainingsJob).run()
   }
+
+  const bree = new Bree({
+    root: path.resolve(__dirname, '../jobs'),
+    jobs: [{
+      name: 'refresh-access-tokens',
+      timeout: '1h',
+      interval: '1d'
+    }]
+  })
+  await bree.start()
 
   return app
 }

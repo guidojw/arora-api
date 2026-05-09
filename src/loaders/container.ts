@@ -4,19 +4,8 @@ import {
   DiscordMessageJob,
   HealthCheckJob
 } from '../jobs'
-import { AsyncContainerModule, Container } from 'inversify'
-import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
 import {
-  AuthService,
-  BanService,
-  CatalogService,
-  ExileService,
-  GroupService,
-  StatusService,
-  TrainingService,
-  UserService
-} from '../services'
-import {
+  AccessToken,
   type Ban,
   BanCancellation,
   BanExtension,
@@ -25,7 +14,21 @@ import {
   TrainingCancellation,
   TrainingType
 } from '../entities'
+import { AsyncContainerModule, Container } from 'inversify'
+import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
+import {
+  AuthService,
+  BanService,
+  CatalogService,
+  ExileService,
+  GroupService,
+  OAuthService,
+  StatusService,
+  TrainingService,
+  UserService
+} from '../services'
 import { BanRepository, TrainingRepository } from '../repositories'
+import { type RedisClientType, createClient } from 'redis'
 import { type Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
 import { RobloxManager, WebSocketManager } from '../managers'
 import { constants } from '../util'
@@ -38,6 +41,15 @@ export default async function init (): Promise<Container> {
   const bindings = new AsyncContainerModule(async bind => {
     await createConnection()
 
+    const client: RedisClientType = createClient({
+      url: process.env.REDIS_HOST,
+      password: process.env.REDIS_PASSWORD
+    })
+
+    await client.connect()
+
+    bind<RedisClientType>(TYPES.RedisClient).toConstantValue(client)
+
     bind<AcceptJoinRequestsJob>(TYPES.AcceptJoinRequestsJob).to(AcceptJoinRequestsJob)
     bind<AnnounceTrainingsJob>(TYPES.AnnounceTrainingsJob).to(AnnounceTrainingsJob)
     bind<DiscordMessageJob>(TYPES.DiscordMessageJob).to(DiscordMessageJob)
@@ -49,6 +61,9 @@ export default async function init (): Promise<Container> {
     bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
     bind<ErrorMiddleware>(TYPES.ErrorMiddleware).to(ErrorMiddleware)
 
+    bind<Repository<AccessToken>>(TYPES.AccessTokenRepository).toDynamicValue(() => {
+      return getRepository(AccessToken)
+    }).inRequestScope()
     bind<Repository<Ban>>(TYPES.BanRepository).toDynamicValue(() => {
       return getCustomRepository(BanRepository)
     }).inRequestScope()
@@ -76,6 +91,7 @@ export default async function init (): Promise<Container> {
     bind<CatalogService>(TYPES.CatalogService).to(CatalogService)
     bind<ExileService>(TYPES.ExileService).to(ExileService)
     bind<GroupService>(TYPES.GroupService).to(GroupService)
+    bind<OAuthService>(TYPES.OAuthService).to(OAuthService)
     bind<StatusService>(TYPES.StatusService).to(StatusService)
     bind<TrainingService>(TYPES.TrainingService).to(TrainingService)
     bind<UserService>(TYPES.UserService).to(UserService)

@@ -1,3 +1,4 @@
+export { default as AccessToken } from './access-token'
 export { default as Ban } from './ban'
 export { default as BanCancellation } from './ban-cancellation'
 export { default as BanExtension } from './ban-extension'
