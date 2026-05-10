@@ -15,9 +15,9 @@ import { BadRequestError } from '../../errors'
 import { OAuthService } from '../../services'
 import { constants } from '../../util'
 import { inject } from 'inversify'
+import { rateLimit } from 'express-rate-limit'
 
 const { TYPES } = constants
-
 @controller('/v1/oauth')
 export default class OAuthController extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.OAuthService)
@@ -25,6 +25,12 @@ export default class OAuthController extends BaseHttpController implements inter
 
   @httpGet(
     '/callback',
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: 10,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false
+    }),
     ...OAuthController.validate('getCallback'),
     TYPES.ErrorMiddleware
   )

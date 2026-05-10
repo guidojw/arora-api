@@ -1461,6 +1461,7 @@ __metadata:
     eslint-plugin-promise: "npm:^7.2.1"
     eslint-plugin-unicorn: "npm:^48.0.0"
     express: "npm:^5.1.0"
+    express-rate-limit: "npm:^8.5.1"
     express-validator: "npm:^7.0.1"
     helmet: "npm:^8.1.0"
     hpp: "npm:^0.2.3"
@@ -2764,6 +2765,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"express-rate-limit@npm:^8.5.1":
+  version: 8.5.1
+  resolution: "express-rate-limit@npm:8.5.1"
+  dependencies:
+    ip-address: "npm:^10.2.0"
+  peerDependencies:
+    express: ">= 4.11"
+  checksum: 10c0/bcd89bb916376f38858b2623cc486bc9a91124ff3c7dee038fafc4c03949db72b0ddc796ade17cc43af3f16af314b689dd3c6557996d8e007791151335b0f7f7
+  languageName: node
+  linkType: hard
+
 "express-validator@npm:^7.0.1":
   version: 7.0.1
   resolution: "express-validator@npm:7.0.1"
@@ -3582,6 +3594,13 @@ __metadata:
   version: 6.0.1
   resolution: "inversify@npm:6.0.1"
   checksum: 10c0/2d0b67663e7ab8b08704e1a2c0ab7a181c412ab0bec5c3d6144946d77ec38a7f213b88f81a92a717f856910baed50b34e75754f25fc3d2160ec74bd62285bf97
+  languageName: node
+  linkType: hard
+
+"ip-address@npm:^10.2.0":
+  version: 10.2.0
+  resolution: "ip-address@npm:10.2.0"
+  checksum: 10c0/5a00aada6e922c9c69dfc800ed5d0fa3348675ebdeed0e1575f503f27ca385b5f534363c9af7ad1daf64c1f1409388cdd3cc2e9b9b0fe1c924a431378d55075a
   languageName: node
   linkType: hard
 
