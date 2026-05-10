@@ -23,16 +23,6 @@ export default class OAuthController extends BaseHttpController implements inter
   @inject(TYPES.OAuthService)
   private readonly oAuthService!: OAuthService
 
-  @httpPost(
-    '/roblox/verify',
-    ...OAuthController.validate('verifyRobloxUser'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async verifyRobloxUser (@requestBody() body: { id: string }): Promise<results.JsonResult> {
-    return this.json(await this.oAuthService.verifyRobloxUser(body.id))
-  }
-
   @httpGet(
     '/callback',
     ...OAuthController.validate('getCallback'),
@@ -52,6 +42,16 @@ export default class OAuthController extends BaseHttpController implements inter
     }
   }
 
+  @httpPost(
+    '/roblox/verify',
+    ...OAuthController.validate('verifyRobloxUser'),
+    TYPES.ErrorMiddleware,
+    TYPES.AuthMiddleware
+  )
+  public async verifyRobloxUser (@requestBody() body: { id: string }): Promise<results.JsonResult> {
+    return this.json(await this.oAuthService.verifyRobloxUser(body.id))
+  }
+
   @httpGet(
     '/roblox/access-token',
     ...OAuthController.validate('getRobloxAccessToken'),
@@ -64,17 +64,17 @@ export default class OAuthController extends BaseHttpController implements inter
 
   private static validate (method: string): ValidationChain[] | Array<RequestHandler & ContextRunner> {
     switch (method) {
-      case 'verifyRobloxUser':
-        return [
-          header('authorization').exists().isString(),
-          body('id').exists()
-        ]
       case 'getCallback':
         return [
           oneOf([
             query(['code', 'state']).exists().isString(),
             query(['error', 'error_description', 'state']).exists().isString()
           ])
+        ]
+      case 'verifyRobloxUser':
+        return [
+          header('authorization').exists().isString(),
+          body('id').exists()
         ]
       case 'getRobloxAccessToken':
         return [

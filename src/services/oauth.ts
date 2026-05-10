@@ -23,19 +23,6 @@ export default class OAuthService {
   @inject(TYPES.WebSocketManager)
   private readonly webSocketManager!: WebSocketManager
 
-  public async verifyRobloxUser (id: string): Promise<{ authorizationUrl: string }> {
-    const state = crypto.randomBytes(16).toString('hex')
-    const authorizationUrl = `https://apis.roblox.com/oauth/v1/authorize?client_id=${process.env.ROBLOX_APP_CLIENT_ID as string}` +
-      `&redirect_uri=${process.env.ROBLOX_APP_REDIRECT_URI as string}` +
-      '&scope=openid%20profile' +
-      '&response_type=code' +
-      `&state=${state}`
-
-    await this.redisClient.set(`state:${state}`, id, { expiration: { type: 'EX', value: 15 * 60 } })
-
-    return { authorizationUrl }
-  }
-
   public async handleCallback (state: string, code: string): Promise<void> {
     const id = await this.redisClient.get(`state:${state}`)
     if (id === null) {
@@ -55,6 +42,19 @@ export default class OAuthService {
     )))
 
     this.webSocketManager.broadcast('robloxUserVerify', { id })
+  }
+
+  public async verifyRobloxUser (id: string): Promise<{ authorizationUrl: string }> {
+    const state = crypto.randomBytes(16).toString('hex')
+    const authorizationUrl = `https://apis.roblox.com/oauth/v1/authorize?client_id=${process.env.ROBLOX_APP_CLIENT_ID as string}` +
+      `&redirect_uri=${process.env.ROBLOX_APP_REDIRECT_URI as string}` +
+      '&scope=openid%20profile' +
+      '&response_type=code' +
+      `&state=${state}`
+
+    await this.redisClient.set(`state:${state}`, id, { expiration: { type: 'EX', value: 15 * 60 } })
+
+    return { authorizationUrl }
   }
 
   public async getRobloxAccessToken (id: string): Promise<Pick<AccessToken, 'accessToken' | 'tokenType' | 'scope'>> {
