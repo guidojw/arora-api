@@ -37,10 +37,7 @@ spec:
         command:
         - sh
         - -c
-        - yarn
-        - run
-        - typeorm
-        - migration:run
+        - yarn run typeorm migration:run
         {{- with .Values.env }}
         env:
           {{- range $value := . }}
