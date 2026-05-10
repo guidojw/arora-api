@@ -24,10 +24,12 @@ export default class OAuthService {
   private readonly webSocketManager!: WebSocketManager
 
   public async handleCallback (state: string, code: string): Promise<void> {
-    const id = await this.redisClient.get(`state:${state}`)
+    const key = `state:${state}`
+    const id = await this.redisClient.get(key)
     if (id === null) {
       throw new BadRequestError()
     }
+    await this.redisClient.del(key)
 
     const result = await robloxOAuthAdapter('POST', 'token', {
       code,
@@ -48,7 +50,7 @@ export default class OAuthService {
     const state = crypto.randomBytes(16).toString('hex')
     const authorizationUrl = `https://apis.roblox.com/oauth/v1/authorize?client_id=${process.env.ROBLOX_APP_CLIENT_ID as string}` +
       `&redirect_uri=${process.env.ROBLOX_APP_REDIRECT_URI as string}` +
-      '&scope=openid%20profile' +
+      '&scope=openid%20profile%20group%3Aread' +
       '&response_type=code' +
       `&state=${state}`
 
