@@ -148,6 +148,13 @@ env:
     secretKeyRef:
       name: postgres-auth
       key: password
+- name: REDIS_HOST
+  value: redis://arora-api-redis.{{ .Release.Namespace }}.svc.cluster.local
+- name: REDIS_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: redis-auth
+      key: redis-password
 - name: KEY_DIR
   value: /opt/app/keys
 - name: ROBLOX_API_KEY
@@ -160,6 +167,21 @@ env:
     secretKeyRef:
       name: roblox-auth
       key: cookie
+- name: ROBLOX_APP_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: roblox-oauth
+      key: client-id
+- name: ROBLOX_APP_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: roblox-oauth
+      key: client-secret
+- name: ROBLOX_APP_REDIRECT_URI
+  valueFrom:
+    secretKeyRef:
+      name: roblox-oauth
+      key: redirect-uri
 - name: DISCORD_WEBHOOK_URL
   valueFrom:
     secretKeyRef:
@@ -241,3 +263,11 @@ postgresql:
 
     persistence:
       storageClass: local-path-retain
+
+redis:
+  global:
+    imagePullSecrets:
+    - name: docker-pull
+
+  auth:
+    existingSecret: redis-auth

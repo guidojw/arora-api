@@ -1,4 +1,6 @@
 export const TYPES = {
+  RedisClient: Symbol.for('RedisClient'),
+
   AcceptJoinRequestsJob: Symbol.for('AcceptJoinRequestsJob'),
   AnnounceTrainingsJob: Symbol.for('AnnounceTrainingsJob'),
   DiscordMessageJob: Symbol.for('DiscordMessageJob'),
@@ -10,6 +12,7 @@ export const TYPES = {
   AuthMiddleware: Symbol.for('AuthMiddleware'),
   ErrorMiddleware: Symbol.for('ErrorMiddleware'),
 
+  AccessTokenRepository: Symbol.for('AccessTokenRepository'),
   BanRepository: Symbol.for('BanRepository'),
   BanCancellationRepository: Symbol.for('BanCancellationRepository'),
   BanExtensionRepository: Symbol.for('BanExtensionRepository'),
@@ -23,6 +26,7 @@ export const TYPES = {
   CatalogService: Symbol.for('CatalogService'),
   ExileService: Symbol.for('ExileService'),
   GroupService: Symbol.for('GroupService'),
+  OAuthService: Symbol.for('OAuthService'),
   StatusService: Symbol.for('StatusService'),
   TrainingService: Symbol.for('TrainingService'),
   UserService: Symbol.for('UserService')

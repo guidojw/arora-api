@@ -21,6 +21,7 @@ export default function init (container: Container): Application {
   return new InversifyExpressServer(container)
     .setConfig(app => {
       app.set('container', container)
+      app.set('trust proxy', (process.env.NODE_ENV ?? 'development') === 'development' ? 1 : 3)
 
       app.use(logger('dev'))
       app.use(express.json())
