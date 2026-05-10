@@ -21,13 +21,13 @@ export default function init (container: Container): Application {
   return new InversifyExpressServer(container)
     .setConfig(app => {
       app.set('container', container)
+      app.set('trust proxy', (process.env.NODE_ENV ?? 'development') === 'development' ? 1 : 3)
 
       app.use(logger('dev'))
       app.use(express.json())
       app.use(express.urlencoded({ extended: false }))
       app.use(helmet())
       app.use(hpp())
-      app.set('trust proxy', (process.env.NODE_ENV ?? 'development') === 'development' ? 1 : 3)
     })
     .setErrorConfig(app => {
       const errorMiddleware = container.get<ErrorMiddleware>(TYPES.ErrorMiddleware)
