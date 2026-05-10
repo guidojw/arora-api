@@ -27,6 +27,7 @@ export default function init (container: Container): Application {
       app.use(express.urlencoded({ extended: false }))
       app.use(helmet())
       app.use(hpp())
+      app.set('trust proxy', (process.env.NODE_ENV ?? 'development') === 'development' ? 1 : 3)
     })
     .setErrorConfig(app => {
       const errorMiddleware = container.get<ErrorMiddleware>(TYPES.ErrorMiddleware)
