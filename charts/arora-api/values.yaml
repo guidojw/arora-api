@@ -149,7 +149,7 @@ env:
       name: postgres-auth
       key: password
 - name: REDIS_HOST
-  value: arora-api-redis.{{ .Release.Namespace }}.svc.cluster.local
+  value: redis://arora-api-redis.{{ .Release.Namespace }}.svc.cluster.local
 - name: REDIS_PASSWORD
   valueFrom:
     secretKeyRef:
