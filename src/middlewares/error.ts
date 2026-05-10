@@ -23,6 +23,14 @@ export default class ErrorMiddleware extends BaseMiddleware {
               location: error.location,
               message: error.msg
             }
+          case 'alternative_grouped': {
+            const nestedError = error.nestedErrors[0][0]
+            return {
+              param: nestedError.path,
+              location: nestedError.location,
+              message: nestedError.msg
+            }
+          }
           default:
             throw new Error(`Unknown error type ${error.type}`)
         }

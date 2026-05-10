@@ -4,6 +4,12 @@ Create the `postgres-auth` secret with:
 
 ```sh
 kubectl create secret generic postgres-auth -n <namespace> --from-literal=postgres-password=<postgres_password> --from-literal=password=<password>
+
+```
+Create the `redis-auth` secret with:
+
+```sh
+kubectl create secret generic redis-auth -n <namespace> --from-literal=redis-password=<redis_password>
 ```
 
 Create the `auth-keys` secret with:
@@ -16,6 +22,12 @@ Create the `roblox-auth` secret with:
 
 ```sh
 kubectl create secret generic roblox-auth -n <namespace> --from-literal=api-key='<key>' --from-literal=cookie='<cookie>'
+```
+
+Create the `roblox-oauth` secret with:
+
+```sh
+kubectl create secret generic roblox-oauth -n <namespace> --from-literal=client-id='<id>' --from-literal=client-secret='<secret>' --from-literal=redirect-uri='<uri>'
 ```
 
 Install/upgrade with:

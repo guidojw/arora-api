@@ -1,3 +1,4 @@
+export { default as BadRequestError } from './bad-request'
 export { default as BaseError } from './base'
 export { default as ConflictError } from './conflict'
 export { default as ForbiddenError } from './forbidden'
