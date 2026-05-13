@@ -50,7 +50,7 @@ export default class OAuthService {
     const state = crypto.randomBytes(16).toString('hex')
     const authorizationUrl = `https://apis.roblox.com/oauth/v1/authorize?client_id=${process.env.ROBLOX_APP_CLIENT_ID as string}` +
       `&redirect_uri=${process.env.ROBLOX_APP_REDIRECT_URI as string}` +
-      '&scope=openid%20profile%20group%3Aread' +
+      '&scope=openid%20profile' +
       '&response_type=code' +
       `&state=${state}`
 
