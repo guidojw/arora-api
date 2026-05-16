@@ -17,7 +17,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@sentry/node": "^9.27.0",
+    "@sentry/node": "^10.53.1",
     "axios": "^0.27.2",
     "axios-retry": "^4.5.0",
     "bree": "^9.2.9",
