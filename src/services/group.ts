@@ -1,17 +1,15 @@
 import { ForbiddenError, UnprocessableError } from '../errors'
-import { RobloxManager, WebSocketManager } from '../managers'
 import { constants, util } from '../util'
 import { inject, injectable } from 'inversify'
-import type { UpdateGroupStatus as BloxyUpdateGroupStatus } from '@guidojw/bloxy/dist/client/apis/GroupsAPI'
 import { DiscordMessageJob } from '../jobs'
 import UserService from './user'
+import { WebSocketManager } from '../managers'
 import applicationConfig from '../configs/application'
 import { robloxOpenCloudAdapter } from '../adapters'
 
 const { TYPES } = constants
 
 export interface ChangeMemberRole { oldRole: GetGroupRole, newRole: GetGroupRole }
-export type UpdateGroupStatus = Exclude<BloxyUpdateGroupStatus, null>
 
 export interface GetGroup {
   readonly path: string
@@ -109,7 +107,6 @@ export interface GetGroupShout {
 @injectable()
 export default class GroupService {
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
-  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
   @inject(TYPES.UserService) private readonly userService!: UserService
   @inject(TYPES.WebSocketManager) private readonly webSocketManager!: WebSocketManager
 
@@ -151,22 +148,6 @@ export default class GroupService {
       cursor = result.nextPageToken
     } while (cursor !== '')
     return roles
-  }
-
-  public async updateGroupStatus (groupId: number, message: string, authorId?: number): Promise<UpdateGroupStatus> {
-    const client = this.robloxManager.getClient(groupId)
-    const shout = await client.apis.groupsAPI.updateGroupStatus({ groupId, message }) as UpdateGroupStatus
-
-    if (typeof authorId !== 'undefined') {
-      const authorName = await this.userService.getUsername(authorId)
-      if (shout.body === '') {
-        await this.discordMessageJob.run(`**${authorName}** cleared the shout`)
-      } else {
-        await this.discordMessageJob.run(`**${authorName}** shouted "*${shout.body}*"`)
-      }
-    }
-
-    return shout
   }
 
   public async getJoinRequests (groupId: number): Promise<GetGroupJoinRequests['groupJoinRequests']> {
@@ -264,13 +245,5 @@ export default class GroupService {
       throw new UnprocessableError('User is already the lowest obtainable role.')
     }
     return await this.changeMemberRole(groupId, userId, { role, authorId })
-  }
-
-  public async kickMember (groupId: number, userId: number): Promise<void> {
-    const client = this.robloxManager.getClient(groupId)
-    const group = await client.getGroup(groupId)
-    await group.kickMember(userId)
-
-    this.webSocketManager.broadcast('rankChange', { groupId, userId, rank: 0 })
   }
 }

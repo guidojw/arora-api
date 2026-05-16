@@ -1,11 +1,10 @@
-import { AnnounceTrainingsJob, DiscordMessageJob } from '../jobs'
 import { ConflictError, NotFoundError, UnprocessableError } from '../errors'
 import { ILike, type Repository } from 'typeorm'
 import type { Training, TrainingCancellation, TrainingType } from '../entities'
 import { type TrainingRepository, TrainingScopes } from '../repositories'
 import { constants, timeUtil } from '../util'
-import cron, { type JobCallback } from 'node-schedule'
 import { inject, injectable } from 'inversify'
+import { DiscordMessageJob } from '../jobs'
 import type { SortQuery } from '../util/request'
 import UserService from './user'
 import { WebSocketManager } from '../managers'
@@ -15,7 +14,6 @@ const { getDate, getTime, getTimeZoneAbbreviation } = timeUtil
 
 @injectable()
 export default class TrainingService {
-  @inject(TYPES.AnnounceTrainingsJob) private readonly announceTrainingsJob!: AnnounceTrainingsJob
   @inject(TYPES.DiscordMessageJob) private readonly discordMessageJob!: DiscordMessageJob
   @inject(TYPES.TrainingRepository) private readonly trainingRepository!: TrainingRepository
   @inject(TYPES.TrainingCancellationRepository) private readonly trainingCancellationRepository!:
@@ -71,13 +69,6 @@ export default class TrainingService {
 
     this.webSocketManager.broadcast('trainingCreate', { groupId, training })
 
-    await this.announceTrainingsJob.run(groupId)
-    cron.scheduleJob(
-      `training_${training.id}`,
-      new Date(training.date.getTime() + 30 * 60 * 1000),
-      this.announceTrainingsJob.run.bind(this.announceTrainingsJob, groupId) as JobCallback
-    )
-
     const dateString = getDate(training.date)
     const timeString = getTime(training.date)
     const authorName = await this.userService.getUsername(training.authorId)
@@ -131,21 +122,6 @@ export default class TrainingService {
 
       const editorName = await this.userService.getUsername(editorId)
       await this.discordMessageJob.run(`**${editorName}**${changeMessages.length > 1 ? `\n- ${changeMessages.join('\n- ')}` : ` ${changeMessages[0]}`}`)
-
-      if (typeof changes.authorId !== 'undefined' || typeof changes.typeId !== 'undefined' || typeof changes.date !==
-        'undefined') {
-        await this.announceTrainingsJob.run(groupId)
-        const jobName = `training_${training.id}`
-        const job = cron.scheduledJobs[jobName]
-        if (typeof job !== 'undefined') {
-          job.cancel()
-        }
-        cron.scheduleJob(
-          jobName,
-          training.date,
-          this.announceTrainingsJob.run.bind(this.announceTrainingsJob, groupId) as JobCallback
-        )
-      }
     }
 
     return training
@@ -164,12 +140,6 @@ export default class TrainingService {
     }))
 
     this.webSocketManager.broadcast('trainingCancel', { groupId, training })
-
-    await this.announceTrainingsJob.run(groupId)
-    const job = cron.scheduledJobs[`training_${cancellation.trainingId}`]
-    if (typeof job !== 'undefined') {
-      job.cancel()
-    }
 
     const authorName = await this.userService.getUsername(cancellation.authorId)
     await this.discordMessageJob.run(`**${authorName}** cancelled training **${cancellation.trainingId}** with reason "*${cancellation.reason}*"`)

@@ -1,9 +1,4 @@
-import {
-  AcceptJoinRequestsJob,
-  AnnounceTrainingsJob,
-  DiscordMessageJob,
-  HealthCheckJob
-} from '../jobs'
+import { AcceptJoinRequestsJob, DiscordMessageJob, HealthCheckJob } from '../jobs'
 import {
   AccessToken,
   type Ban,
@@ -19,7 +14,6 @@ import { AuthMiddleware, ErrorMiddleware } from '../middlewares'
 import {
   AuthService,
   BanService,
-  CatalogService,
   ExileService,
   GroupService,
   OAuthService,
@@ -30,7 +24,7 @@ import {
 import { BanRepository, TrainingRepository } from '../repositories'
 import { type RedisClientType, createClient } from 'redis'
 import { type Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
-import { RobloxManager, WebSocketManager } from '../managers'
+import { WebSocketManager } from '../managers'
 import { constants } from '../util'
 
 const { TYPES } = constants
@@ -51,11 +45,9 @@ export default async function init (): Promise<Container> {
     bind<RedisClientType>(TYPES.RedisClient).toConstantValue(client)
 
     bind<AcceptJoinRequestsJob>(TYPES.AcceptJoinRequestsJob).to(AcceptJoinRequestsJob)
-    bind<AnnounceTrainingsJob>(TYPES.AnnounceTrainingsJob).to(AnnounceTrainingsJob)
     bind<DiscordMessageJob>(TYPES.DiscordMessageJob).to(DiscordMessageJob)
     bind<HealthCheckJob>(TYPES.HealthCheckJob).to(HealthCheckJob)
 
-    bind<RobloxManager>(TYPES.RobloxManager).to(RobloxManager).inSingletonScope()
     bind<WebSocketManager>(TYPES.WebSocketManager).to(WebSocketManager).inSingletonScope()
 
     bind<AuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware)
@@ -88,7 +80,6 @@ export default async function init (): Promise<Container> {
 
     bind<AuthService>(TYPES.AuthService).to(AuthService)
     bind<BanService>(TYPES.BanService).to(BanService)
-    bind<CatalogService>(TYPES.CatalogService).to(CatalogService)
     bind<ExileService>(TYPES.ExileService).to(ExileService)
     bind<GroupService>(TYPES.GroupService).to(GroupService)
     bind<OAuthService>(TYPES.OAuthService).to(OAuthService)

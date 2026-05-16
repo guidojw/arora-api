@@ -1,6 +1,5 @@
 export { default as AuthService } from './auth'
 export { default as BanService } from './ban'
-export { default as CatalogService } from './catalog'
 export { default as GroupService } from './group'
 export { default as OAuthService } from './oauth'
 export { default as ExileService } from './exile'
