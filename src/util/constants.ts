@@ -2,11 +2,9 @@ export const TYPES = {
   RedisClient: Symbol.for('RedisClient'),
 
   AcceptJoinRequestsJob: Symbol.for('AcceptJoinRequestsJob'),
-  AnnounceTrainingsJob: Symbol.for('AnnounceTrainingsJob'),
   DiscordMessageJob: Symbol.for('DiscordMessageJob'),
   HealthCheckJob: Symbol.for('HealthCheckJob'),
 
-  RobloxManager: Symbol.for('RobloxManager'),
   WebSocketManager: Symbol.for('WebSocketManager'),
 
   AuthMiddleware: Symbol.for('AuthMiddleware'),
@@ -23,7 +21,6 @@ export const TYPES = {
 
   AuthService: Symbol.for('AuthService'),
   BanService: Symbol.for('BanService'),
-  CatalogService: Symbol.for('CatalogService'),
   ExileService: Symbol.for('ExileService'),
   GroupService: Symbol.for('GroupService'),
   OAuthService: Symbol.for('OAuthService'),
