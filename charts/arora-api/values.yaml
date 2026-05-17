@@ -162,11 +162,6 @@ env:
     secretKeyRef:
       name: roblox-auth
       key: api-key
-- name: ROBLOX_COOKIE
-  valueFrom:
-    secretKeyRef:
-      name: roblox-auth
-      key: cookie
 - name: ROBLOX_APP_CLIENT_ID
   valueFrom:
     secretKeyRef:

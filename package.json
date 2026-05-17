@@ -13,12 +13,11 @@
     "build": "tsc",
     "build:prod": "tsc -p tsconfig.production.json",
     "lint": "eslint src",
-    "start": "node bin/www",
+    "start": "node --import ./dist/instrument.mjs bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@guidojw/bloxy": "^5.7.6",
-    "@sentry/node": "^9.27.0",
+    "@sentry/node": "^10.53.1",
     "axios": "^0.27.2",
     "axios-retry": "^4.5.0",
     "bree": "^9.2.9",
@@ -65,7 +64,7 @@
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-unicorn": "^48.0.0",
     "reflect-metadata": "^0.1.13",
-    "typescript": "^5.2.2"
+    "typescript": "^5.7.3"
   },
   "engines": {
     "node": ">=14"

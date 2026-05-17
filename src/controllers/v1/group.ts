@@ -1,4 +1,4 @@
-import { BanService, ExileService, GroupService, TrainingService } from '../../services'
+import { BanService, ExileService, TrainingService } from '../../services'
 import {
   BaseHttpController,
   controller,
@@ -24,22 +24,7 @@ const { decodeScopeQueryParam, decodeSortQueryParam } = requestUtil
 export default class GroupV1Controller extends BaseHttpController implements interfaces.Controller {
   @inject(TYPES.BanService) private readonly banService!: BanService
   @inject(TYPES.ExileService) private readonly exileService!: ExileService
-  @inject(TYPES.GroupService) private readonly groupService!: GroupService
   @inject(TYPES.TrainingService) private readonly trainingService!: TrainingService
-
-  // GroupService
-  @httpPut(
-    '/:groupId/status',
-    ...GroupV1Controller.validate('updateGroupStatus'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async updateGroupStatus (
-    @requestParam('groupId') groupId: number,
-      @requestBody() body: { authorId: number, message: string }
-  ): Promise<results.JsonResult> {
-    return this.json(this.groupService.updateGroupStatus(groupId, body.message, body.authorId))
-  }
 
   // BanService
   @httpGet(

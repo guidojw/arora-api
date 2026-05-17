@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node'
 import type { BaseJob } from '../jobs'
 import type { Container } from 'inversify'
 import cron from 'node-schedule'
@@ -8,14 +9,20 @@ export default function init (container: Container): void {
     return
   }
 
-  for (const jobConfig of Object.values(cronConfig)) {
+  for (const [jobName, jobConfig] of Object.entries(cronConfig)) {
     const job = container.get<BaseJob>(jobConfig.job)
 
     if (typeof jobConfig.args !== 'undefined') {
       const [...args] = jobConfig.args
-      cron.scheduleJob(jobConfig.expression, job.run.bind(job, ...args))
+      cron.scheduleJob(
+        jobConfig.expression,
+        () => Sentry.startSpan({ name: `scheduled-task: ${jobName}` }, job.run.bind(job, ...args))
+      )
     } else {
-      cron.scheduleJob(jobConfig.expression, job.run.bind(job))
+      cron.scheduleJob(
+        jobConfig.expression,
+        () => Sentry.startSpan({ name: `scheduled-task: ${jobName}` }, job.run.bind(job))
+      )
     }
   }
 }

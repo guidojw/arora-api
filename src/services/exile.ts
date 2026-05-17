@@ -43,9 +43,6 @@ export default class ExileService {
       throw new ForbiddenError('User\'s role is unexilable.')
     }
 
-    try {
-      await this.groupService.kickMember(groupId, userId)
-    } catch {} // eslint-disable-line no-empty
     const exile = await this.exileRepository.save(this.exileRepository.create({
       authorId,
       groupId,

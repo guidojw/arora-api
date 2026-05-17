@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node'
 import type BaseManager from './base'
 import type WebSocket from 'ws'
 import { injectable } from 'inversify'
@@ -42,9 +43,18 @@ export default class WebSocketManager implements BaseManager {
   }
 
   public broadcast (event: string, data?: any): void {
-    for (const connection of this.connections) {
-      connection.send(JSON.stringify({ event, data }))
-    }
+    Sentry.startSpan({ name: `broadcast: ${event}`, op: 'ws.broadcast' }, () => {
+      const traceData = Sentry.getTraceData()
+      const sentryTraceHeader = traceData['sentry-trace']
+      const sentryBaggageHeader = traceData.baggage
+      const metadata = {
+        sentryTrace: sentryTraceHeader,
+        baggage: sentryBaggageHeader
+      }
+      for (const connection of this.connections) {
+        connection.send(JSON.stringify({ event, data, metadata }))
+      }
+    })
   }
 
   private removeConnection (connection: AroraWebSocket): void {

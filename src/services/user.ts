@@ -1,13 +1,5 @@
-import { inject, injectable } from 'inversify'
-import type { GetUsersByUserIds } from '@guidojw/bloxy/dist/client/apis/UsersAPI'
-import { NotFoundError } from '../errors'
-import { RobloxManager } from '../managers'
-import { constants } from '../util'
+import { injectable } from 'inversify'
 import { robloxOpenCloudAdapter } from '../adapters'
-
-const { TYPES } = constants
-
-export type GetUsers = GetUsersByUserIds['data']
 
 export interface GetUser {
   readonly path: string
@@ -24,25 +16,6 @@ export interface GetUser {
 
 @injectable()
 export default class UserService {
-  @inject(TYPES.RobloxManager) private readonly robloxManager!: RobloxManager
-
-  public async getUserIdFromUsername (username: string): Promise<number> {
-    const client = this.robloxManager.getClient()
-    const user = await client.getUserIdFromUsername(username)
-
-    // This Roblox endpoint doesn't throw HTTP 404 if a user doesn't exist..
-    if (typeof user.id === 'undefined') {
-      throw new NotFoundError('User not found')
-    }
-
-    return user.id
-  }
-
-  public async getUsers (userIds: number[]): Promise<GetUsers> {
-    const client = this.robloxManager.getClient()
-    return (await client.apis.usersAPI.getUsersByIds({ userIds })).data
-  }
-
   public async getUsername (userId: number): Promise<string> {
     return (await this.getUser(userId)).name
   }

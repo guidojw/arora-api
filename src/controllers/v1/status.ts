@@ -1,12 +1,5 @@
-import {
-  BaseHttpController,
-  controller,
-  httpGet,
-  type interfaces,
-  requestParam,
-  type results
-} from 'inversify-express-utils'
-import { type ValidationChain, header, param } from 'express-validator'
+import { BaseHttpController, controller, httpGet, type interfaces } from 'inversify-express-utils'
+import { type ValidationChain, header } from 'express-validator'
 import { GetStatus } from '../../services/status'
 import { StatusService } from '../../services'
 import { constants } from '../../util'
@@ -23,26 +16,11 @@ export default class StatusController extends BaseHttpController implements inte
     return this.statusService.getStatus()
   }
 
-  @httpGet(
-    '/:groupId',
-    ...StatusController.validate('getGroupClientStatus'),
-    TYPES.ErrorMiddleware,
-    TYPES.AuthMiddleware
-  )
-  public async getGroupClientStatus (@requestParam('groupId') groupId: number): Promise<results.JsonResult> {
-    return this.json(await this.statusService.getGroupClientStatus(groupId))
-  }
-
   private static validate (method: string): ValidationChain[] {
     switch (method) {
       case 'getStatus':
         return [
           header('authorization').exists().isString()
-        ]
-      case 'getGroupClientStatus':
-        return [
-          header('authorization').exists().isString(),
-          param('groupId').isInt().toInt()
         ]
 
       default:
