@@ -70,6 +70,7 @@ jobs:
             TAG='staging'
           fi
 
+          echo $TAG
           docker pull ghcr.io/guidojw/arora-api:$TAG
           DIGEST=$(docker images --digests --filter reference=arora-api --format {{.Digest}})
           echo 'tag='"$DIGEST" >> "$GITHUB_OUTPUT"
