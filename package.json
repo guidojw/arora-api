@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@sentry/node": "^10.53.1",
-    "axios": "^0.27.2",
+    "axios": "^0.31.0",
     "axios-retry": "^4.5.0",
     "bree": "^9.2.9",
     "class-transformer": "^0.5.1",
