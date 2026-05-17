@@ -46,7 +46,7 @@ export default class WebSocketManager implements BaseManager {
     Sentry.startSpan({ name: `broadcast: ${event}`, op: 'ws.broadcast' }, () => {
       const traceData = Sentry.getTraceData()
       const sentryTraceHeader = traceData['sentry-trace']
-      const sentryBaggageHeader = traceData['baggage']
+      const sentryBaggageHeader = traceData.baggage
       const metadata = {
         sentryTrace: sentryTraceHeader,
         baggage: sentryBaggageHeader
