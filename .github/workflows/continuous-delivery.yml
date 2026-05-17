@@ -58,9 +58,9 @@ jobs:
             if [ "${INPUT_MERGE,,}" = 'y' ]; then
               git fetch origin staging
               if ! git diff origin/main origin/staging --exit-code; then
-                echo 'has_diff=true' >> "$GITHUB_OUTPUT"
+                HAS_DIFF=true
               else
-                echo 'has_diff=false' >> "$GITHUB_OUTPUT"
+                HAS_DIFF=false
               fi
             fi
 
@@ -71,10 +71,14 @@ jobs:
             TAG='staging'
           fi
 
+          echo 'has_diff='"$HAS_DIFF" >> "$GITHUB_OUTPUT"
           echo 'tag='"$TAG" >> "$GITHUB_OUTPUT"
-          docker pull ghcr.io/guidojw/arora-api:$TAG
-          DIGEST=$(docker images --digests --filter 'reference=ghcr.io/guidojw/arora-api' --format '{{.Digest}}')
-          echo 'digest='"$DIGEST" >> "$GITHUB_OUTPUT"
+
+          if [ "$HAS_DIFF" = false ]; then
+            docker pull ghcr.io/guidojw/arora-api:$TAG
+            DIGEST=$(docker images --digests --filter 'reference=ghcr.io/guidojw/arora-api' --format '{{.Digest}}')
+            echo 'digest='"$DIGEST" >> "$GITHUB_OUTPUT"
+          fi
 
   merge:
     name: Merge
