@@ -74,7 +74,7 @@ jobs:
           echo 'has_diff='"$HAS_DIFF" >> "$GITHUB_OUTPUT"
           echo 'tag='"$TAG" >> "$GITHUB_OUTPUT"
 
-          if [ "$HAS_DIFF" = false ]; then
+          if [ "$HAS_DIFF" != true ]; then
             docker pull ghcr.io/guidojw/arora-api:$TAG
             DIGEST=$(docker images --digests --filter 'reference=ghcr.io/guidojw/arora-api' --format '{{.Digest}}')
             echo 'digest='"$DIGEST" >> "$GITHUB_OUTPUT"
