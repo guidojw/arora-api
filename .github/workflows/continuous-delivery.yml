@@ -31,8 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: branch_check
     outputs:
-      has_diff: ${{ steps.get_metadata.outputs.has_diff }}
       stage: ${{ steps.get_metadata.outputs.stage }}
+      has_diff: ${{ steps.get_metadata.outputs.has_diff }}
       tag: ${{ steps.get_metadata.outputs.tag }}
       digest: ${{ steps.get_metadata.outputs.digest }}
     steps:
