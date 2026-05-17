@@ -15,21 +15,21 @@ env:
   PROJECT_NAME: arora-api
 
 jobs:
-  # branch_check:
-  #   name: Branch Check
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Validate branch
-  #       run: |
-  #         if [ "$GITHUB_REF_NAME" != 'staging' ] && [ "$GITHUB_REF_NAME" != 'main' ]; then
-  #           echo 'This workflow can only be run on branches staging and main.'
-  #           exit 1
-  #         fi
+  branch_check:
+    name: Branch Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch
+        run: |
+          if [ "$GITHUB_REF_NAME" != 'staging' ] && [ "$GITHUB_REF_NAME" != 'main' ]; then
+            echo 'This workflow can only be run on branches staging and main.'
+            exit 1
+          fi
 
   metadata:
     name: Metadata
     runs-on: ubuntu-latest
-    # needs: branch_check
+    needs: branch_check
     outputs:
       has_diff: ${{ steps.get_metadata.outputs.has_diff }}
       stage: ${{ steps.get_metadata.outputs.stage }}
@@ -140,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [metadata, merge, continuous_integration, publish_image]
     if: |
-      ((github.ref_name == 'main' &&
+      (github.ref_name == 'staging' || github.ref_name == 'main') && ((github.ref_name == 'main' &&
       github.event.inputs.merge == 'y' && fromJSON(needs.metadata.outputs.has_diff) && success()) ||
       ((github.event.inputs.merge != 'y' || !fromJSON(needs.metadata.outputs.has_diff)) && !cancelled()))
     steps:
@@ -226,7 +226,7 @@ jobs:
   update_check_run:
     name: Update Check Run
     runs-on: ubuntu-latest
-    needs: [metadata, merge, continuous_integration, publish_image, deploy]
+    needs: [branch_check, metadata, merge, continuous_integration, publish_image, deploy]
     if: (github.ref_name == 'staging' || github.ref_name == 'main') && always()
     permissions:
       checks: write
