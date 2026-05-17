@@ -17,6 +17,7 @@ if (typeof process.env.SENTRY_DSN !== 'undefined') {
       })
     ],
     tracesSampleRate: 0.5,
+    tracePropagationTargets: [],
     sendDefaultPii: true,
     enableLogs: true,
     beforeSendLog: (log: Sentry.Log) => log.message.includes('UPDATE "access_tokens"') ? null : log
