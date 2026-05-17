@@ -1,5 +1,4 @@
 import './axios'
-import * as Sentry from '@sentry/node'
 import type { Application } from 'express'
 import type { BaseManager } from '../managers'
 import Bree from 'bree'
@@ -13,21 +12,6 @@ import path from 'node:path'
 const { TYPES } = constants
 
 export async function init (): Promise<Application> {
-  if (typeof process.env.SENTRY_DSN !== 'undefined') {
-    Sentry.init({
-      dsn: process.env.SENTRY_DSN,
-      environment: process.env.NODE_ENV,
-      release: process.env.BUILD_HASH,
-      integrations: [
-        Sentry.rewriteFramesIntegration({
-          root: process.cwd()
-        })
-      ],
-      sendDefaultPii: true,
-      tracesSampleRate: 0.2
-    })
-  }
-
   const container = await containerLoader()
   container.get<BaseManager>(TYPES.WebSocketManager).init()
 
