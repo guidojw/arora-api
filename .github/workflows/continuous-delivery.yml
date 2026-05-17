@@ -34,6 +34,7 @@ jobs:
       has_diff: ${{ steps.get_metadata.outputs.has_diff }}
       stage: ${{ steps.get_metadata.outputs.stage }}
       tag: ${{ steps.get_metadata.outputs.tag }}
+      digest: ${{ steps.get_metadata.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -70,9 +71,10 @@ jobs:
             TAG='staging'
           fi
 
+          echo 'tag='"$TAG" >> "$GITHUB_OUTPUT"
           docker pull ghcr.io/guidojw/arora-api:$TAG
           DIGEST=$(docker images --digests --filter 'reference=ghcr.io/guidojw/arora-api' --format '{{.Digest}}')
-          echo 'tag='"$TAG@$DIGEST" >> "$GITHUB_OUTPUT"
+          echo 'digest='"$DIGEST" >> "$GITHUB_OUTPUT"
 
   merge:
     name: Merge
@@ -192,11 +194,12 @@ jobs:
             --dependency-update \
             -n "arora-api-$STAGE" \
             -f charts/arora-api/values.yaml \
-            --set "image.tag=$TAG" \
+            --set "image.tag=$TAG@$DIGEST" \
             --set "ingressHost=$INGRESS_HOST"
         env:
           STAGE: ${{ needs.metadata.outputs.stage }}
           TAG: ${{ needs.metadata.outputs.tag }}
+          DIGEST: ${{ needs.publish_image.outputs.digest || needs.metadata.outputs.digest }}
           INGRESS_HOST: ${{ steps.get_host.outputs.ingress_host }}
 
       - name: Finalize Sentry release
