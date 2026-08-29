@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    {{- include "arora-api.labels" . | nindent 4 }}
+data:
+  application.js: |
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const applicationConfig = {
+        skippedRanks: [2, 99],
+        unbannableRanks: [99, [103]],
+        undemotableRanks: [2, 99, [103]],
+        unexilableRanks: [99, [103]],
+        unpromotableRanks: [[1, 2], 99, [102]]
+    };
+    exports.default = applicationConfig;
+  cron.js: |
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const util_1 = require("../util");
+    const { TYPES } = util_1.constants;
+    const cronConfig = {
+        acceptJoinRequestsJob: {
+            expression: '*/5 * * * *', // https://crontab.guru/#*/30_*_*_*_*
+            job: TYPES.AcceptJoinRequestsJob,
+            args: [1018818]
+        },
+        healthCheckJob: {
+            expression: '*/5 * * * *', // https://crontab.guru/#*/5_*_*_*_*
+            job: TYPES.HealthCheckJob,
+            args: ['main']
+        }
+    };
+    exports.default = cronConfig;
