@@ -119,6 +119,7 @@ volumes:
 - name: config
   configMap:
     name: config
+    optional: true
 - name: auth-keys
   secret:
     secretName: auth-keys
