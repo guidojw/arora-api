@@ -116,6 +116,9 @@ volumes:
 #   secret:
 #     secretName: mysecret
 #     optional: false
+- name: config
+  configMap:
+    name: config
 - name: auth-keys
   secret:
     secretName: auth-keys
@@ -125,6 +128,9 @@ volumeMounts:
 # - name: foo
 #   mountPath: "/etc/foo"
 #   readOnly: true
+- name: config
+  mountPath: /opt/app/dist/configs
+  readOnly: true
 - name: auth-keys
   mountPath: /opt/app/keys
   readOnly: true
