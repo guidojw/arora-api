@@ -55,7 +55,7 @@ jobs:
             echo 'stage=production' >> "$GITHUB_OUTPUT"
             TAG='latest'
           else
-            echo 'stage='"$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+            echo 'stage=staging' >> "$GITHUB_OUTPUT"
             TAG="${GITHUB_REF_NAME////-}"
           fi
 
