@@ -134,7 +134,7 @@ jobs:
     if: |
       ((github.ref_name == 'main' && github.event.inputs.merge == 'y' && fromJSON(needs.metadata.outputs.has_diff) &&
       success()) || (github.event.inputs.merge != 'y' || !fromJSON(needs.metadata.outputs.has_diff)) &&
-      jobs.metadata.status == 'success')
+      needs.metadata.result == 'success')
     steps:
       - name: Get environment URL
         id: get_url
