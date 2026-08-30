@@ -56,7 +56,7 @@ jobs:
             TAG='latest'
           else
             echo 'stage='"$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
-            TAG="$GITHUB_REF_NAME"
+            TAG="${GITHUB_REF_NAME////-}"
           fi
 
           echo 'has_diff='"$HAS_DIFF" >> "$GITHUB_OUTPUT"
@@ -132,8 +132,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [metadata, merge, continuous_integration, publish_image]
     if: |
-      ((github.ref_name == 'main' && github.event.inputs.merge == 'y' && fromJSON(needs.metadata.outputs.has_diff) &&
-      success()) || ((github.event.inputs.merge != 'y' || !fromJSON(needs.metadata.outputs.has_diff)) && !cancelled()))
+      ((github.ref_name == 'main' && github.event.inputs.merge == 'y' && fromJSON(needs.metadata.outputs.has_diff)) ||
+      (github.event.inputs.merge != 'y' || !fromJSON(needs.metadata.outputs.has_diff))) && success()
     steps:
       - name: Get environment URL
         id: get_url
