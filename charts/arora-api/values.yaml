@@ -116,6 +116,10 @@ volumes:
 #   secret:
 #     secretName: mysecret
 #     optional: false
+- name: config
+  configMap:
+    name: config
+    optional: true
 - name: auth-keys
   secret:
     secretName: auth-keys
@@ -125,6 +129,14 @@ volumeMounts:
 # - name: foo
 #   mountPath: "/etc/foo"
 #   readOnly: true
+- name: config
+  mountPath: /opt/app/dist/configs/application.js
+  subPath: application.js
+  readOnly: true
+- name: config
+  mountPath: /opt/app/dist/configs/cron.js
+  subPath: cron.js
+  readOnly: true
 - name: auth-keys
   mountPath: /opt/app/keys
   readOnly: true
