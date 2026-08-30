@@ -131,6 +131,7 @@ volumeMounts:
 #   readOnly: true
 - name: config
   mountPath: /opt/app/dist/configs
+  subPath: configs
   readOnly: true
 - name: auth-keys
   mountPath: /opt/app/keys
