@@ -254,6 +254,7 @@ extraObjects:
 
 postgresql:
   image:
+    repository: bitnamilegacy/postgresql
     pullSecrets:
     - name: docker-pull
 
