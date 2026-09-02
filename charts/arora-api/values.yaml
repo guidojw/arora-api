@@ -253,7 +253,12 @@ extraObjects:
       secretName: {{ include "arora-api.fullname" . }}-cert
 
 postgresql:
+  global:
+    security:
+      allowInsecureImages: true
+
   image:
+    repository: bitnamilegacy/postgresql
     pullSecrets:
     - name: docker-pull
 
