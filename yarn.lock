@@ -1383,7 +1383,7 @@ __metadata:
     redis: "npm:^5.12.1"
     reflect-metadata: "npm:^0.1.13"
     typeorm: "npm:^0.2.41"
-    typescript: "npm:^5.7.3"
+    typescript: "npm:^5.9.3"
     ws: "npm:^8.8.1"
   languageName: unknown
   linkType: soft
@@ -5487,7 +5487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.7.3":
+"typescript@npm:^5.9.3":
   version: 5.9.3
   resolution: "typescript@npm:5.9.3"
   bin:
@@ -5497,7 +5497,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.7.3#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^5.9.3#optional!builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
   bin:
