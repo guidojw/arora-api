@@ -10,6 +10,7 @@ metadata:
   labels:
     {{- include "arora-api.labels" . | nindent 4 }}
 spec:
+  ttlSecondsAfterFinished: 100
   template:
     metadata:
       {{- with .Values.podAnnotations }}
