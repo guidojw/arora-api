@@ -47,7 +47,7 @@ export default class BanService {
       .andWhere('ban.user_id = :userId', { userId })
       .getOne()
 
-    if (typeof ban === 'undefined') {
+    if (ban === null) {
       throw new NotFoundError('Ban not found.')
     }
     return ban
@@ -58,10 +58,10 @@ export default class BanService {
     userId: number,
     { authorId, duration, reason }: { authorId: number, duration?: number, reason: string }
   ): Promise<Ban> {
-    if (typeof await this.banRepository.scopes.default
+    if (await this.banRepository.scopes.default
       .andWhere('ban.group_id = :groupId', { groupId })
       .andWhere('ban.user_id = :userId', { userId })
-      .getOne() !== 'undefined'
+      .getOne() !== null
     ) {
       throw new ConflictError('User is already banned.')
     }

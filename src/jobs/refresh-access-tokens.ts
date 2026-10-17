@@ -1,15 +1,15 @@
 import * as Sentry from '@sentry/node'
-import { createConnection, getRepository } from 'typeorm'
 import { AccessToken } from '../entities'
+import { dataSource } from '../data-source'
 import { parentPort } from 'node:worker_threads'
 import { plainToInstance } from 'class-transformer'
 import { robloxOAuthAdapter } from '../adapters'
 
 async function refreshAccessTokens (): Promise<void> {
   await Sentry.startSpan({ name: `scheduled-task: ${refreshAccessTokens.name}` }, async () => {
-    await createConnection()
+    await dataSource.initialize()
 
-    const repository = getRepository(AccessToken)
+    const repository = dataSource.getRepository(AccessToken)
 
     const accessTokens = await repository.find()
     for (const accessToken of accessTokens) {

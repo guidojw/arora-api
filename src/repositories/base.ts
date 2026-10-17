@@ -1,11 +1,22 @@
 import * as lodash from 'lodash'
 import { type ClassConstructor, plainToInstance } from 'class-transformer'
-import { type ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm'
+import {
+  type DataSource,
+  type EntityTarget,
+  type ObjectLiteral,
+  type QueryRunner,
+  Repository,
+  SelectQueryBuilder
+} from 'typeorm'
 import { util } from '../util'
 
 const { groupBy } = util
 
 export default abstract class BaseRepository<T extends ObjectLiteral> extends Repository<T> {
+  public constructor (target: EntityTarget<T>, dataSource: DataSource) {
+    super(target, dataSource.createEntityManager())
+  }
+
   public transform (record: any): T {
     return plainToInstance(
       this.target as ClassConstructor<T>,
@@ -53,12 +64,24 @@ export abstract class BaseScopes<T extends ObjectLiteral> extends SelectQueryBui
     }, this)
   }
 
+  public override createQueryBuilder (queryRunner?: QueryRunner): this {
+    // Subqueries are plain query builders, they have no repository.
+    return new SelectQueryBuilder(this.dataSource, queryRunner ?? this.queryRunner) as unknown as this
+  }
+
+  public override clone (): this {
+    return new (this.constructor as new (repository: BaseRepository<T>, queryBuilder: SelectQueryBuilder<T>) => this)(
+      this.repository,
+      this
+    )
+  }
+
   public override async getMany (): Promise<T[]> {
     return this.repository.transformMany(await super.getRawMany())
   }
 
-  public override async getOne (): Promise<T | undefined> {
-    return this.repository.transformMany(await super.getRawMany()).shift()
+  public override async getOne (): Promise<T | null> {
+    return this.repository.transformMany(await super.getRawMany()).shift() ?? null
   }
 
   public override leftJoin (

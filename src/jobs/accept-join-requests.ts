@@ -37,7 +37,7 @@ export default class AcceptJoinRequestsJob implements BaseJob {
       const username = await this.userService.getUsername(userId)
 
       try {
-        if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+        if (await this.exileRepository.findOne({ where: { groupId, userId } }) !== null) {
           await this.groupService.declineJoinRequest(joinRequest.path)
           await this.discordMessageJob.run(`Declined **${username}**'s join request`)
         } else {

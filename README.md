@@ -14,7 +14,7 @@ arora-api
 1. Create a Postgres user with permission to create databases.
 2. Create a new database as your just created Postgres user, named `arora_api_<env>` with `<env>` being your 
    `NODE_ENV` environment variable. The project tries to connect to database `arora_api_development` on `127.0.0.1` 
-   (see `ormconfig.js`) if `NODE_ENV` is not set.<br/>
+   (see `src/data-source.ts`) if `NODE_ENV` is not set.<br/>
    To connect to a database on an external IP, use `staging` or `production` and set `POSTGRES_HOST` in `.env`
    containing the address of your external database server.
 3. Install the dependencies with `yarn install` or `npm install`.
@@ -32,7 +32,8 @@ arora-api
 
 ## Usage
 * If you're starting the project for the first time, or if a new database migration has been added (in 
-  `src/migrations`), you need to run `typeorm migration:run` before continuing to the next steps.
+  `src/migrations`), you need to run `yarn build` and then `yarn typeorm migration:run -d dist/data-source.js` before
+  continuing to the next steps.
 * To compile the TypeScript source to `.js` files, run `yarn build` or `npm run build`. 
 * To start the server, run `yarn start` or `npm start`. 
 * The project is now accessible [http://localhost:3000](http://localhost:3000).

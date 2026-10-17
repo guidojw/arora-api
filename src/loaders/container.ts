@@ -23,9 +23,10 @@ import {
 } from '../services'
 import { BanRepository, TrainingRepository } from '../repositories'
 import { type RedisClientType, createClient } from 'redis'
-import { type Repository, createConnection, getCustomRepository, getRepository } from 'typeorm'
+import { type Repository } from 'typeorm'
 import { WebSocketManager } from '../managers'
 import { constants } from '../util'
+import { dataSource } from '../data-source'
 
 const { TYPES } = constants
 
@@ -33,7 +34,7 @@ export default async function init (): Promise<Container> {
   const container = new Container()
 
   const bindings = new AsyncContainerModule(async bind => {
-    await createConnection()
+    await dataSource.initialize()
 
     const client: RedisClientType = createClient({
       url: process.env.REDIS_HOST,
@@ -54,28 +55,28 @@ export default async function init (): Promise<Container> {
     bind<ErrorMiddleware>(TYPES.ErrorMiddleware).to(ErrorMiddleware)
 
     bind<Repository<AccessToken>>(TYPES.AccessTokenRepository).toDynamicValue(() => {
-      return getRepository(AccessToken)
+      return dataSource.getRepository(AccessToken)
     }).inRequestScope()
     bind<Repository<Ban>>(TYPES.BanRepository).toDynamicValue(() => {
-      return getCustomRepository(BanRepository)
+      return new BanRepository(dataSource)
     }).inRequestScope()
     bind<Repository<BanCancellation>>(TYPES.BanCancellationRepository).toDynamicValue(() => {
-      return getRepository(BanCancellation)
+      return dataSource.getRepository(BanCancellation)
     }).inRequestScope()
     bind<Repository<BanExtension>>(TYPES.BanExtensionRepository).toDynamicValue(() => {
-      return getRepository(BanExtension)
+      return dataSource.getRepository(BanExtension)
     }).inRequestScope()
     bind<Repository<Exile>>(TYPES.ExileRepository).toDynamicValue(() => {
-      return getRepository(Exile)
+      return dataSource.getRepository(Exile)
     }).inRequestScope()
     bind<Repository<Training>>(TYPES.TrainingRepository).toDynamicValue(() => {
-      return getCustomRepository(TrainingRepository)
+      return new TrainingRepository(dataSource)
     }).inRequestScope()
     bind<Repository<TrainingCancellation>>(TYPES.TrainingCancellationRepository).toDynamicValue(() => {
-      return getRepository(TrainingCancellation)
+      return dataSource.getRepository(TrainingCancellation)
     }).inRequestScope()
     bind<Repository<TrainingType>>(TYPES.TrainingTypeRepository).toDynamicValue(() => {
-      return getRepository(TrainingType)
+      return dataSource.getRepository(TrainingType)
     }).inRequestScope()
 
     bind<AuthService>(TYPES.AuthService).to(AuthService)

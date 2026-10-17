@@ -38,7 +38,7 @@ spec:
         command:
         - sh
         - -c
-        - yarn run typeorm migration:run
+        - yarn run typeorm migration:run -d dist/data-source.js
         {{- with .Values.env }}
         env:
           {{- range $value := . }}

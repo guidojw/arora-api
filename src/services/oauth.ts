@@ -61,7 +61,7 @@ export default class OAuthService {
 
   public async getRobloxAccessToken (id: string): Promise<Pick<AccessToken, 'accessToken' | 'tokenType' | 'scope'>> {
     let accessToken = await this.accessTokenRepository.findOne({ where: { id } })
-    if (typeof accessToken === 'undefined') {
+    if (accessToken === null) {
       throw new NotFoundError('Access token not found.')
     }
 
