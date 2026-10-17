@@ -1,9 +1,12 @@
 import BaseRepository, { BaseScopes } from './base'
-import { EntityRepository, type SelectQueryBuilder } from 'typeorm'
+import { type DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Ban } from '../entities'
 
-@EntityRepository(Ban)
 export default class BanRepository extends BaseRepository<Ban> {
+  public constructor (dataSource: DataSource) {
+    super(Ban, dataSource)
+  }
+
   public get scopes (): BanScopes {
     return new BanScopes(this, this.createQueryBuilder('ban'))
   }
@@ -53,9 +56,6 @@ export class BanScopes extends BaseScopes<Ban> {
   }
 
   private static makeEndsAtQueryBuilder (qb: SelectQueryBuilder<any>): SelectQueryBuilder<any> {
-    // @ts-expect-error: Connection is somehow undefined on this qb and
-    // repository is a connection instance so weird fix but works?
-    qb.connection = qb.repository
     return qb
       .select('ban.id', 'id')
       .addSelect(

@@ -24,7 +24,7 @@ export default class ExileService {
 
   public async getExile (groupId: number, userId: number): Promise<Exile> {
     const exile = await this.exileRepository.findOne({ where: { groupId, userId } })
-    if (typeof exile === 'undefined') {
+    if (exile === null) {
       throw new NotFoundError('Exile not found.')
     }
     return exile
@@ -35,7 +35,7 @@ export default class ExileService {
     userId: number,
     { authorId, reason }: { authorId: number, reason: string }
   ): Promise<Exile> {
-    if (typeof await this.exileRepository.findOne({ where: { groupId, userId } }) !== 'undefined') {
+    if (await this.exileRepository.findOne({ where: { groupId, userId } }) !== null) {
       throw new ConflictError('User is already exiled.')
     }
     const rank = await this.groupService.getRank(groupId, userId)
