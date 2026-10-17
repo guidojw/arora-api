@@ -1,21 +1,19 @@
+// Intl has no abbreviation API, so try locales; zones none know give GMT+9.
+const TIME_ZONE_LOCALES = ['en-GB', 'en-US', 'en-AU', 'en-ZA', 'en-CA', 'en-IE', 'en-SG', 'en-HK']
+
 export function getDate (date: Date): string {
-  const day = date.getDate()
-  const month = date.getMonth()
-  const year = date.getFullYear()
-  return `${day}-${month + 1}-${year}`
+  return date.toLocaleDateString()
 }
 
 export function getTime (date: Date): string {
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
-  return `${hours}:${'0'.repeat(2 - String(minutes).length)}${minutes}`
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
 
 export function getTimeZoneAbbreviation (date: Date): string {
-  return date.toLocaleTimeString('en-us', { hour12: false, hour: '2-digit', minute: '2-digit', timeZoneName: 'long' })
-    .replace(/^(2[0-4]|[0-1][1-9]):[0-5]\d\s/, '')
-    .split(' ')
-    .filter(word => word !== 'Standard')
-    .map(word => word.charAt(0))
-    .join('')
+  const names = TIME_ZONE_LOCALES.map(locale => new Intl.DateTimeFormat(
+    locale,
+    { timeZoneName: 'short' }
+  ).formatToParts(date).find(part => part.type === 'timeZoneName')?.value ?? 'UTC')
+  // CLDR's en-GB name for Gulf Standard Time is a typo.
+  return (names.find(name => !/^GMT[+-]/.test(name)) ?? names[0]).replace('GTS', 'GST')
 }
