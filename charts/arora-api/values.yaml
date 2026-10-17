@@ -149,6 +149,8 @@ env:
 #       fieldPath: metadata.name
 - name: TZ
   value: Europe/Amsterdam
+- name: LANG
+  value: nl_NL.UTF-8
 - name: PORT
   value: "80"
 - name: POSTGRES_HOST
