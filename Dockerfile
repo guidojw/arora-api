@@ -5,6 +5,9 @@ ENV NODE_ENV=$NODE_ENV
 ARG BUILD_HASH
 ENV BUILD_HASH=$BUILD_HASH
 
+# Node 25+ no longer bundles corepack, which provides yarn
+RUN npm install -g corepack && corepack enable
+
 WORKDIR /opt/app
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
