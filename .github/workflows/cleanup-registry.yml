@@ -9,10 +9,8 @@ jobs:
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Delete untagged images
-        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
-        with:
-          package-name: ${{ github.event.repository.name }}
-          package-type: container
-          delete-only-untagged-versions: true
+        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
